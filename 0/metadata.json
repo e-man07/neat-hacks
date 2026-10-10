@@ -1,0 +1,25 @@
+{
+  "cli_version": "0.11.5-nightly.202610100625.1f44a6f96",
+  "checkpoint_id": "01M4KS1PB0FFH4JWXP5Z0EMNBE",
+  "session_id": "88a90ae7-b1fc-5614-8021-5272f785237a",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-10T20:46:08.641935412Z",
+  "branch": "nightshift/p4-api",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [],
+  "agent": "Claude Code",
+  "model": "claude-sonnet-5-5",
+  "turn_id": "24f3164c9098",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 480,
+    "cache_creation_tokens": 560989,
+    "cache_read_tokens": 85448590,
+    "output_tokens": 284361,
+    "api_call_count": 241
+  },
+  "session_metrics": {
+    "turn_count": 1
+  }
+}
