@@ -33,6 +33,7 @@ An anomaly has opened an incident. Find the root cause from evidence, then choos
 
 Work like a senior SRE:
 - Start from the signals, then look at failing conversations and their neatlogs traces.
+- The culprit must be a release that served the failing runs (window.releases). Don't blame a release that was already rolled back.
 - Check recent deploys. If a deploy lines up with the onset, read its release diff and its change
   provenance (commit, Entire checkpoint, and the prompt the developer gave their coding agent).
 - If failures are provider errors (5xx, unavailable) with no matching deploy, check model health.
@@ -310,6 +311,19 @@ class Investigation:
         if action == "rollback_release" and not params.get("target"):
             bad = args.get("culprit_release") or self.adapter.active_config().get("release")
             params["target"] = self.adapter.last_known_good(bad)
+        # Sanity checks against the evidence: a culprit must have served the failing runs, and a rollback
+        # must actually change what's live. (A model that pattern-matches a previous incident fails both.)
+        live = self.adapter.active_config().get("release")
+        served = set((self.focus.releases if self.focus is not self.stats else self.stats.releases) or [])
+        caveats: list[str] = []
+        if action == "rollback_release" and params.get("target") == live:
+            action, params = "none", {}
+            caveats.append(f"rollback target {live} is already live, so there is nothing to roll back")
+        if args.get("culprit_release") and served and args["culprit_release"] not in served:
+            caveats.append(f"blamed release {args['culprit_release']} served none of the failing runs ({', '.join(sorted(served))})")
+        if caveats:
+            args["confidence"] = min(float(args.get("confidence") or 0.5), 0.4)
+            args["root_cause"] = (args.get("root_cause") or "") + " [Night Shift check: " + "; ".join(caveats) + ".]"
         d = Diagnosis(
             incident_type=args.get("incident_type") if args.get("incident_type") in INCIDENT_TYPES else "unknown",
             title=args.get("title") or "Incident",

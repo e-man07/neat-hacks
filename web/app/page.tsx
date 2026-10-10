@@ -50,8 +50,8 @@ export default function Home() {
               It stops the bleeding by itself. It only wakes you for decisions that can’t be undone.
             </p>
             <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-              <PrimaryLink href="/console">Open the live console</PrimaryLink>
-              <GhostLink href="/benchmark">See the incident benchmark</GhostLink>
+              <PrimaryLink href="/app">Put your agent on call</PrimaryLink>
+              <GhostLink href="/sandbox">Try the live sandbox</GhostLink>
             </div>
             <div className="mt-6 font-mono text-[11px] text-white/40">
               built for neatHack 2026 · traced with neatlogs · provenance from Entire · economics from cfo.ai
@@ -214,11 +214,11 @@ export default function Home() {
         <div className="dotgrid relative overflow-hidden rounded-2xl border border-line px-6 py-16 text-center">
           <h2 className="subhead text-[30px] sm:text-[40px]">Go to sleep. It’s handled.</h2>
           <p className="mx-auto mt-3 max-w-[520px] text-white/60">
-            Deploy a bad release in the console and watch Night Shift catch it, price it, contain it and prove it.
+            Connect an agent in five minutes: one SDK, your neatlogs key, and a policy that says what Night Shift may do alone.
           </p>
           <div className="mt-7 flex justify-center gap-3">
-            <PrimaryLink href="/console">Open the console</PrimaryLink>
-            <GhostLink href="/business">Business plan</GhostLink>
+            <PrimaryLink href="/app">Get started</PrimaryLink>
+            <GhostLink href="/sandbox">Try the sandbox</GhostLink>
           </div>
         </div>
         <footer className="mt-10 flex flex-wrap items-center justify-between gap-3 text-[12px] text-white/35">

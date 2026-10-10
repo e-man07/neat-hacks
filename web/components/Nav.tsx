@@ -3,8 +3,8 @@ import ThemeToggle from "./ThemeToggle";
 import { Moon } from "./ui";
 
 const LINKS = [
-  { href: "/console", label: "Console" },
-  { href: "/incidents", label: "Incidents" },
+  { href: "/sandbox", label: "Sandbox" },
+  { href: "/docs", label: "Docs" },
   { href: "/benchmark", label: "Benchmark" },
   { href: "/business", label: "Business" },
 ];
@@ -31,10 +31,10 @@ export default function Nav() {
           GitHub
         </a>
         <Link
-          href="/console"
+          href="/app"
           className="inline-flex items-center gap-2 rounded-md bg-white px-3.5 py-2 text-sm font-medium text-black transition hover:bg-white/90"
         >
-          Open console →
+          Sign in →
         </Link>
       </div>
     </header>

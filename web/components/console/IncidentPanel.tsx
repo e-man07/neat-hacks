@@ -37,10 +37,14 @@ export default function IncidentPanel({
   inc,
   onChange,
   offset = 0,
+  onApprove = (id) => post(`/api/actions/${id}/approve`),
+  onUndo,
 }: {
   inc: IncidentDetail | null;
   onChange: () => void;
   offset?: number;
+  onApprove?: (actionId: number) => Promise<unknown>;
+  onUndo?: (actionId: number) => Promise<unknown>;
 }) {
   if (!inc) {
     return (
@@ -145,13 +149,34 @@ export default function IncidentPanel({
                     {String((a.params as Record<string, unknown>).summary ?? JSON.stringify(a.params))}
                   </p>
                 </div>
-                <Button tone="primary" onClick={() => post(`/api/actions/${a.id}/approve`).then(onChange)}>
+                <Button
+                  tone="primary"
+                  onClick={() =>
+                    onApprove(a.id)
+                      .catch((e) => alert((e as Error).message))
+                      .then(onChange)
+                  }
+                >
                   Approve
                 </Button>
               </div>
             ))}
           </div>
         )}
+
+        {onUndo &&
+          inc.actions
+            .filter((a) => a.status === "applied" && a.mode === "auto")
+            .map((a) => (
+              <div key={a.id} className="mt-3 flex items-center gap-3 rounded-lg border border-line p-3">
+                <div className="min-w-0 flex-1 text-[12.5px] text-white/75">
+                  Night Shift applied <span className="font-mono">{a.kind.replaceAll("_", " ")}</span> on its own. It can be undone in one step.
+                </div>
+                <Button tone="danger" onClick={() => onUndo(a.id).then(onChange)}>
+                  Undo
+                </Button>
+              </div>
+            ))}
 
         {/* Timeline */}
         <div className="mt-4">
