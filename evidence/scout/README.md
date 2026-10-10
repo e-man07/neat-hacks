@@ -44,3 +44,10 @@ Postmortems: [run1](run1/POSTMORTEM.md), [run2](run2/POSTMORTEM.md).
   passes only when no tool call failed.
 - Evals and replays are traced under their own root span (`scout_replay`), so they never count as
   production traffic.
+- **A noisy false alarm, handled by the money gate.** After run 2, 3 of 10 healthy s2 runs escalated
+  (the refund question sometimes defers to support). The detector opened INC-1010-03, the investigator
+  pattern-matched the earlier incident and blamed s3, and Night Shift priced the damage at $1 and
+  **deferred it to the morning without paging anyone**. The deferral was right, the diagnosis was not. The
+  investigator's output is now checked against the evidence: a blamed release must have served the
+  failing runs, and a rollback to the release that's already live becomes "no action". Either failure
+  caps confidence at 0.4.
