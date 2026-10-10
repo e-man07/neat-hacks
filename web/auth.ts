@@ -33,8 +33,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           github_token: account.access_token ?? null,
         }),
         cache: "no-store",
-      }).catch(() => null);
-      return Boolean(res?.ok);
+      }).catch((e) => {
+        console.error(`night shift API unreachable at ${API_INTERNAL}:`, e);
+        return null;
+      });
+      if (res?.ok) return true;
+      // Say why, instead of the generic AccessDenied page.
+      const reason = !res ? "ApiUnreachable" : res.status === 401 ? "InternalSecretMismatch" : `ApiError${res.status}`;
+      console.error(`night shift sign-in failed: ${reason} (${API_INTERNAL})`);
+      return `/signin?error=${reason}`;
     },
     async jwt({ token, profile }) {
       if (profile) {

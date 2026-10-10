@@ -4,6 +4,12 @@ import { auth, githubEnabled, signIn } from "@/auth";
 import NightSky from "@/components/NightSky";
 import { Moon } from "@/components/ui";
 
+const ERRORS: Record<string, string> = {
+  ApiUnreachable: "GitHub sign-in worked, but this site can't reach the Night Shift API. Check NS_API_URL and redeploy.",
+  InternalSecretMismatch: "GitHub sign-in worked, but the API rejected this site. NS_INTERNAL_SECRET must match the API's.",
+  AccessDenied: "Sign-in was refused.",
+};
+
 export default async function SignIn({ searchParams }: { searchParams: Promise<{ callbackUrl?: string; error?: string }> }) {
   const { callbackUrl, error } = await searchParams;
   const next = callbackUrl && callbackUrl.startsWith("/") ? callbackUrl : "/app";
@@ -19,7 +25,11 @@ export default async function SignIn({ searchParams }: { searchParams: Promise<{
         <p className="mt-2 text-sm text-muted">
           GitHub sign-in also lets Night Shift open fix PRs on your repos, and only after you approve them.
         </p>
-        {error && <p className="mt-4 rounded-md bg-alert/10 px-3 py-2 text-xs text-alert">Sign-in failed ({error}). Try again.</p>}
+        {error && (
+          <p className="mt-4 rounded-md bg-alert/10 px-3 py-2 text-xs text-alert">
+            {ERRORS[error] ?? `Sign-in failed (${error}). Try again.`}
+          </p>
+        )}
         <form
           className="mt-6"
           action={async () => {
