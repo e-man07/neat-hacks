@@ -16,3 +16,4 @@ backend/harbor/evals/regressions/INC-*
 .cfo_oauth_state.json
 deploy/api.env
 deploy/web.env
+deploy/slack-manifest.filled.yml
