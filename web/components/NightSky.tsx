@@ -56,6 +56,7 @@ export default function NightSky({ alert = 0, className = "" }: { alert?: number
 
     const draw = (t: number) => {
       ctx.clearRect(0, 0, w, h);
+      const dot = (getComputedStyle(canvas).getPropertyValue("--sky") || "255, 255, 255").split(",").map((x) => parseInt(x, 10));
       const mx = w * 0.78, my = h * 0.28, mr = Math.min(w, h) * 0.13;
       const a = alertRef.current;
       for (let y = STEP / 2; y < h; y += STEP) {
@@ -75,7 +76,7 @@ export default function NightSky({ alert = 0, className = "" }: { alert?: number
           // stars
           const star = hash(col, Math.floor(y / STEP));
           if (star > 0.992) v = 0.55 + 0.45 * Math.sin(t * 0.002 + star * 100);
-          let r = 255, g = 255, b = 255;
+          let [r, g, b] = dot;
           if (inBuilding) {
             const lit = hash(col * 3, Math.floor(y / STEP) * 7) > 0.86;
             v = lit ? 0.75 : 0.07;

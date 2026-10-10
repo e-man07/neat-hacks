@@ -132,7 +132,7 @@ export function Sparkline({
 
 export function WindowFrame({ title, children, className = "" }: { title: string; children: ReactNode; className?: string }) {
   return (
-    <div className={`window overflow-hidden ${className}`}>
+    <div className={`window force-dark overflow-hidden ${className}`}>
       <div className="window-bar">
         <i style={{ background: "#ff5f57" }} />
         <i style={{ background: "#febc2e" }} />
@@ -147,7 +147,7 @@ export function WindowFrame({ title, children, className = "" }: { title: string
 export function Moon({ size = 18 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden>
-      <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z" fill="#fff" />
+      <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z" fill="currentColor" />
     </svg>
   );
 }

@@ -110,7 +110,7 @@ export default function Home() {
           />
         </div>
         {hero?.coding_prompt && (
-          <Card className="mt-8 p-5">
+          <Card className="relative mt-8 p-5">
             <Label>root cause, traced through Entire to the prompt behind the change</Label>
             <p className="mt-2 line-clamp-3 text-[15px] leading-relaxed text-white/85">
               “{hero.coding_prompt.length >= 300 ? `${hero.coding_prompt.trimEnd()}…` : hero.coding_prompt}”

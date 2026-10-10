@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ThemeToggle from "./ThemeToggle";
 import { Moon } from "./ui";
 
 const LINKS = [
@@ -22,6 +23,7 @@ export default function Nav() {
         ))}
       </nav>
       <div className="flex items-center gap-3">
+        <ThemeToggle />
         <a
           href="https://github.com/e-man07/neat-hacks"
           className="hidden text-sm text-white/60 transition hover:text-white sm:block"

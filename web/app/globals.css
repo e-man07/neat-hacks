@@ -1,6 +1,12 @@
 @import "tailwindcss";
 
-:root {
+:root,
+.force-dark {
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --sky: 255, 255, 255;
+  --headline: #ffffff;
+  --code-bg: rgba(255, 255, 255, 0.06);
   --bg: #0a0a0a;
   --panel: #000000;
   --card: #0f0f10;
@@ -16,6 +22,37 @@
   --ok: #4ade80;
   --info: #7aa2ff;
   --violet: #b69cff;
+}
+
+/* Light theme: Tailwind's white/black are used as foreground/background, so swapping them
+   inverts the UI. Terminal windows and the phone keep `.force-dark`, like real devices. */
+:root[data-theme="light"] {
+  --color-white: #0b0b0c;
+  --color-black: #ffffff;
+  --sky: 24, 24, 32;
+  --headline: #0b0b0c;
+  --code-bg: rgba(0, 0, 0, 0.05);
+  --bg: #f5f4f0;
+  --panel: #ffffff;
+  --card: #ffffff;
+  --card-2: #f0efea;
+  --line: rgba(0, 0, 0, 0.09);
+  --line-strong: rgba(0, 0, 0, 0.18);
+  --fg: #0b0b0c;
+  --fg-2: #2b2b30;
+  --muted: rgba(0, 0, 0, 0.58);
+  --faint: rgba(0, 0, 0, 0.42);
+  --alert: #dc4a26;
+  --amber: #a86a12;
+  --ok: #15803d;
+  --info: #2f5bd3;
+  --violet: #6d4fe0;
+  color-scheme: light;
+}
+
+.force-dark {
+  color: var(--fg-2);
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -42,6 +79,7 @@ html,
 body {
   background: var(--bg);
   color: var(--fg-2);
+  transition: background-color 0.2s ease;
 }
 
 body {
@@ -55,21 +93,21 @@ body {
 }
 
 .headline {
-  color: #fff;
+  color: var(--headline);
   font-weight: 400;
   letter-spacing: -0.05em;
   line-height: 1.02;
 }
 
 .subhead {
-  color: #fff;
+  color: var(--headline);
   font-weight: 400;
   letter-spacing: -0.025em;
   line-height: 1.15;
 }
 
 .subhead .dim {
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--muted);
 }
 
 .window {
@@ -98,7 +136,7 @@ body {
 }
 
 .dotgrid {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.14) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(var(--sky), 0.14) 1px, transparent 1px);
   background-size: 6px 6px;
 }
 
@@ -138,12 +176,12 @@ body {
   }
 }
 
-.prose-ns h1 { color: #fff; font-size: 1.6rem; letter-spacing: -0.03em; margin: 0 0 0.75rem; }
-.prose-ns h2 { color: #fff; font-size: 1.05rem; margin: 1.6rem 0 0.5rem; letter-spacing: -0.01em; }
+.prose-ns h1 { color: var(--headline); font-size: 1.6rem; letter-spacing: -0.03em; margin: 0 0 0.75rem; }
+.prose-ns h2 { color: var(--headline); font-size: 1.05rem; margin: 1.6rem 0 0.5rem; letter-spacing: -0.01em; }
 .prose-ns p, .prose-ns li { color: var(--fg-2); font-size: 0.92rem; line-height: 1.6; }
 .prose-ns ul { list-style: disc; padding-left: 1.2rem; margin: 0.4rem 0; }
-.prose-ns code { font-family: var(--font-geist-mono); font-size: 0.82em; background: rgba(255,255,255,0.06); padding: 1px 5px; border-radius: 4px; color: #fff; }
+.prose-ns code { font-family: var(--font-geist-mono); font-size: 0.82em; background: var(--code-bg); padding: 1px 5px; border-radius: 4px; color: var(--headline); }
 .prose-ns a { color: var(--info); text-decoration: underline; text-underline-offset: 3px; }
-.prose-ns strong { color: #fff; }
+.prose-ns strong { color: var(--headline); }
 .prose-ns table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 0.8rem 0; }
 .prose-ns th, .prose-ns td { border-bottom: 1px solid var(--line); padding: 6px 8px; text-align: left; }

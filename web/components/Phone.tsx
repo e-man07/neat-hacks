@@ -8,7 +8,7 @@ export type PhoneNote = { title: string; body: string; time: string; tone?: "ok"
 /** A lock-screen phone showing the pages Night Shift sends. */
 export default function Phone({ notes, clock, footer }: { notes: PhoneNote[]; clock: string; footer?: ReactNode }) {
   return (
-    <div className="relative mx-auto w-[260px] rounded-[38px] border border-white/15 bg-[#050506] p-3 shadow-[0_40px_120px_rgba(0,0,0,.7)]">
+    <div className="force-dark relative mx-auto w-[260px] rounded-[38px] border border-white/15 bg-[#050506] p-3 shadow-[0_40px_120px_rgba(0,0,0,.7)]">
       <div className="absolute left-1/2 top-3 h-5 w-20 -translate-x-1/2 rounded-full bg-black" />
       <div className="dotgrid relative h-[470px] overflow-hidden rounded-[30px] bg-gradient-to-b from-[#0b0d18] to-black px-3 pt-10">
         <div className="text-center">
@@ -25,7 +25,7 @@ export default function Phone({ notes, clock, footer }: { notes: PhoneNote[]; cl
               className="slide-in rounded-2xl border border-white/10 bg-white/[0.08] p-3 backdrop-blur"
             >
               <div className="mb-1 flex items-center gap-1.5 text-[10px] uppercase tracking-wide text-white/50">
-                <span className="grid h-4 w-4 place-items-center rounded bg-black">
+                <span className="grid h-4 w-4 place-items-center rounded bg-black text-white">
                   <Moon size={10} />
                 </span>
                 Night Shift <span className="ml-auto normal-case">{n.time}</span>
