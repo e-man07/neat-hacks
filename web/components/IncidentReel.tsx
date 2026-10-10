@@ -57,13 +57,13 @@ export default function IncidentReel({ events, title, base = "03:07" }: { events
   }, [shown]);
 
   return (
-    <WindowFrame title={title} className="w-full">
+    <WindowFrame title={title} className="w-full min-w-0">
       <div className="h-[340px] overflow-hidden px-4 py-3 font-mono text-[12px] leading-[1.55]">
         {shown.slice(0, n).map((e, i) => {
           const s = KIND_STYLE[e.kind] ?? { tag: e.kind.toUpperCase(), color: "var(--faint)" };
           const text = e.kind === "step" ? e.title.replace(/^(\w+):\s*/, "$1 → ") : e.title;
           return (
-            <div key={i} className="slide-in flex gap-3">
+            <div key={i} className="slide-in flex min-w-0 gap-3">
               <span className="shrink-0 text-white/30">{clockAt(base, e.t)}</span>
               <span className="w-[86px] shrink-0" style={{ color: s.color }}>
                 {s.tag}

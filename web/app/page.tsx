@@ -85,8 +85,8 @@ export default function Home() {
           <br />
           <span className="dim">From the first bad refund to the page on your phone.</span>
         </h2>
-        <div className="mt-10 grid items-center gap-8 lg:grid-cols-[1fr_auto]">
-          <div className="dotgrid rounded-2xl p-4 sm:p-8">
+        <div className="mt-10 grid items-center gap-8 lg:grid-cols-[minmax(0,1fr)_auto]">
+          <div className="dotgrid min-w-0 rounded-2xl p-4 sm:p-8">
             {hero ? (
               <IncidentReel events={hero.timeline} title={`night-shift — ${hero.incident_id} · ${hero.name}`} />
             ) : (
@@ -112,7 +112,9 @@ export default function Home() {
         {hero?.coding_prompt && (
           <Card className="mt-8 p-5">
             <Label>root cause, traced through Entire to the prompt behind the change</Label>
-            <p className="mt-2 text-[15px] leading-relaxed text-white/85">“{hero.coding_prompt}”</p>
+            <p className="mt-2 line-clamp-3 text-[15px] leading-relaxed text-white/85">
+              “{hero.coding_prompt.length >= 300 ? `${hero.coding_prompt.trimEnd()}…` : hero.coding_prompt}”
+            </p>
             <p className="mt-2 font-mono text-[11px] text-white/40">
               release {hero.culprit} · checkpoint {hero.checkpoint}
             </p>
