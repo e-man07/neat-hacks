@@ -1,0 +1,26 @@
+incident: INC-1010-01-ad73
+cases:
+- scenario: R-H-1002
+  must_be:
+  - correct
+  - escalated
+  observed_during_incident: wrong_refund
+  source_trace: 56321b269a51d01d2a50018e756cb4d1
+- scenario: R-H-1058
+  must_be:
+  - correct
+  - escalated
+  observed_during_incident: escalated
+  source_trace: 4bf99a774af8f26429d7676c9163e4c5
+- scenario: R-H-1008
+  must_be:
+  - correct
+  - escalated
+  observed_during_incident: wrong_refund
+  source_trace: 6f3734e566d9a55a64e6de45a8bbdb2f
+- scenario: R-H-1022
+  must_be:
+  - correct
+  - escalated
+  observed_during_incident: escalated
+  source_trace: 332eef99d0978d22a5c2a6cd773660e5

@@ -111,15 +111,17 @@ class NeatlogsMCP:
         args = {"query": query, "limit": limit, **{k: v for k, v in filters.items() if v is not None}}
         return self.call("search_traces", args)
 
-    def get_trace_context(self, trace_id: str, span_types: list[str] | None = None,
-                          fields: list[str] | None = None, max_chars_per_field: int = 1200,
-                          limit: int = 60) -> dict[str, Any]:
-        args: dict[str, Any] = {"trace_id": trace_id, "limit": limit, "max_chars_per_field": max_chars_per_field}
-        if span_types:
-            args["span_types"] = span_types
-        if fields:
-            args["fields"] = fields
-        return self.call("get_trace_context", args)
+    def get_trace_context(self, trace_id: str, max_chars_per_field: int = 1200) -> dict[str, Any]:
+        """Full trace context. (Selective fields/limits are disabled server-side, so clip here.)"""
+        ctx = self.call("get_trace_context", {"trace_id": trace_id})
+        if isinstance(ctx, dict):
+            for span in ctx.get("spans") or []:
+                for key in ("input_value", "output_value"):
+                    val = span.get(key)
+                    if isinstance(val, str) and len(val) > max_chars_per_field:
+                        half = max_chars_per_field // 2
+                        span[key] = val[:half] + " … " + val[-half:]
+        return ctx
 
     def list_detections(self) -> Any:
         return self.call("list_detections")

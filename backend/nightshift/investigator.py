@@ -47,6 +47,12 @@ Containment actions (all reversible, executed by policy, not by you):
 - cap_steps {"steps": 6}: runaway loops and no release to roll back.
 Also propose a permanent fix for a human to approve (it will not be applied automatically).
 
+Confidence is your probability that BOTH the root cause and the containment action are right.
+Calibrate it: ≥ 0.85 when a deploy lines up with the onset AND the diff, trace or error shows the
+mechanism; 0.6–0.85 when the evidence points one way but the mechanism is not confirmed; < 0.6 only
+when you are genuinely unsure. Containment actions are reversible and verified by replay afterwards,
+so do not lower confidence just because the stakes are high.
+
 Cite trace ids and the commit/checkpoint you relied on. Be concise. Call submit_diagnosis exactly once."""
 
 TOOLS: list[dict[str, Any]] = [
@@ -172,7 +178,7 @@ class Investigation:
     def tool_get_trace(self, trace_id: str) -> dict[str, Any]:
         if self.mcp.available:
             try:
-                ctx = self.mcp.get_trace_context(trace_id, fields=["input_value", "output_value"], max_chars_per_field=600)
+                ctx = self.mcp.get_trace_context(trace_id, max_chars_per_field=600)
                 return {"source": "neatlogs", "trace": _compact_trace(ctx)}
             except NeatlogsMCPError as exc:
                 log.info("neatlogs trace %s not readable yet: %s", trace_id, exc)
@@ -405,11 +411,13 @@ def _compact_trace(ctx: Any) -> Any:
     spans = ctx.get("spans") or ctx.get("data", {}).get("spans") or []
     out = []
     for s in spans[:40]:
-        out.append({k: s.get(k) for k in ("span_name", "name", "span_type", "status", "status_code", "status_message",
-                                          "tool_name", "tool_arguments", "model", "input_value", "output_value",
-                                          "total_tokens") if s.get(k) not in (None, "", [])})
-    return {"trace_id": ctx.get("trace_id"), "status": ctx.get("status") or ctx.get("processing_status"),
-            "span_count": len(spans), "spans": out}
+        out.append({k: s.get(k) for k in ("name", "type", "status", "status_message", "error", "tool_name",
+                                          "tool_arguments", "model", "input_value", "output_value",
+                                          "total_tokens", "duration_ms") if s.get(k) not in (None, "", [])})
+    return {"trace_id": ctx.get("trace_id"), "workflow": ctx.get("workflow"), "status": ctx.get("status"),
+            "has_error": ctx.get("has_error"), "llm_calls": ctx.get("llm_calls"), "tool_calls": ctx.get("tool_calls"),
+            "total_tokens": ctx.get("total_tokens"), "latency_ms": ctx.get("latency_ms"),
+            "span_count": ctx.get("span_count", len(spans)), "spans": out}
 
 
 def _summarise(tool: str, args: dict[str, Any], result: Any) -> str:

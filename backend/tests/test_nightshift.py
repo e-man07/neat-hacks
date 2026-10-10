@@ -104,7 +104,7 @@ def test_injection_wave_disables_auto_refunds(db):
 def test_policy_refuses_irreversible_and_low_confidence():
     assert policy.decide("deploy_code_fix", {}, "prompt_regression", 0.9, 5000).mode == "needs_approval"
     assert policy.decide("rollback_release", {"target": "r41"}, "prompt_regression", 0.4, 5000).mode == "needs_approval"
-    assert policy.decide("rollback_release", {"target": "r41"}, "prompt_regression", 0.9, 5).mode == "page_only"
+    assert policy.decide("rollback_release", {"target": "r41"}, "prompt_regression", 0.9, 5).mode == "defer"
     assert policy.decide("disable_flag", {"flag": "auto_refund_enabled"}, "prompt_injection", 0.9, 5).mode == "auto"
 
 

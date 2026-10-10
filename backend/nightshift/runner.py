@@ -112,6 +112,8 @@ class NightShift:
                                 on_step=lambda s: self.event(iid, "step", f"{s['tool']}: {s['summary']}",
                                                              {"tool": s["tool"], "args": s["args"]}))
             diag = inv.run()
+            fresh, _, _ = detector.detect(self.db, since=self.quiet_since())
+            focus = self._since_change(fresh, size=20) if fresh.n else focus
             imp = impact_mod.assess(focus, base)
             safety = diag.incident_type in policy.load_policy()["gates"]["safety_incident_types"]
             severity = "SEV1" if safety or imp.projected_loss_if_waiting >= 1000 else (
@@ -139,6 +141,9 @@ class NightShift:
         dec = policy.decide(diag.action, diag.action_params, diag.incident_type, diag.confidence,
                             imp.projected_loss_if_waiting, taken)
         self.event(iid, "decide", f"Policy: {dec.mode} — {diag.action} {diag.action_params}", dec.as_dict())
+        if dec.mode == "defer":
+            actions.record_proposal(self.db, iid, diag.action, diag.action_params, "; ".join(dec.reasons))
+            return self._defer(iid, diag, imp, "; ".join(dec.reasons))
         if dec.mode != "auto":
             actions.record_proposal(self.db, iid, diag.action, diag.action_params, "; ".join(dec.reasons))
             return self._await_human(iid, diag, imp, "; ".join(dec.reasons))
@@ -198,7 +203,7 @@ class NightShift:
         return {"id": iid, "status": "RESOLVED" if ok else "ESCALATED"}
 
     # -- helpers --------------------------------------------------------------------------------
-    def _since_change(self, stats: detector.WindowStats) -> detector.WindowStats:
+    def _since_change(self, stats: detector.WindowStats, size: int | None = None) -> detector.WindowStats:
         """Restrict the window to conversations after the last control change (deploy, fault)
         inside it, so healthy pre-change traffic does not dilute the price of the incident."""
         if not stats.first_ts:
@@ -207,9 +212,13 @@ class NightShift:
                           [stats.first_ts])
         if not row or not row["t"]:
             return stats
-        marks = ",".join("?" for _ in stats.conversation_ids)
-        rows = self.db.query(f"SELECT * FROM conversations WHERE id IN ({marks}) AND ts >= ?",
-                             [*stats.conversation_ids, row["t"]])
+        if size:
+            rows = self.db.query("SELECT * FROM conversations WHERE replay = 0 AND ts >= ? ORDER BY ts DESC LIMIT ?",
+                                 [row["t"], size])
+        else:
+            marks = ",".join("?" for _ in stats.conversation_ids)
+            rows = self.db.query(f"SELECT * FROM conversations WHERE id IN ({marks}) AND ts >= ?",
+                                 [*stats.conversation_ids, row["t"]])
         return detector._stats(rows) if len(rows) >= 3 else stats
 
     def _await_human(self, iid: str, diag: Diagnosis, imp: impact_mod.Impact, why: str) -> dict[str, Any]:
@@ -219,6 +228,16 @@ class NightShift:
                    f"${imp.loss_per_minute:,.2f}/min at risk.", "urgent")
         reporter.write_postmortem(self.db, iid)
         return {"id": iid, "status": "AWAITING_HUMAN"}
+
+    def _defer(self, iid: str, diag: Diagnosis, imp: impact_mod.Impact, why: str) -> dict[str, Any]:
+        """Low impact: not worth waking anyone. Leave it, with the proposed fix, for the morning."""
+        self._set(iid, status="DEFERRED")
+        self.event(iid, "defer", f"Not worth waking anyone: ${imp.projected_loss_if_waiting:,.0f} at risk until morning. "
+                   "Left the proposed fix for the day shift.", {"why": why})
+        self._page(iid, "🌙 For the morning", f"{diag.title}. Low impact (${imp.projected_loss_if_waiting:,.0f} until "
+                   "morning), so I didn't wake you. Proposed fix is waiting.", "low")
+        reporter.write_postmortem(self.db, iid)
+        return {"id": iid, "status": "DEFERRED"}
 
     def _propose_permanent_fix(self, iid: str, diag: Diagnosis) -> None:
         if not diag.permanent_fix:

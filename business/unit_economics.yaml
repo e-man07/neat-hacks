@@ -6,8 +6,8 @@ currency: USD
 
 # Customer-facing support volume (production, not the demo sample)
 conversations_per_hour:
-  day: 1800        # 08:00-24:00
-  night: 420       # 00:00-08:00
+  day: 480         # 08:00-24:00
+  night: 90        # 00:00-08:00
 
 average_order_value: 112.00
 customer_lifetime_value: 260.00
