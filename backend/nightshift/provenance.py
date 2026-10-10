@@ -53,6 +53,7 @@ class Provenance:
     model: str | None = None
     coding_prompts: list[str] = field(default_factory=list)
     coding_agent_note: str | None = None
+    graph_changes: str | None = None  # entity-level change list from entire-graph
     diff_excerpt: str = ""
     entire_url: str | None = None
 
@@ -147,6 +148,9 @@ def for_release(release_id: str) -> Provenance:
         recs = _transcript(prov.checkpoint_id)
         prov.coding_prompts = _prompts_from_transcript(prov.checkpoint_id, recs)
         prov.coding_agent_note = _agent_note(recs)
+    code, out = _entire("graph", "commit", prov.commit, "--max-seconds", "30", timeout=60)
+    if code == 0 and out.strip():
+        prov.graph_changes = out.strip()[:2500]
     slug = _github_slug()
     if slug and prov.commit:
         prov.entire_url = f"https://entire.io/gh/{slug}/commit/{prov.commit}"

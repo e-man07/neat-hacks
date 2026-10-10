@@ -88,7 +88,7 @@ TOOLS: list[dict[str, Any]] = [
                                           "action": {"type": "string", "enum": ACTIONS},
                                           "action_params": {"type": "object"},
                                           "permanent_fix": {"type": "string"},
-                                          "confidence": {"type": "number"}},
+                                          "confidence": {"type": "number", "description": "0-1, calibrated as described in your instructions"}},
                                           "required": ["incident_type", "title", "root_cause", "action", "action_params", "confidence"]}}},
 ]
 
@@ -154,7 +154,7 @@ class Investigation:
                 "flags": cfg.flags, "tools": cfg.tools}
 
     def tool_list_recent_deploys(self) -> dict[str, Any]:
-        onset = self.stats.first_ts or time.time()
+        onset = self.focus.first_ts or self.stats.first_ts or time.time()
         out = []
         for d in deploys.recent_deploys(self.db, 6):
             out.append({"release": d["release"], "previous_release": d["previous_release"], "actor": d["actor"],
@@ -290,6 +290,13 @@ class Investigation:
                     except json.JSONDecodeError:
                         args = {}
                     if c.function.name == "submit_diagnosis":
+                        missing = [k for k in ("incident_type", "root_cause", "action", "confidence") if args.get(k) in (None, "")]
+                        if missing:
+                            messages.append({"role": "tool", "tool_call_id": c.id, "content": json.dumps(
+                                {"error": f"missing required fields: {', '.join(missing)}. Re-submit with every field; "
+                                          "confidence is a number between 0 and 1."})})
+                            self._record("submit_diagnosis", {}, {"error": f"missing {', '.join(missing)}; re-submitting"})
+                            continue
                         d = self._finalise(args, method="llm", model=model)
                         d.cost_usd = llm.cost_usd(model, usage)
                         set_attrs(span, **{"nightshift.incident_type": d.incident_type, "nightshift.action": d.action,

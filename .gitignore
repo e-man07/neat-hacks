@@ -11,3 +11,5 @@ runs/
 *.db
 *.sqlite
 .DS_Store
+backend/harbor/evals/regressions/INC-*
+.cfo_token.json
