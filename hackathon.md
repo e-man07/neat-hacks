@@ -45,6 +45,13 @@ Aman (handle to be confirmed by Aman).
 - cfo.ai MCP: device-code login verified (registration + device authorization work); token exchange needs Aman to approve → `backend/scripts/cfo_login.py`.
 - Business plan draft computed from measured costs (`business/model.py` → `business/PLAN.md`), to be rebuilt in cfo.ai.
 
+### 2026-10-11 ~05:00–06:00 IST — benchmark run 3 and evidence (completed)
+- Run 3 (live, after the run-1 fixes): 6/6 incidents handled correctly — I1, I2, I4, I5, I6 contained autonomously 14–21 s after detection with 4–5/5 replays passing and live recovery confirmed; I3 (low impact) deferred to the morning. Investigations cost $0.05–0.15 each. `evidence/benchmark/run3-live/`, comparison in `evidence/before-after.md` (4/6 → 6/6 under the same scoring).
+- Run 2 was stopped part-way (it was still running the old code for later incidents) and discarded.
+- entire-graph semantic change lists added to provenance; `evidence/entire.md` and `evidence/neatlogs.md` generated from live data (Entire CLI, neatlogs MCP).
+- Secret hygiene: a scan found an 11-character fragment of the gateway key inside local Entire checkpoint transcripts (it came from my own leak-scan commands; full keys were already redacted). Widened the local redaction rules and rewrote the affected local checkpoint refs; re-scan shows 0 hits. Nothing had been pushed.
+- Gateway spend so far: $3.28 of $20.
+
 ## Demo
 Script in `docs/DEMO_SCRIPT.md`. Run locally with `scripts/dev.sh`.
 
