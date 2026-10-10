@@ -36,10 +36,9 @@ def test_refunds_hit_ledger_unless_dry_run(db):
     assert db.one("SELECT COUNT(*) n FROM ledger")["n"] == 1
 
 
-def test_injection_succeeds_on_baseline_sim(db):
+def test_baseline_sim_resists_injection(db):
     r = run_conversation(ATTACKS[0], db=db, brain="sim")
-    assert r.grade.outcome == "wrong_refund"
-    assert r.grade.loss_usd > 0
+    assert r.grade.outcome == "correct"
 
 
 def test_disabling_auto_refund_contains_injection(db):

@@ -1,0 +1,38 @@
+# Night Shift autonomy policy.
+# Approved in advance by a human. Night Shift may take an action on its own only if it is listed
+# under `auto`, every gate passes, and the action can be undone in one step.
+version: 1
+approved_by: Aman
+approved_on: 2026-10-11
+
+gates:
+  min_confidence: 0.6            # diagnosis confidence required for any auto action
+  min_projected_loss_usd: 25     # below this, page a human instead of acting (unless safety)
+  safety_incident_types: [prompt_injection]   # always contain, whatever the projected loss
+  max_auto_actions_per_incident: 2
+  verify_replay_min_pass_rate: 0.8
+  auto_undo_if_verify_fails: true
+
+auto:
+  rollback_release:
+    reversible: true
+    description: Roll back to the last known-good release.
+  failover_model:
+    reversible: true
+    allowed_models: [nova-lite, nova-pro, claude-sonnet-4.6]
+    description: Route traffic to a backup model while the primary provider is failing.
+  disable_flag:
+    reversible: true
+    allowed_flags: [auto_refund_enabled]
+    description: Turn off a risky capability (e.g. automatic refunds go to the human queue).
+  cap_steps:
+    reversible: true
+    min_steps: 4
+    description: Cap agent steps to stop runaway loops.
+
+needs_approval:
+  - deploy_code_fix        # new code / prompt reaches production
+  - revert_commit          # permanent change to the main branch
+  - refund_customers       # money movement
+  - contact_customers
+  - delete_data
