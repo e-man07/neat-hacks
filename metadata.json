@@ -1,0 +1,54 @@
+{
+  "cli_version": "0.11.5-nightly.202610100625.1f44a6f96",
+  "checkpoint_id": "01M4KQD0RPAHYV0297DH9XQPGY",
+  "strategy": "manual-commit",
+  "branch": "nightshift/p3-incidents",
+  "checkpoints_count": 4,
+  "files_touched": [
+    "backend/harbor/agent.py",
+    "backend/harbor/grader.py",
+    "backend/harbor/scenarios.py",
+    "backend/nightshift/detector.py",
+    "backend/nightshift/investigator.py",
+    "backend/nightshift/provenance.py",
+    "backend/nightshift/runner.py",
+    "backend/nightshift/verifier.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": ""
+    },
+    {
+      "metadata": "/1/metadata.json",
+      "transcript": "/1/full.jsonl",
+      "compact_transcript": "/1/transcript.jsonl",
+      "content_hash": "/1/content_hash.txt",
+      "prompt": ""
+    },
+    {
+      "metadata": "/2/metadata.json",
+      "transcript": "/2/full.jsonl",
+      "compact_transcript": "/2/transcript.jsonl",
+      "content_hash": "/2/content_hash.txt",
+      "prompt": "/2/prompt.txt"
+    },
+    {
+      "metadata": "/3/metadata.json",
+      "transcript": "/3/full.jsonl",
+      "compact_transcript": "/3/transcript.jsonl",
+      "content_hash": "/3/content_hash.txt",
+      "prompt": ""
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 304,
+    "cache_creation_tokens": 394903,
+    "cache_read_tokens": 39214985,
+    "output_tokens": 179963,
+    "api_call_count": 153
+  }
+}
