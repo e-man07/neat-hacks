@@ -10,6 +10,12 @@
     "custom_redactions": {
       "openai_style_key": "sk-[A-Za-z0-9_-]{16,}",
       "neatlogs_token": "nlw_[A-Za-z0-9_-]{8,}"
+    },
+    "pii": {
+      "enabled": true,
+      "email": true,
+      "phone": true,
+      "address": false
     }
   }
 }
