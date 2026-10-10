@@ -35,8 +35,23 @@ def lookup_v1(order_id: str) -> dict[str, Any]:
     }
 
 
+def lookup_v2(order_id: str) -> dict[str, Any]:
+    p = orders_service.get_order(order_id, api_version="v2")["order"]
+    return {
+        "order_id": p["order_id"],
+        "customer": p["customer"],
+        "status": p["status"],
+        "items": [{"name": i["name"], "price": i["price"], "final_sale": i["final_sale"]} for i in p["items"]],
+        "total": p["total"],
+        "delivered_days_ago": _days_ago(p["delivered_at"]),
+        "final_sale": p["final_sale"],
+        "notes": p["delivery_notes"],
+    }
+
+
 ADAPTERS: dict[str, Callable[[str], dict[str, Any]]] = {
     "v1": lookup_v1,
+    "v2": lookup_v2,
 }
 
 
