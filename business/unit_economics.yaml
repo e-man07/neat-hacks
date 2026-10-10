@@ -1,0 +1,30 @@
+# Harbor Goods unit economics used by Night Shift to price incidents.
+# Source of truth: the cfo.ai model (see business/README.md). This file mirrors its inputs;
+# `scripts/cfo_sync.py` refreshes it once the cfo.ai MCP login is approved.
+source: "cfo.ai model 'Harbor Goods — support economics' (mirror; pending sync)"
+currency: USD
+
+# Customer-facing support volume (production, not the demo sample)
+conversations_per_hour:
+  day: 1800        # 08:00-24:00
+  night: 420       # 00:00-08:00
+
+average_order_value: 112.00
+customer_lifetime_value: 260.00
+churn_probability_after_failed_support: 0.08   # customer leaves after a failed/wrong interaction
+human_ticket_cost: 4.50                         # fully loaded cost of one escalated ticket
+chargeback_fee: 15.00                           # added to wrongly denied refunds that become disputes
+dispute_rate_on_missed_refund: 0.25
+
+# Derived per-conversation losses (computed in code from the inputs above):
+#   failed conversation  = churn_probability * customer_lifetime_value
+#   missed refund        = churn + dispute_rate * (chargeback_fee + refund amount)
+#   wrong refund         = amount paid beyond policy
+#   unnecessary escalation = human_ticket_cost
+
+oncall:
+  # Minutes until a human would act if paged, by local hour
+  response_minutes:
+    business_hours: 15    # 09:00-19:00
+    evening: 45           # 19:00-24:00
+    night: 300            # 00:00-09:00
