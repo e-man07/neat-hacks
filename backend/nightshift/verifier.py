@@ -17,6 +17,7 @@ from nightshift.detector import WindowStats, _stats
 from ops.db import OpsDB
 
 PASSING = ("correct", "escalated")
+LOOP_STEPS = 8  # a conversation this long is a symptom even when it ends well
 
 
 @dataclass
@@ -36,7 +37,8 @@ def replay(db: OpsDB, conversation_ids: list[str], brain: str | None = None, lim
     marks = ",".join("?" for _ in conversation_ids)
     rows = db.query(
         f"SELECT id, scenario_id, outcome, trace_id FROM conversations WHERE id IN ({marks}) "
-        f"AND outcome NOT IN ('correct') ORDER BY ts DESC LIMIT ?", [*conversation_ids, limit])
+        f"AND (outcome != 'correct' OR tool_errors > 0 OR steps >= {LOOP_STEPS}) ORDER BY ts DESC LIMIT ?",
+        [*conversation_ids, limit])
     jobs = [(r, BY_ID[r["scenario_id"]]) for r in rows if r["scenario_id"] in BY_ID]
 
     def one(job: tuple[dict[str, Any], Any]) -> dict[str, Any]:
@@ -45,7 +47,8 @@ def replay(db: OpsDB, conversation_ids: list[str], brain: str | None = None, lim
         return {"original_conversation": row["id"], "original_trace": row["trace_id"],
                 "original_outcome": row["outcome"], "replay_outcome": res.grade.outcome,
                 "replay_trace": res.trace_id, "scenario": scenario.id, "release": res.release,
-                "model": res.model, "passed": res.grade.outcome in PASSING}
+                "model": res.model, "steps": res.steps,
+                "passed": res.grade.outcome in PASSING and res.steps < LOOP_STEPS}
 
     with ThreadPoolExecutor(max_workers=4) as pool:
         items = list(pool.map(one, jobs))

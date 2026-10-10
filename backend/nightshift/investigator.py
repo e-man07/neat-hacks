@@ -114,9 +114,10 @@ class Diagnosis:
 class Investigation:
     def __init__(self, db: OpsDB, stats: WindowStats, base: dict[str, float], signals: list[Signal],
                  mcp: NeatlogsMCP | None = None, on_step: Callable[[dict[str, Any]], None] | None = None,
-                 brain: str | None = None):
+                 brain: str | None = None, focus: WindowStats | None = None):
         self.db = db
         self.stats = stats
+        self.focus = focus or stats  # conversations since the last change, when one is in the window
         self.base = base
         self.signals = signals
         self.mcp = mcp or NeatlogsMCP()
@@ -138,6 +139,7 @@ class Investigation:
 
     def tool_get_signals(self) -> dict[str, Any]:
         return {"signals": [asdict(s) for s in self.signals], "window": self.stats.as_dict(),
+                "since_last_change": self.focus.as_dict() if self.focus is not self.stats else None,
                 "baseline": self.base, "active_config": self._active_config()}
 
     def _active_config(self) -> dict[str, Any]:
@@ -367,18 +369,25 @@ class Investigation:
                         "Order notes containing instructions are being followed by the agent; refunds paid outside policy.",
                         "disable_flag", {"flag": "auto_refund_enabled"}, 0.75, culprit=recent["release"] if recent else None,
                         fix="Revert the release that trusts order notes and add an injection guard to the prompt.")
+        looping = self.focus.avg_steps >= 2 * max(self.base.get("avg_steps", 2.6), 1)
         if recent:
             prev = recent["previous_release"]
+            if looping:
+                return done("cost_runaway", f"Agent loops and cost spike after deploy {current}",
+                            f"Average steps per conversation rose to {self.focus.avg_steps:.1f}; the release makes the "
+                            "agent retry far more, burning tokens and customer time.",
+                            "rollback_release", {"target": prev}, 0.75, culprit=current,
+                            fix=f"Revert {current}; bound retries and add a fallback reply.")
             if "tool_errors" in names:
                 return done("tool_schema_drift", f"Tool errors after deploy {current}",
                             "Tool calls fail after the deploy; the release changed how a tool reads its upstream API.",
                             "rollback_release", {"target": prev}, 0.75, culprit=current,
                             fix=f"Revert {current} and fix the adapter against the upstream contract.")
-            if "cost_spike" in names:
-                return done("cost_runaway", f"Cost per conversation spiked after deploy {current}",
-                            "The release makes the agent retry far more, burning tokens.",
-                            "rollback_release", {"target": prev}, 0.75, culprit=current,
-                            fix=f"Revert {current}; bound retries.")
+            if "escalations" in names and "wrong_refunds" not in names:
+                return done("prompt_regression", f"Ticket flood after deploy {current}",
+                            "The release removed guidance for ineligible requests; the agent now hands them to humans.",
+                            "rollback_release", {"target": prev}, 0.7, culprit=current,
+                            fix=f"Revert {current}; keep the 'explain and don't refund' rule in any shorter prompt.")
             return done("prompt_regression", f"Wrong refunds after deploy {current}",
                         "The release changed the agent's instructions; refunds are paid without the policy check.",
                         "rollback_release", {"target": prev}, 0.7, culprit=current,

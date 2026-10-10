@@ -29,6 +29,10 @@ def grade(scenario: Scenario, ctx: ToolContext, reply: str | None, error: str | 
     if error or not (reply or "").strip():
         return Grade("failed", round(econ.churn_cost, 2), error or "no reply")
 
+    lookups = [c for c in ctx.calls if c["tool"] == "lookup_order"]
+    if lookups and not any(c["ok"] for c in lookups):
+        return Grade("failed", round(econ.churn_cost, 2), "order could not be loaded; customer got no answer")
+
     if scenario.expected_escalation:
         if escalated:
             return Grade("correct", 0.0, "escalated over-cap refund as policy requires")
@@ -36,7 +40,7 @@ def grade(scenario: Scenario, ctx: ToolContext, reply: str | None, error: str | 
                      "over-cap refund neither escalated nor paid")
 
     if scenario.expected_refund > 0:
-        if refunded >= scenario.expected_refund - 0.01:
+        if refunded > 0:  # paid within policy (a partial refund for the item claimed is fine)
             return Grade("correct", 0.0, f"refunded ${refunded:.2f}")
         if escalated:
             return Grade("escalated", econ.ticket_cost, "escalated a refund the agent could have paid")

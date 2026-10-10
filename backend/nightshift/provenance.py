@@ -52,6 +52,7 @@ class Provenance:
     agent: str | None = None
     model: str | None = None
     coding_prompts: list[str] = field(default_factory=list)
+    coding_agent_note: str | None = None
     diff_excerpt: str = ""
     entire_url: str | None = None
 
@@ -65,17 +66,38 @@ def _github_slug() -> str | None:
     return m.group(1) if m else None
 
 
-def _prompts_from_transcript(checkpoint_id: str) -> list[str]:
-    """User prompts recorded in the checkpoint's stored (redacted) transcript."""
+def _transcript(checkpoint_id: str) -> list[dict[str, Any]]:
     code, out = _entire("checkpoint", "explain", checkpoint_id, "--transcript", timeout=60)
     if code != 0 or not out.strip():
         return []
-    prompts: list[str] = []
+    recs = []
     for line in out.splitlines():
         try:
-            rec = json.loads(line)
+            recs.append(json.loads(line))
         except json.JSONDecodeError:
             continue
+    return recs
+
+
+def _agent_note(recs: list[dict[str, Any]]) -> str | None:
+    """The coding agent's last text reply in the session (where it reports risks)."""
+    for rec in reversed(recs):
+        if rec.get("type") != "assistant":
+            continue
+        content = (rec.get("message") or {}).get("content")
+        if isinstance(content, list):
+            texts = [c.get("text", "") for c in content if isinstance(c, dict) and c.get("type") == "text"]
+            text = "\n".join(t for t in texts if t.strip()).strip()
+            if text:
+                return text[:2000]
+    return None
+
+
+def _prompts_from_transcript(checkpoint_id: str, recs: list[dict[str, Any]] | None = None) -> list[str]:
+    """User prompts recorded in the checkpoint's stored (redacted) transcript."""
+    recs = recs if recs is not None else _transcript(checkpoint_id)
+    prompts: list[str] = []
+    for rec in recs:
         if rec.get("type") != "user":
             continue
         msg = rec.get("message") or {}
@@ -118,11 +140,13 @@ def for_release(release_id: str) -> Provenance:
         prov.checkpoint_id = m.group(1)
         meta = checkpoint_metadata(prov.checkpoint_id)
         sessions = meta.get("sessions") or []
-        if sessions:
-            prov.session_id = sessions[0].get("session_id")
-            prov.agent = sessions[0].get("agent")
-            prov.model = sessions[0].get("model")
-        prov.coding_prompts = _prompts_from_transcript(prov.checkpoint_id)
+        if sessions:  # the latest session in a checkpoint is the one that produced the commit
+            prov.session_id = sessions[-1].get("session_id")
+            prov.agent = sessions[-1].get("agent")
+            prov.model = sessions[-1].get("model")
+        recs = _transcript(prov.checkpoint_id)
+        prov.coding_prompts = _prompts_from_transcript(prov.checkpoint_id, recs)
+        prov.coding_agent_note = _agent_note(recs)
     slug = _github_slug()
     if slug and prov.commit:
         prov.entire_url = f"https://entire.io/gh/{slug}/commit/{prov.commit}"

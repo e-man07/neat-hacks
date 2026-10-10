@@ -107,11 +107,12 @@ class NightShift:
             self._set(iid, status="INVESTIGATING")
             self.event(iid, "investigate", "Investigating with neatlogs traces, deploy log and Entire provenance",
                        {"nightshift_trace_id": trace_id})
-            inv = Investigation(self.db, stats, base, signals, mcp=self.mcp, brain=self.brain,
+            focus = self._since_change(stats)
+            inv = Investigation(self.db, stats, base, signals, mcp=self.mcp, brain=self.brain, focus=focus,
                                 on_step=lambda s: self.event(iid, "step", f"{s['tool']}: {s['summary']}",
                                                              {"tool": s["tool"], "args": s["args"]}))
             diag = inv.run()
-            imp = impact_mod.assess(stats, base)
+            imp = impact_mod.assess(focus, base)
             safety = diag.incident_type in policy.load_policy()["gates"]["safety_incident_types"]
             severity = "SEV1" if safety or imp.projected_loss_if_waiting >= 1000 else (
                 "SEV2" if imp.projected_loss_if_waiting >= 25 else "SEV3")
@@ -197,6 +198,20 @@ class NightShift:
         return {"id": iid, "status": "RESOLVED" if ok else "ESCALATED"}
 
     # -- helpers --------------------------------------------------------------------------------
+    def _since_change(self, stats: detector.WindowStats) -> detector.WindowStats:
+        """Restrict the window to conversations after the last control change (deploy, fault)
+        inside it, so healthy pre-change traffic does not dilute the price of the incident."""
+        if not stats.first_ts:
+            return stats
+        row = self.db.one("SELECT MAX(ts) t FROM control_history WHERE ts >= ? AND actor != 'nightshift'",
+                          [stats.first_ts])
+        if not row or not row["t"]:
+            return stats
+        marks = ",".join("?" for _ in stats.conversation_ids)
+        rows = self.db.query(f"SELECT * FROM conversations WHERE id IN ({marks}) AND ts >= ?",
+                             [*stats.conversation_ids, row["t"]])
+        return detector._stats(rows) if len(rows) >= 3 else stats
+
     def _await_human(self, iid: str, diag: Diagnosis, imp: impact_mod.Impact, why: str) -> dict[str, Any]:
         self._set(iid, status="AWAITING_HUMAN")
         self.event(iid, "page", f"Waiting for a human: {why}", {"why": why})
