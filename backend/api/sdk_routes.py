@@ -58,6 +58,14 @@ class EventIn(BaseModel):
     release: str | None = None
     model: str | None = None
     note: str | None = None
+    # run details, so the run counts even if its trace never reaches neatlogs
+    input: str | None = None
+    output: str | None = None
+    steps: int | None = None
+    tool_errors: int | None = None
+    tokens: int | None = None
+    latency_ms: float | None = None
+    cost_usd: float | None = None
 
 
 @router.post("/events")

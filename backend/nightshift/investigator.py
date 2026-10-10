@@ -141,7 +141,8 @@ class Investigation:
             return []
         marks = ",".join("?" for _ in ids)
         rows = self.db.query(
-            f"SELECT * FROM conversations WHERE id IN ({marks}) AND outcome != 'correct' ORDER BY ts DESC LIMIT ?",
+            f"SELECT * FROM conversations WHERE id IN ({marks}) AND (outcome != 'correct' OR tool_errors > 0) "
+            f"ORDER BY (outcome != 'correct') DESC, ts DESC LIMIT ?",
             [*ids, limit])
         return rows
 

@@ -172,3 +172,30 @@ def test_sdk_agent_incident_end_to_end(client):
     kinds = [e["kind"] for e in inc["events"]]
     assert "act" in kinds and "verify" in kinds
     assert json.dumps(inc["verification"]).count('"ok": true') >= 1
+
+
+def test_sdk_events_count_runs_whose_trace_never_arrives(client):
+    from api.deps import platform
+    from nightshift import sources
+
+    created = client.post("/api/app/agents", json={"name": "Scout"}).json()
+    aid, sdk = created["agent"]["id"], {"Authorization": f"Bearer {created['token']}"}
+    client.post("/v1/deploys", headers=sdk, json={"release": "s3"})
+    client.post("/v1/events", headers=sdk, json={"outcome": "escalated", "trace_id": "abc", "value_usd": 4.5,
+                                                 "input": "How long is data kept?", "steps": 5, "tool_errors": 2,
+                                                 "tokens": 3000})
+    db = platform().store.agent_db(aid)
+    row = db.one("SELECT * FROM conversations WHERE id = 'abc'")
+    assert row["outcome"] == "escalated" and row["release"] == "s3" and row["tool_errors"] == 2 and row["loss_usd"] == 4.5
+
+    class FakeMCP:
+        available = True
+
+        def search_traces(self, *a, **k):
+            return {"results": [{"trace_id": "abc", "root_span_name": "scout_answer", "errored_span_count": 3,
+                                 "status": "success", "total_tokens": 3100}]}
+
+    agent = {**created["agent"], "root_span_name": "scout_answer"}
+    assert sources.poll_neatlogs(db, FakeMCP(), agent) == 0
+    row = db.one("SELECT * FROM conversations WHERE id = 'abc'")
+    assert row["brain"] == "sdk+neatlogs" and row["tool_errors"] == 3

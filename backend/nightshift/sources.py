@@ -7,6 +7,7 @@ from __future__ import annotations
 import datetime as dt
 import logging
 import time
+import uuid
 from typing import Any
 
 from nightshift.neatlogs_mcp import NeatlogsMCP, NeatlogsMCPError
@@ -74,7 +75,9 @@ def poll_neatlogs(db: OpsDB, mcp: NeatlogsMCP, agent: dict[str, Any], lookback_s
     query = agent.get("root_span_name") or agent.get("workflow_name")
     if not query or not mcp.available:
         return 0
-    since = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(time.time() - lookback_s))
+    # never read traces from before the agent was connected (old experiments in the same project)
+    start = max(time.time() - lookback_s, float(agent.get("created_at") or 0))
+    since = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(start))
     try:
         res = mcp.search_traces(query, limit=100, workflow_name=agent.get("workflow_name") or None, date_from=since)
     except NeatlogsMCPError as exc:
@@ -89,16 +92,47 @@ def poll_neatlogs(db: OpsDB, mcp: NeatlogsMCP, agent: dict[str, Any], lookback_s
             continue
         if t.get("root_span_name") and agent.get("root_span_name") and t["root_span_name"] != agent["root_span_name"]:
             continue
-        exists = db.one("SELECT id FROM conversations WHERE id = ?", [t["trace_id"]])
+        exists = db.one("SELECT id, brain, tool_errors, tokens, transcript_json FROM conversations WHERE id = ?",
+                        [t["trace_id"]])
         if exists:
+            if exists["brain"] == "sdk":  # reported by the SDK first; enrich with what the trace shows
+                db.update("conversations", "id", t["trace_id"], {
+                    "brain": "sdk+neatlogs",
+                    "tool_errors": max(int(exists["tool_errors"] or 0), int(t.get("errored_span_count") or 0)),
+                    "tokens": int(exists["tokens"] or 0) or int(t.get("total_tokens") or 0)})
             continue
         db.insert("conversations", row_from_trace(db, t, cost_failed, price_model))
         new += 1
     return new
 
 
+def row_from_event(db: OpsDB, event: dict[str, Any], cost_per_failed_run: float) -> dict[str, Any]:
+    """A run reported by the SDK before (or without) its neatlogs trace. Trace export is best effort, so
+    the SDK's outcome report is the run's heartbeat and the trace, when it lands, adds detail."""
+    ts = float(event.get("ts") or time.time())
+    negative = event["outcome"] in NEGATIVE
+    model = event.get("model") or db.get_control("default_model") or "claude-haiku"
+    tokens = int(event.get("tokens") or 0)
+    cost = event.get("cost_usd")
+    if cost is None:
+        cost = llm.cost_usd(model, llm.Usage(prompt_tokens=int(tokens * 0.9), completion_tokens=tokens - int(tokens * 0.9)))
+    return {
+        "id": event.get("trace_id") or f"ev_{uuid.uuid4().hex[:16]}", "ts": ts,
+        "release": event.get("release") or _release_at(db, ts), "model": model, "brain": "sdk",
+        "scenario_id": None, "kind": "trace", "customer_message": (event.get("input") or "")[:2000],
+        "reply": (event.get("output") or "")[:2000],
+        "outcome": ("escalated" if event["outcome"] == "escalated" else "failed") if negative else "correct",
+        "loss_usd": round(float(event.get("value_usd") or 0) or (cost_per_failed_run if negative else 0.0), 2),
+        "cost_usd": float(cost), "tokens": tokens, "steps": int(event.get("steps") or 0),
+        "tool_errors": int(event.get("tool_errors") or 0), "error": event.get("note") if negative else None,
+        "trace_id": event.get("trace_id"), "latency_ms": float(event.get("latency_ms") or 0),
+        "transcript_json": dumps({"grade_note": event.get("note")}), "replay": 0,
+    }
+
+
 def apply_event(db: OpsDB, event: dict[str, Any], cost_per_failed_run: float) -> None:
-    """An outcome event from the SDK; updates the trace row if it was already observed."""
+    """An outcome event from the SDK: updates the trace row if neatlogs already delivered it, otherwise
+    records the run from the event itself (when the SDK sent run details)."""
     db.insert("events", {"ts": time.time(), "trace_id": event.get("trace_id"), "outcome": event["outcome"],
                          "value_usd": float(event.get("value_usd") or 0), "release": event.get("release"),
                          "model": event.get("model"), "note": event.get("note")})
@@ -107,6 +141,8 @@ def apply_event(db: OpsDB, event: dict[str, Any], cost_per_failed_run: float) ->
         return
     row = db.one("SELECT * FROM conversations WHERE id = ?", [tid])
     if not row:
+        if event.get("input") is not None:
+            db.insert("conversations", row_from_event(db, event, cost_per_failed_run))
         return
     if event["outcome"] in NEGATIVE:
         outcome = "escalated" if event["outcome"] == "escalated" else "failed"

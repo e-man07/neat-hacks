@@ -94,11 +94,17 @@ class NightShift:
                                            "default_model": default_model})
 
     def record(self, outcome: str, trace_id: Optional[str] = None, value_usd: float = 0.0,
-               release: Optional[str] = None, model: Optional[str] = None, note: Optional[str] = None) -> bool:
-        """outcome: ok | failed | escalated | negative. value_usd: money lost on this run, if any."""
-        return self._post("/v1/events", {"outcome": outcome, "trace_id": trace_id or current_trace_id(),
-                                          "value_usd": value_usd, "release": release, "model": model,
-                                          "note": note})
+               release: Optional[str] = None, model: Optional[str] = None, note: Optional[str] = None,
+               **run: Any) -> bool:
+        """outcome: ok | failed | escalated | negative. value_usd: money lost on this run, if any.
+
+        Optional run details (input, output, steps, tool_errors, tokens, latency_ms, cost_usd) let Night
+        Shift count the run even when its trace is late or never exported."""
+        allowed = {"input", "output", "steps", "tool_errors", "tokens", "latency_ms", "cost_usd"}
+        body = {"outcome": outcome, "trace_id": trace_id or current_trace_id(), "value_usd": value_usd,
+                "release": release, "model": model, "note": note}
+        body.update({k: v for k, v in run.items() if k in allowed and v is not None})
+        return self._post("/v1/events", body)
 
     def _post(self, path: str, body: dict) -> bool:
         if not self.enabled:

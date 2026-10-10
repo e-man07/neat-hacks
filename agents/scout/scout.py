@@ -351,10 +351,21 @@ def handle(question: str, ns: Any, replay: bool = False) -> dict[str, Any]:
                 pass
     value = VALUE_FAILED_USD if outcome == "failed" else VALUE_ESCALATED_USD if outcome == "escalated" else 0.0
     if not replay:
-        ns.record(outcome, trace_id=trace_id, value_usd=value, release=release.id, model=model, note=note)
+        ns.record(outcome, trace_id=trace_id, value_usd=value, release=release.id, model=model, note=note,
+                  input=question, output=res.answer or res.error or "", steps=res.steps, tool_errors=res.tool_errors,
+                  tokens=res.tokens, latency_ms=round((time.time() - started) * 1000))
     return {"trace_id": trace_id, "release": release.id, "model": model, "outcome": outcome, "note": note,
             "answer": res.answer, "error": res.error, "steps": res.steps, "tool_errors": res.tool_errors,
             "tools": res.tool_log, "latency_s": round(time.time() - started, 2)}
+
+
+def replay_handler(ns: Any) -> Callable[[str], dict[str, Any]]:
+    """A replay passes when the answer grades ok and no tool call failed along the way."""
+    def run(question: str) -> dict[str, Any]:
+        r = handle(question, ns, replay=True)
+        return {"ok": r["outcome"] == "ok" and r["tool_errors"] == 0, "output": r["answer"], "trace_id": r["trace_id"]}
+
+    return run
 
 
 # -- CLI ------------------------------------------------------------------------------------------------------
@@ -435,8 +446,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"\n{args.release}: {good}/{len(rows)} correct")
     elif args.cmd == "serve":
         ns = _ns()
-        ns.serve_replays(lambda q: (lambda r: {"ok": r["outcome"] == "ok", "output": r["answer"],
-                                               "trace_id": r["trace_id"]})(handle(q, ns, replay=True)))
+        ns.serve_replays(replay_handler(ns))
         questions, n = list(BANK), 0
         while not args.count or n < args.count:
             r = handle(random.choice(questions), ns)

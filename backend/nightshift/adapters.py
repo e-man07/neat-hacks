@@ -229,7 +229,7 @@ class SdkAdapter(AgentAdapter):
             return ReplayResult(0, 0, 1.0)
         marks = ",".join("?" for _ in conversation_ids)
         rows = self.db.query(f"SELECT id, customer_message, outcome FROM conversations WHERE id IN ({marks}) "
-                             f"AND outcome != 'correct' AND customer_message IS NOT NULL AND customer_message != '' "
+                             f"AND (outcome != 'correct' OR tool_errors > 0) AND customer_message IS NOT NULL AND customer_message != '' "
                              f"ORDER BY ts DESC LIMIT 6", conversation_ids)
         if not rows:
             return ReplayResult(0, 0, 1.0)
