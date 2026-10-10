@@ -52,6 +52,15 @@ Aman (handle to be confirmed by Aman).
 - Secret hygiene: a scan found an 11-character fragment of the gateway key inside local Entire checkpoint transcripts (it came from my own leak-scan commands; full keys were already redacted). Widened the local redaction rules and rewrote the affected local checkpoint refs; re-scan shows 0 hits. Nothing had been pushed.
 - Gateway spend so far: $3.28 of $20.
 
+### 2026-10-11 ~01:00–04:30 IST: from demo to product (P7–P11)
+- Multi-tenant platform: workspaces, agent tokens (stored hashed), Fernet-encrypted secrets, versioned per-agent policies (auto actions must be reversible), Slack app with Approve/Undo buttons, webhook and ntfy paging, and GitHub revert PRs opened only after approval.
+- `nightshift-sdk` (zero dependencies, fail-open): control plane (release, model, flags, step cap), deploy reports, outcome events, and a replay worker for verification.
+- **Scout**, a second agent wired only through the SDK and neatlogs. Two dev Claude Code sessions wrote s2 ("faster search", which Night Shift correctly left alone) and s3 (reads docs from a folder that doesn't exist yet; the dev session warned about it). Two live incidents: detected in about 1.5 min, rolled back automatically, verified by replays Scout ran itself (3/3), resolved in under 3 min. `evidence/scout/`.
+- Finding: neatlogs lost most of Scout's traces. Search returned ~25 traces for ~120 runs, and the SDK diagnostics showed 0 drops. SDK events now carry run details, and traces enrich them when they arrive.
+- Finding: a noisy 3/10 escalation window opened a false incident. The money gate deferred it ($1, nobody paged), but the investigator blamed a release that was no longer live. Its output is now checked against the evidence.
+- Web product: GitHub sign-in (Auth.js), app shell, connect-an-agent wizard, agent pages (metrics, control plane, deploys, traces, policy editor, settings), incident inbox with approve/undo, paging setup, SDK docs. The old console became `/sandbox`.
+- Deploy kit: GCP VM with Caddy and automatic HTTPS, Vercel env, Slack manifest (`docs/DEPLOY.md`).
+
 ## Demo
 Script in `docs/DEMO_SCRIPT.md`. Run locally with `scripts/dev.sh`.
 
