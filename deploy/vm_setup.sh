@@ -1,17 +1,37 @@
 #!/usr/bin/env bash
 # Runs on the VM as root: installs the API (uv + FastAPI) behind Caddy with automatic HTTPS (sslip.io).
 set -euo pipefail
-IP=${1:?public ip}
+MD=http://metadata.google.internal/computeMetadata/v1
+md() { curl -fsS -H "Metadata-Flavor: Google" "$MD/$1" 2>/dev/null || true; }
+IP=${1:-$(md instance/network-interfaces/0/access-configs/0/external-ip)}
+[ -n "$IP" ] || { echo "no public ip"; exit 1; }
+# env: /tmp/api.env (scp) or the ns-env metadata attribute (startup script); kept on disk after first boot
+[ -f /tmp/api.env ] || md instance/attributes/ns-env > /tmp/api.env
 HOST="api.${IP//./-}.sslip.io"
 REPO=${REPO:-https://github.com/e-man07/neat-hacks.git}
 BRANCH=${BRANCH:-main}
 
 apt-get update -qq
-apt-get install -y -qq git curl debian-keyring debian-archive-keyring apt-transport-https gnupg >/dev/null
+apt-get install -y -qq git curl >/dev/null
 if ! command -v caddy >/dev/null; then
-  curl -1sLf https://dl.cloudsmith.io/public/caddy/stable/gpg.key | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
-  curl -1sLf https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt > /etc/apt/sources.list.d/caddy-stable.list
-  apt-get update -qq && apt-get install -y -qq caddy >/dev/null
+  # static binary (the cloudsmith apt repo can be unavailable)
+  curl -fsSL https://github.com/caddyserver/caddy/releases/download/v2.10.2/caddy_2.10.2_linux_amd64.tar.gz | tar -xz -C /usr/local/bin caddy
+  chmod +x /usr/local/bin/caddy
+  id caddy >/dev/null 2>&1 || useradd --system --home /var/lib/caddy --create-home --shell /usr/sbin/nologin caddy
+  mkdir -p /etc/caddy
+  cat > /etc/systemd/system/caddy.service <<'UNIT'
+[Unit]
+Description=Caddy
+After=network-online.target
+[Service]
+User=caddy
+ExecStart=/usr/local/bin/caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
+ExecReload=/usr/local/bin/caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+Restart=always
+[Install]
+WantedBy=multi-user.target
+UNIT
 fi
 id nightshift >/dev/null 2>&1 || useradd -m -s /bin/bash nightshift
 sudo -u nightshift bash -c 'command -v ~/.local/bin/uv >/dev/null || curl -LsSf https://astral.sh/uv/install.sh | sh'
@@ -19,7 +39,8 @@ sudo -u nightshift bash -c 'command -v ~/.local/bin/uv >/dev/null || curl -LsSf 
 if [ ! -d /opt/nightshift/.git ]; then git clone -q --branch "$BRANCH" "$REPO" /opt/nightshift; fi
 git -C /opt/nightshift fetch -q origin "$BRANCH" && git -C /opt/nightshift reset -q --hard "origin/$BRANCH"
 git -C /opt/nightshift fetch -q origin '+refs/heads/_entire/*:refs/entire/*' || true
-install -m 600 -o nightshift /tmp/api.env /opt/nightshift/.env
+if [ -s /tmp/api.env ]; then install -m 600 -o nightshift /tmp/api.env /opt/nightshift/.env; fi
+rm -f /tmp/api.env
 grep -q '^PUBLIC_API_URL=' /opt/nightshift/.env || echo "PUBLIC_API_URL=https://$HOST" >> /opt/nightshift/.env
 chown -R nightshift /opt/nightshift
 sudo -u nightshift bash -c 'cd /opt/nightshift/backend && ~/.local/bin/uv sync -q'
@@ -47,7 +68,8 @@ $HOST {
 }
 CADDY
 systemctl daemon-reload
-systemctl enable --now nightshift-api
+systemctl enable --now nightshift-api caddy
 systemctl restart nightshift-api caddy
 sleep 4
-curl -fsS "https://$HOST/api/health" && echo && echo "Night Shift API is live at https://$HOST"
+for i in $(seq 1 30); do curl -fsS "https://$HOST/api/health" >/dev/null 2>&1 && break; sleep 5; done
+curl -fsS "https://$HOST/api/health" && echo && echo "NIGHTSHIFT_READY https://$HOST"
