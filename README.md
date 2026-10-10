@@ -66,6 +66,9 @@ Console: deploy a bad release (each one was written by a real Claude Code sessio
 outage or an attack wave, and watch Night Shift handle it. Turn Night Shift off to see what happens
 without it.
 
+Entire checkpoints were pushed as temporary `_entire/*` branches (the build sandbox could only push
+branches). Run `scripts/restore_entire_refs.sh` once from a normal clone to move them to `refs/entire/*`.
+
 ## Repo map
 
 | Path | What |
