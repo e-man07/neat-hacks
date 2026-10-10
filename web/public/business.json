@@ -1,0 +1,282 @@
+{
+  "status": "Draft computed locally from measured costs; cfo.ai model pending (see business/ARI_PROMPT.md)",
+  "cfo_share_url": null,
+  "pricing": [
+    {
+      "tier": "Hobby",
+      "price": "$0",
+      "includes": [
+        "1 agent",
+        "detection, investigations and postmortems",
+        "paging only \u2014 no autonomous actions"
+      ]
+    },
+    {
+      "tier": "Team",
+      "price": "$399/mo",
+      "includes": [
+        "up to 5 agents",
+        "autonomous containment under your policy",
+        "60 investigations / month included"
+      ]
+    },
+    {
+      "tier": "Scale",
+      "price": "$1,990/mo",
+      "includes": [
+        "up to 25 agents",
+        "custom policies, SSO, audit export",
+        "priority support"
+      ]
+    }
+  ],
+  "unit_costs": [
+    {
+      "item": "LLM cost per investigation (Claude Sonnet)",
+      "value": "$0.087",
+      "source": "mean of 6 live investigations in run3-live"
+    },
+    {
+      "item": "replay verification per investigation",
+      "value": "$0.036",
+      "source": "6 replays \u00d7 Haiku conversation cost (measured ~$0.006)"
+    },
+    {
+      "item": "LLM cost per customer per month",
+      "value": "$7.39",
+      "source": "60 investigations/month"
+    },
+    {
+      "item": "blended revenue per customer (ARPA)",
+      "value": "$638/mo",
+      "source": "15% on Scale"
+    },
+    {
+      "item": "COGS per customer",
+      "value": "$48/mo",
+      "source": "LLM + infra + payment fees"
+    },
+    {
+      "item": "gross margin",
+      "value": "93%",
+      "source": "ARPA vs COGS"
+    }
+  ],
+  "forecast": [
+    {
+      "month": "M01",
+      "customers": 0,
+      "mrr": 0,
+      "costs": 9400,
+      "net": -9400,
+      "cash": 140600
+    },
+    {
+      "month": "M02",
+      "customers": 0,
+      "mrr": 0,
+      "costs": 9400,
+      "net": -9400,
+      "cash": 131200
+    },
+    {
+      "month": "M03",
+      "customers": 1,
+      "mrr": 638,
+      "costs": 9448,
+      "net": -8810,
+      "cash": 122390
+    },
+    {
+      "month": "M04",
+      "customers": 3,
+      "mrr": 1894,
+      "costs": 11042,
+      "net": -9148,
+      "cash": 113242
+    },
+    {
+      "month": "M05",
+      "customers": 6,
+      "mrr": 3750,
+      "costs": 11181,
+      "net": -7431,
+      "cash": 105811
+    },
+    {
+      "month": "M06",
+      "customers": 10,
+      "mrr": 6188,
+      "costs": 11363,
+      "net": -5175,
+      "cash": 100637
+    },
+    {
+      "month": "M07",
+      "customers": 14,
+      "mrr": 9191,
+      "costs": 11588,
+      "net": -2397,
+      "cash": 98240
+    },
+    {
+      "month": "M08",
+      "customers": 20,
+      "mrr": 12741,
+      "costs": 11853,
+      "net": 888,
+      "cash": 99127
+    },
+    {
+      "month": "M09",
+      "customers": 26,
+      "mrr": 16822,
+      "costs": 17659,
+      "net": -836,
+      "cash": 98291
+    },
+    {
+      "month": "M10",
+      "customers": 34,
+      "mrr": 21419,
+      "costs": 18002,
+      "net": 3416,
+      "cash": 101707
+    },
+    {
+      "month": "M11",
+      "customers": 42,
+      "mrr": 26515,
+      "costs": 18384,
+      "net": 8131,
+      "cash": 109839
+    },
+    {
+      "month": "M12",
+      "customers": 50,
+      "mrr": 32096,
+      "costs": 18801,
+      "net": 13295,
+      "cash": 123133
+    },
+    {
+      "month": "M13",
+      "customers": 60,
+      "mrr": 38147,
+      "costs": 19254,
+      "net": 18893,
+      "cash": 142027
+    },
+    {
+      "month": "M14",
+      "customers": 70,
+      "mrr": 44655,
+      "costs": 19741,
+      "net": 24914,
+      "cash": 166941
+    },
+    {
+      "month": "M15",
+      "customers": 81,
+      "mrr": 51605,
+      "costs": 20261,
+      "net": 31344,
+      "cash": 198285
+    },
+    {
+      "month": "M16",
+      "customers": 93,
+      "mrr": 58983,
+      "costs": 20813,
+      "net": 38171,
+      "cash": 236455
+    },
+    {
+      "month": "M17",
+      "customers": 105,
+      "mrr": 66779,
+      "costs": 21396,
+      "net": 45383,
+      "cash": 281838
+    },
+    {
+      "month": "M18",
+      "customers": 118,
+      "mrr": 74978,
+      "costs": 22009,
+      "net": 52968,
+      "cash": 334806
+    },
+    {
+      "month": "M19",
+      "customers": 131,
+      "mrr": 83568,
+      "costs": 22652,
+      "net": 60916,
+      "cash": 395723
+    },
+    {
+      "month": "M20",
+      "customers": 145,
+      "mrr": 92539,
+      "costs": 23323,
+      "net": 69216,
+      "cash": 464939
+    },
+    {
+      "month": "M21",
+      "customers": 160,
+      "mrr": 101878,
+      "costs": 24022,
+      "net": 77856,
+      "cash": 542795
+    },
+    {
+      "month": "M22",
+      "customers": 175,
+      "mrr": 111575,
+      "costs": 24747,
+      "net": 86828,
+      "cash": 629623
+    },
+    {
+      "month": "M23",
+      "customers": 191,
+      "mrr": 121618,
+      "costs": 25499,
+      "net": 96120,
+      "cash": 725743
+    },
+    {
+      "month": "M24",
+      "customers": 207,
+      "mrr": 131998,
+      "costs": 26275,
+      "net": 105723,
+      "cash": 831465
+    }
+  ],
+  "assumptions": [
+    "starting cash: 150000",
+    "founders: 2",
+    "founder monthly cost: 4500",
+    "hire month: 9",
+    "engineer monthly cost: 5500",
+    "base infra monthly: 400",
+    "infra per customer monthly: 18",
+    "marketing monthly from m4: 1500",
+    "price team: 399",
+    "price scale: 1990",
+    "scale share of paid: 0.15",
+    "investigations per customer month: 60",
+    "replays per investigation: 6",
+    "replay cost: 0.006",
+    "monthly logo churn: 0.03",
+    "payment fees: 0.035",
+    "new paid customers per month ramps from 0 to 22 over 24 months"
+  ],
+  "runway_months": ">24",
+  "breakeven_month": "M08",
+  "gross_margin": 0.925,
+  "arpa": 637.65
+}
