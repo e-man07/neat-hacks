@@ -13,3 +13,4 @@ runs/
 .DS_Store
 backend/harbor/evals/regressions/INC-*
 .cfo_token.json
+.cfo_oauth_state.json
