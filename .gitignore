@@ -14,3 +14,5 @@ runs/
 backend/harbor/evals/regressions/INC-*
 .cfo_token.json
 .cfo_oauth_state.json
+deploy/api.env
+deploy/web.env
