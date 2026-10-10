@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Controls from "@/components/console/Controls";
 import IncidentPanel from "@/components/console/IncidentPanel";
 import TrafficFeed from "@/components/console/TrafficFeed";
+import ThemeToggle from "@/components/ThemeToggle";
 import NightSky from "@/components/NightSky";
 import Phone, { type PhoneNote } from "@/components/Phone";
 import { Counter, Label, Moon, Pill, Sparkline } from "@/components/ui";
@@ -124,6 +125,7 @@ export default function ConsolePage() {
             </span>
           )}
           <span className={connected ? "text-ok" : "text-alert"}>{connected ? "● stream" : "○ offline"}</span>
+          <ThemeToggle />
         </div>
       </header>
 
