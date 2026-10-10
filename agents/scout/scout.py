@@ -33,6 +33,7 @@ RELEASES_DIR = HERE / "releases"
 DEFAULT_RELEASE = "s1"
 WORKFLOW = "scout-answers"
 ROOT_SPAN = "scout_answer"
+REPLAY_SPAN = "scout_replay"  # evals and verification replays: traced, but not live traffic
 # A wrong answer becomes a support ticket and some churn risk; an escalation is just the ticket.
 VALUE_FAILED_USD = 6.0
 VALUE_ESCALATED_USD = 4.5
@@ -330,7 +331,7 @@ def handle(question: str, ns: Any, replay: bool = False) -> dict[str, Any]:
     tools_enabled = ns.flag("tools_enabled", True)
     brain = answer_live if _brain() == "live" else answer_sim
     started = time.time()
-    with _trace(ROOT_SPAN, "WORKFLOW") as span:
+    with _trace(REPLAY_SPAN if replay else ROOT_SPAN, "WORKFLOW") as span:
         _set(span, **{"neatlogs.workflow_name": WORKFLOW, "input.value": question, "scout.release": release.id,
                       "scout.model": model, "scout.replay": replay})
         trace_id = _trace_id(span)
@@ -339,12 +340,10 @@ def handle(question: str, ns: Any, replay: bool = False) -> dict[str, Any]:
         _set(span, **{"output.value": res.answer or res.error or "", "scout.outcome": outcome,
                       "scout.grade_note": note, "scout.tool_errors": res.tool_errors})
         if res.error:
-            raise_error = RuntimeError(res.error)
             try:
                 from opentelemetry.trace import Status, StatusCode
 
                 span.set_status(Status(StatusCode.ERROR, res.error[:200]))
-                span.record_exception(raise_error)
             except Exception:
                 pass
     value = VALUE_FAILED_USD if outcome == "failed" else VALUE_ESCALATED_USD if outcome == "escalated" else 0.0
