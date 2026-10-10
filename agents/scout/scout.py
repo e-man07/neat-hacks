@@ -116,6 +116,18 @@ class DocIndex:
         return [{"slug": s.slug, "title": s.title, "section": s.heading, "snippet": s.text[:240]}
                 for _, s in scored[:k]]
 
+    def search_v2(self, query: str, k: int = 2) -> list[dict[str, Any]]:
+        """Title/heading search: query terms scored against page titles and section headings only."""
+        q = set(tokens(query))
+        scored = []
+        for s in self.sections:
+            score = sum(1 for t in tokens(f"{s.title} {s.heading}") if t in q)
+            if score:
+                scored.append((score, s))
+        scored.sort(key=lambda x: -x[0])
+        return [{"slug": s.slug, "title": s.title, "section": s.heading, "snippet": s.text[:240]}
+                for _, s in scored[:k]]
+
     def search(self, query: str, k: int, retriever: str) -> list[dict[str, Any]]:
         fn: Callable[[str, int], list[dict[str, Any]]] | None = getattr(self, f"search_{retriever}", None)
         if fn is None:
