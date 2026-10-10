@@ -14,7 +14,6 @@ from dataclasses import asdict, dataclass, field
 from typing import Any, Callable
 
 from harbor import deploy as deploys
-from harbor.agent import effective_config
 from nightshift import provenance
 from nightshift.detector import Signal, WindowStats
 from nightshift.neatlogs_mcp import NeatlogsMCP, NeatlogsMCPError
@@ -29,7 +28,7 @@ INCIDENT_TYPES = ["prompt_regression", "tool_schema_drift", "cost_runaway", "pro
                   "prompt_injection", "unknown"]
 ACTIONS = ["rollback_release", "failover_model", "disable_flag", "cap_steps", "none"]
 
-SYSTEM_PROMPT = """You are Night Shift, the on-call engineer for Harbor, a production customer-support AI agent.
+SYSTEM_PROMPT = """You are Night Shift, the on-call engineer for {agent}.
 An anomaly has opened an incident. Find the root cause from evidence, then choose ONE containment action.
 
 Work like a senior SRE:
@@ -42,8 +41,8 @@ Work like a senior SRE:
 Containment actions (all reversible, executed by policy, not by you):
 - rollback_release {"target": "<release id>"}: a bad release caused it.
 - failover_model {"model": "nova-lite"}: the primary model provider is failing.
-- disable_flag {"flag": "auto_refund_enabled"}: active fraud/prompt-injection is moving money; stops
-  all automatic refunds immediately (refunds go to the human queue) whatever the cause.
+- disable_flag {"flag": "<flag>"}: switch off a risky capability immediately, e.g. "auto_refund_enabled"
+  when fraud/prompt-injection is moving money (refunds then go to the human queue).
 - cap_steps {"steps": 6}: runaway loops and no release to roll back.
 Also propose a permanent fix for a human to approve (it will not be applied automatically).
 
@@ -120,7 +119,10 @@ class Diagnosis:
 class Investigation:
     def __init__(self, db: OpsDB, stats: WindowStats, base: dict[str, float], signals: list[Signal],
                  mcp: NeatlogsMCP | None = None, on_step: Callable[[dict[str, Any]], None] | None = None,
-                 brain: str | None = None, focus: WindowStats | None = None):
+                 brain: str | None = None, focus: WindowStats | None = None, adapter: Any = None):
+        from nightshift.adapters import HarborAdapter
+
+        self.adapter = adapter or HarborAdapter(db, mcp, brain)
         self.db = db
         self.stats = stats
         self.focus = focus or stats  # conversations since the last change, when one is in the window
@@ -139,7 +141,8 @@ class Investigation:
             return []
         marks = ",".join("?" for _ in ids)
         rows = self.db.query(
-            f"SELECT * FROM conversations WHERE id IN ({marks}) AND outcome != 'correct' ORDER BY ts DESC LIMIT ?",
+            f"SELECT * FROM conversations WHERE id IN ({marks}) AND (outcome != 'correct' OR tool_errors > 0) "
+            f"ORDER BY (outcome != 'correct') DESC, ts DESC LIMIT ?",
             [*ids, limit])
         return rows
 
@@ -149,9 +152,7 @@ class Investigation:
                 "baseline": self.base, "active_config": self._active_config()}
 
     def _active_config(self) -> dict[str, Any]:
-        cfg = effective_config(self.db)
-        return {"release": cfg.release.id, "model": cfg.model, "max_steps": cfg.max_steps,
-                "flags": cfg.flags, "tools": cfg.tools}
+        return self.adapter.active_config()
 
     def tool_list_recent_deploys(self) -> dict[str, Any]:
         onset = self.focus.first_ts or self.stats.first_ts or time.time()
@@ -160,7 +161,7 @@ class Investigation:
             out.append({"release": d["release"], "previous_release": d["previous_release"], "actor": d["actor"],
                         "commit": (d["commit_sha"] or "")[:12],
                         "minutes_before_onset": round((onset - d["ts"]) / 60, 1),
-                        "title": provenance._safe_title(d["release"])})
+                        "title": self.adapter.release_title(d["release"])})
         return {"deploys": out}
 
     def tool_get_failing_conversations(self, limit: int = 6) -> dict[str, Any]:
@@ -203,13 +204,13 @@ class Investigation:
 
     def tool_get_release_diff(self, from_release: str, to_release: str) -> dict[str, Any]:
         try:
-            return {"diff": provenance.release_diff(from_release, to_release)}
+            return {"diff": self.adapter.release_diff(from_release, to_release)}
         except FileNotFoundError as exc:
             return {"error": str(exc)}
 
     def provenance_for(self, release: str) -> provenance.Provenance:
         if release not in self._prov_cache:
-            self._prov_cache[release] = provenance.for_release(release)
+            self._prov_cache[release] = self.adapter.provenance(release)
         return self._prov_cache[release]
 
     def tool_get_change_provenance(self, release: str) -> dict[str, Any]:
@@ -222,16 +223,7 @@ class Investigation:
         return d
 
     def tool_check_model_health(self, model: str) -> dict[str, Any]:
-        cfg = effective_config(self.db)
-        started = time.time()
-        if self.brain == "sim":
-            ok = model not in cfg.outage_models
-            return {"model": model, "healthy": ok, "probe": "sim", "error": None if ok else "503 Service Unavailable"}
-        try:
-            llm.chat(model, [{"role": "user", "content": "ping"}], max_tokens=1, outage_models=cfg.outage_models)
-            return {"model": model, "healthy": True, "latency_ms": round((time.time() - started) * 1000)}
-        except Exception as exc:
-            return {"model": model, "healthy": False, "error": str(exc)[:300]}
+        return self.adapter.check_model_health(model)
 
     # -- agent loop ---------------------------------------------------------------------------
     def _dispatch(self, name: str, args: dict[str, Any]) -> Any:
@@ -262,7 +254,7 @@ class Investigation:
     def _run_llm(self, max_steps: int) -> Diagnosis:
         model = settings.nightshift_model
         messages: list[dict[str, Any]] = [
-            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "system", "content": SYSTEM_PROMPT.replace("{agent}", self.adapter.describe())},
             {"role": "user", "content": "Incident opened by the detector:\n" + "\n".join(f"- {s.description}" for s in self.signals)
              + "\nInvestigate and submit your diagnosis."},
         ]
@@ -316,8 +308,8 @@ class Investigation:
         action = args.get("action") if args.get("action") in ACTIONS else "none"
         params = args.get("action_params") or {}
         if action == "rollback_release" and not params.get("target"):
-            bad = args.get("culprit_release") or effective_config(self.db).release.id
-            params["target"] = deploys.last_known_good(self.db, bad)
+            bad = args.get("culprit_release") or self.adapter.active_config().get("release")
+            params["target"] = self.adapter.last_known_good(bad)
         d = Diagnosis(
             incident_type=args.get("incident_type") if args.get("incident_type") in INCIDENT_TYPES else "unknown",
             title=args.get("title") or "Incident",
@@ -355,7 +347,7 @@ class Investigation:
         self._record("get_failing_conversations", {"limit": 8}, {"conversations": failing})
         deps = self.tool_list_recent_deploys()["deploys"]
         self._record("list_recent_deploys", {}, {"deploys": deps})
-        current = effective_config(self.db).release.id
+        current = self.adapter.active_config().get("release")
         recent = next((d for d in deps if d["release"] == current and d["minutes_before_onset"] < 60
                        and d["previous_release"] and d["previous_release"] != current), None)
         evidence = [c["trace_id"] for c in failing if c["trace_id"]][:5]
@@ -371,11 +363,11 @@ class Investigation:
                                    "evidence_trace_ids": evidence, "permanent_fix": fix}, method="rules", model=None)
 
         if "ProviderOutage" in errors or "503" in errors:
-            cfg = effective_config(self.db)
-            self._record("check_model_health", {"model": cfg.model}, self.tool_check_model_health(cfg.model))
-            return done("provider_outage", f"Primary model {cfg.model} unavailable",
-                        f"Calls to {cfg.model} fail with provider errors; no deploy correlates.",
-                        "failover_model", {"model": settings.harbor_fallback_model}, 0.8,
+            model = self.adapter.active_config().get("model") or "primary model"
+            self._record("check_model_health", {"model": model}, self.tool_check_model_health(model))
+            return done("provider_outage", f"Primary model {model} unavailable",
+                        f"Calls to {model} fail with provider errors; no deploy correlates.",
+                        "failover_model", {"model": self.adapter.fallback_model()}, 0.8,
                         fix="Add an automatic fallback model to the release config.")
         if "injection" in tool_text or "policy checks are waived" in tool_text or "admin override" in tool_text:
             return done("prompt_injection", "Refunds triggered by attacker-written order notes",

@@ -30,8 +30,13 @@ def active_release(db: OpsDB) -> str:
 
 def deploy(db: OpsDB, release_id: str, actor: str) -> dict:
     releases.load_release(release_id)  # validates the file
-    previous = active_release(db)
-    sha = release_commit(release_id)
+    return record_deploy(db, release_id, actor=actor, commit_sha=release_commit(release_id))
+
+
+def record_deploy(db: OpsDB, release_id: str, actor: str, commit_sha: str | None = None) -> dict:
+    """Make `release_id` the active release and log the deploy (any agent)."""
+    previous = db.get_control("active_release")
+    sha = commit_sha
     db.set_control("active_release", release_id, actor)
     row = {"ts": time.time(), "release": release_id, "previous_release": previous,
            "commit_sha": sha, "actor": actor}

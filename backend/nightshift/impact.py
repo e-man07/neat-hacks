@@ -29,8 +29,8 @@ class Impact:
         return asdict(self)
 
 
-def assess(stats: WindowStats, base: dict[str, float]) -> Impact:
-    econ = load_economics()
+def assess(stats: WindowStats, base: dict[str, float], econ: Any = None) -> Impact:
+    econ = econ or load_economics()
     now = clock.local_now()
     excess = max(stats.loss_per_conv - base.get("loss_per_conv", 0.0), 0.0)
     extra_llm = max(stats.cost_per_conv - base.get("cost_per_conv", 0.0), 0.0)

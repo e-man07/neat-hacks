@@ -1,0 +1,38 @@
+# Real-looking customer questions with the facts a correct answer must contain.
+# Each entry in `must` is a group of alternatives; every group must appear in the answer.
+- q: How much do you charge when we go past our event allowance on Growth?
+  must: [["$8", "8 dollars", "$8.00"]]
+- q: We're on the free plan and hit our event cap. Do we lose data?
+  must: [["pause", "paused", "stops"], ["next month", "first day", "1st"]]
+- q: Can I get a refund on our annual plan? We renewed two weeks ago.
+  must: [["pro rata", "prorated", "pro-rata"], ["30 days"]]
+- q: Which identity providers work with SSO?
+  must: [["okta"], ["azure", "entra"]]
+- q: If we enforce SSO, can anyone still log in with a password?
+  must: [["owner"]]
+- q: How fast does SCIM remove someone who left the company?
+  must: [["5 minutes", "five minutes"]]
+- q: How many rows can I get in a CSV download of a chart?
+  must: [["50,000", "50000", "50k"]]
+- q: How often does the BigQuery sync run on Enterprise?
+  must: [["hour", "hourly"]]
+- q: A user asked us to erase their data under GDPR. How long does that take?
+  must: [["30 days"]]
+- q: I deleted a project by mistake yesterday. Can I get it back?
+  must: [["14", "fourteen"], ["restore", "recover"]]
+- q: How many events can I batch in one ingestion call?
+  must: [["1,000", "1000", "one thousand"]]
+- q: What happens if we send too many requests to ingestion?
+  must: [["429"]]
+- q: What's the longest conversion window a funnel can have?
+  must: [["90 days"]]
+- q: How many steps can a funnel have?
+  must: [["20", "twenty"]]
+- q: How long do cohort webhooks keep retrying if our endpoint is down?
+  must: [["24 hours", "24h", "a day"]]
+- q: How long is data kept on the Growth plan?
+  must: [["3 years", "three years"]]
+- q: How do I read data with an API key? My write key gets denied.
+  must: [["service account"]]
+- q: How many days of data can I pull per Export API call?
+  must: [["31"]]

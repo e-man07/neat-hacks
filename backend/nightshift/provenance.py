@@ -13,6 +13,7 @@ import re
 import shutil
 import subprocess
 from dataclasses import asdict, dataclass, field
+from pathlib import Path
 from typing import Any
 
 from harbor import releases
@@ -25,16 +26,16 @@ log = logging.getLogger(__name__)
 TRAILER_RE = re.compile(r"^Entire-Checkpoint:\s*(\S+)\s*$", re.MULTILINE)
 
 
-def _git(*args: str, timeout: int = 15) -> str:
-    out = subprocess.run(["git", *args], cwd=REPO_DIR, capture_output=True, text=True, timeout=timeout)
+def _git(*args: str, timeout: int = 15, cwd: Path | None = None) -> str:
+    out = subprocess.run(["git", *args], cwd=cwd or REPO_DIR, capture_output=True, text=True, timeout=timeout)
     return out.stdout
 
 
-def _entire(*args: str, timeout: int = 30) -> tuple[int, str]:
+def _entire(*args: str, timeout: int = 30, cwd: Path | None = None) -> tuple[int, str]:
     exe = shutil.which("entire")
     if not exe:
         return 127, "entire CLI not installed"
-    out = subprocess.run([exe, *args], cwd=REPO_DIR, capture_output=True, text=True, timeout=timeout)
+    out = subprocess.run([exe, *args], cwd=cwd or REPO_DIR, capture_output=True, text=True, timeout=timeout)
     return out.returncode, out.stdout or out.stderr
 
 
@@ -61,14 +62,14 @@ class Provenance:
         return asdict(self)
 
 
-def _github_slug() -> str | None:
-    url = _git("remote", "get-url", "origin").strip()
+def _github_slug(cwd: Path | None = None) -> str | None:
+    url = _git("remote", "get-url", "origin", cwd=cwd).strip()
     m = re.search(r"github\.com[:/](.+?)(?:\.git)?$", url)
     return m.group(1) if m else None
 
 
-def _transcript(checkpoint_id: str) -> list[dict[str, Any]]:
-    code, out = _entire("checkpoint", "explain", checkpoint_id, "--transcript", timeout=60)
+def _transcript(checkpoint_id: str, cwd: Path | None = None) -> list[dict[str, Any]]:
+    code, out = _entire("checkpoint", "explain", checkpoint_id, "--transcript", timeout=60, cwd=cwd)
     if code != 0 or not out.strip():
         return []
     recs = []
@@ -115,8 +116,8 @@ def _prompts_from_transcript(checkpoint_id: str, recs: list[dict[str, Any]] | No
     return prompts[:5]
 
 
-def checkpoint_metadata(checkpoint_id: str) -> dict[str, Any]:
-    code, out = _entire("checkpoint", "explain", checkpoint_id, "--json")
+def checkpoint_metadata(checkpoint_id: str, cwd: Path | None = None) -> dict[str, Any]:
+    code, out = _entire("checkpoint", "explain", checkpoint_id, "--json", cwd=cwd)
     if code != 0:
         return {}
     try:
@@ -126,32 +127,44 @@ def checkpoint_metadata(checkpoint_id: str) -> dict[str, Any]:
 
 
 def for_release(release_id: str) -> Provenance:
+    """Harbor sandbox: a release is a YAML file in this repo."""
     rel = releases.load_release(release_id)
-    prov = Provenance(release=release_id, file=rel.file)
-    log_out = _git("log", "-n", "1", "--format=%H%x1f%s%x1f%an%x1f%aI%x1f%B", "--", rel.file)
+    sha = _git("log", "-n", "1", "--format=%H", "--", rel.file).strip()
+    if not sha:
+        return Provenance(release=release_id, file=rel.file)
+    prov = for_commit(sha, release=release_id)
+    prov.file = rel.file
+    return prov
+
+
+def for_commit(sha: str, release: str = "", repo_dir: Path | None = None) -> Provenance:
+    """Commit → files and diff → `Entire-Checkpoint:` trailer → session, prompts, agent note,
+    plus entire-graph's semantic change list. Works on any local clone with Entire refs."""
+    cwd = repo_dir
+    prov = Provenance(release=release, file="")
+    log_out = _git("log", "-n", "1", "--format=%H%x1f%s%x1f%an%x1f%aI%x1f%B", sha, cwd=cwd)
     if not log_out.strip():
         return prov
-    sha, subject, author, date, body = log_out.split("\x1f", 4)
-    prov.commit, prov.commit_subject, prov.commit_author, prov.commit_date = sha.strip(), subject, author, date
-    prov.files_changed = [f for f in _git("show", "--name-only", "--format=", prov.commit).splitlines() if f]
-    diff = _git("show", "--format=", "--unified=2", prov.commit)
-    prov.diff_excerpt = diff[:6000]
+    full, subject, author, date, body = log_out.split("\x1f", 4)
+    prov.commit, prov.commit_subject, prov.commit_author, prov.commit_date = full.strip(), subject, author, date
+    prov.files_changed = [f for f in _git("show", "--name-only", "--format=", prov.commit, cwd=cwd).splitlines() if f]
+    prov.diff_excerpt = _git("show", "--format=", "--unified=2", prov.commit, cwd=cwd)[:6000]
     m = TRAILER_RE.search(body)
     if m:
         prov.checkpoint_id = m.group(1)
-        meta = checkpoint_metadata(prov.checkpoint_id)
+        meta = checkpoint_metadata(prov.checkpoint_id, cwd=cwd)
         sessions = meta.get("sessions") or []
         if sessions:  # the latest session in a checkpoint is the one that produced the commit
             prov.session_id = sessions[-1].get("session_id")
             prov.agent = sessions[-1].get("agent")
             prov.model = sessions[-1].get("model")
-        recs = _transcript(prov.checkpoint_id)
+        recs = _transcript(prov.checkpoint_id, cwd=cwd)
         prov.coding_prompts = _prompts_from_transcript(prov.checkpoint_id, recs)
         prov.coding_agent_note = _agent_note(recs)
-    code, out = _entire("graph", "commit", prov.commit, "--max-seconds", "30", timeout=60)
+    code, out = _entire("graph", "commit", prov.commit, "--max-seconds", "30", timeout=60, cwd=cwd)
     if code == 0 and out.strip():
         prov.graph_changes = out.strip()[:2500]
-    slug = _github_slug()
+    slug = _github_slug(cwd)
     if slug and prov.commit:
         prov.entire_url = f"https://entire.io/gh/{slug}/commit/{prov.commit}"
     return prov

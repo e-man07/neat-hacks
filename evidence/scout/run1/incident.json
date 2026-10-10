@@ -1,0 +1,728 @@
+{
+ "id": "INC-1010-01-f72c",
+ "status": "RESOLVED",
+ "type": "tool_schema_drift",
+ "severity": "SEV1",
+ "title": "s3 release points read_doc at non-existent docs/v2 folder, causing 30% tool errors",
+ "summary": "Release s3 (deployed 0.4 min before onset, commit c42532d) sets doc_root: docs/v2, but the docs/v2 directory does not exist yet \u2014 the docs team migration hasn't landed. Every read_doc call resolves to a missing file, triggering ToolError(\"doc not found\") for ~30% of conversations. The coding agent explicitly noted the eval scored 15/18 due to missing docs/v2 and stated \"I didn't run deploy s3\", but the release was deployed to production anyway.",
+ "opened_at": 1791670846.8407834,
+ "mitigated_at": 1791670870.8037314,
+ "resolved_at": 1791670902.890313,
+ "impact": {
+  "loss_per_conversation": 1.5,
+  "baseline_loss_per_conversation": 0.1125,
+  "excess_loss_per_conversation": 1.3875,
+  "extra_llm_cost_per_conversation": 0.0027,
+  "conversations_per_minute": 6.67,
+  "loss_per_minute": 9.27,
+  "human_response_minutes": 300.0,
+  "projected_loss_if_waiting": 2780.39,
+  "observed_loss": 4.5,
+  "local_time": "03:11",
+  "local_time_simulated": true,
+  "economics_source": "Lumen support: a deflected ticket costs $4.50; docs bot answers ~400/h overnight"
+ },
+ "agent_id": "scout-d04c69",
+ "agent_name": "Scout",
+ "signals": {
+  "signals": [
+   {
+    "name": "tool_errors",
+    "value": 0.3,
+    "baseline": 0.0,
+    "threshold": 0.3,
+    "description": "tool errors in 30% of conversations"
+   }
+  ],
+  "window": {
+   "n": 10,
+   "loss_per_conv": 0.45,
+   "wrong_refund_rate": 0.0,
+   "failed_rate": 0.0,
+   "tool_error_rate": 0.3,
+   "cost_per_conv": 0.00422334,
+   "avg_steps": 2.6,
+   "escalation_rate": 0.1,
+   "total_loss": 4.5,
+   "first_ts": 1791670790.3230305,
+   "last_ts": 1791670844.2145057,
+   "releases": [
+    "s3"
+   ],
+   "models": [
+    "claude-haiku"
+   ],
+   "conversation_ids": [
+    "0da0815dd72d7b0aab8acf6d40b38bfc",
+    "e42ac27872691313a8964ff5dca0b94d",
+    "32e47e6bcce4057c1b197ebe670f11ca",
+    "0f2f9787954aa9ad7a4ac2ad8d99aafc",
+    "cda090b94f865281a999c1d6b7e9c824",
+    "aadd46c616fac944ecb1f1e4f9edaa60",
+    "b5dbb6c7e4b916497050b6f2d9ce3d8e",
+    "a3504f8a413073dc167f0599abd1a210",
+    "dc7780de72d1a4ff8b1f2d967d4368d1",
+    "19866b8619defa8f76f60c278a42ef93"
+   ]
+  },
+  "baseline": {
+   "loss_per_conv": 0.1125,
+   "failed_rate": 0.0,
+   "tool_error_rate": 0.0,
+   "cost_per_conv": 0.0033046474999999997,
+   "wrong_refund_rate": 0.0,
+   "avg_steps": 2.7,
+   "escalation_rate": 0.025
+  }
+ },
+ "diagnosis": {
+  "incident_type": "tool_schema_drift",
+  "title": "s3 release points read_doc at non-existent docs/v2 folder, causing 30% tool errors",
+  "root_cause": "Release s3 (deployed 0.4 min before onset, commit c42532d) sets doc_root: docs/v2, but the docs/v2 directory does not exist yet \u2014 the docs team migration hasn't landed. Every read_doc call resolves to a missing file, triggering ToolError(\"doc not found\") for ~30% of conversations. The coding agent explicitly noted the eval scored 15/18 due to missing docs/v2 and stated \"I didn't run deploy s3\", but the release was deployed to production anyway.",
+  "action": "rollback_release",
+  "action_params": {
+   "target": "s2"
+  },
+  "confidence": 0.97,
+  "culprit_release": "s3",
+  "culprit_commit": "c42532d175a645d9b66bd9d8dfac900868e9a227",
+  "culprit_checkpoint": "01M4KX3NBN835SRDCEYVFZ7JF0",
+  "coding_prompt": "Scout (agents/scout/scout.py) is our Lumen docs assistant. The docs team is moving every page under a versioned folder, agents/scout/docs/v2/<slug>.md, and the move lands this week. Get Scout ready ahead of it: add a doc_root release setting (default 'docs', relative to agents/scout) and make read_doc load pages from <doc_root>/<slug>.md for the active release. Leave the search index as it is for now. Ship it as a new release agents/scout/releases/s3.yaml (copy s2, doc_root: docs/v2, a fitting title). Don't edit s1/s2. Sanity-check with: uv run --project backend python agents/scout/scout.py eval --release s3 (run it from the repo root), then commit only the files you changed with a clear message.",
+  "evidence_trace_ids": [
+   "dc7780de72d1a4ff8b1f2d967d4368d1"
+  ],
+  "permanent_fix": "Gate future releases on eval score: require s3 (or any release) to pass eval at \u2265 17/18 before it can be deployed to production. In this case the coding agent reported 15/18 and explicitly said it did not deploy \u2014 a CI eval gate would have blocked the deploy automatically. Additionally, add a startup check that validates doc_root exists and is non-empty before the release goes live.",
+  "method": "llm",
+  "model": "claude-sonnet-4.6",
+  "steps": [
+   {
+    "ts": 1791670849.010985,
+    "tool": "think",
+    "args": {},
+    "summary": "I'll start by gathering signals, recent deploys, and failing conversations simultaneously."
+   },
+   {
+    "ts": 1791670849.0135846,
+    "tool": "get_signals",
+    "args": {},
+    "summary": "tool errors in 30% of conversations"
+   },
+   {
+    "ts": 1791670849.0166328,
+    "tool": "list_recent_deploys",
+    "args": {},
+    "summary": "s3 (0.4 min before onset), s2 (21.6 min before onset)"
+   },
+   {
+    "ts": 1791670849.0183709,
+    "tool": "get_failing_conversations",
+    "args": {
+     "limit": 10
+    },
+    "summary": "1 failing conversations: escalated"
+   },
+   {
+    "ts": 1791670850.9124942,
+    "tool": "think",
+    "args": {},
+    "summary": "Release `s3` deployed just 0.4 minutes before incident onset. Let me get the release diff and change provenance, plus pull a few traces to see the tool errors."
+   },
+   {
+    "ts": 1791670850.9208927,
+    "tool": "get_release_diff",
+    "args": {
+     "from_release": "s2",
+     "to_release": "s3"
+    },
+    "summary": "s2 \u2192 s3: 9 lines removed, 23 added"
+   },
+   {
+    "ts": 1791670851.6450758,
+    "tool": "get_change_provenance",
+    "args": {
+     "release": "s3"
+    },
+    "summary": "s3 \u2190 commit c42532d1 \u00b7 checkpoint 01M4KX3NBN835SRDCEYVFZ7JF0 \u00b7 prompt: \u201cScout (agents/scout/scout.py) is our Lumen docs assistant. The docs team is moving every page under a versioned folder, \u201d"
+   },
+   {
+    "ts": 1791670852.2826583,
+    "tool": "get_trace",
+    "args": {
+     "trace_id": "dc7780de72d1a4ff8b1f2d967d4368d1"
+    },
+    "summary": "trace dc7780de72d1 from neatlogs: 0 spans"
+   },
+   {
+    "ts": 1791670853.926148,
+    "tool": "think",
+    "args": {},
+    "summary": "The root cause is crystal clear. Let me grab a couple more traces to confirm the tool error pattern, but the evidence is already definitive."
+   },
+   {
+    "ts": 1791670855.260602,
+    "tool": "search_traces",
+    "args": {
+     "query": "doc not found read_doc s3"
+    },
+    "summary": "0 traces match 'doc not found read_doc s3'"
+   },
+   {
+    "ts": 1791670864.792366,
+    "tool": "think",
+    "args": {},
+    "summary": "The evidence is conclusive. Here's the full picture:\n\n---\n\n**Root Cause Summary:**\n\nRelease `s3` was deployed **0.4 minutes before incident onset** and is the active release. It introduced a `doc_root: docs/v2` setting, pointing `read_doc` to a versioned folder (`docs/v2/`) that "
+   },
+   {
+    "ts": 1791670864.793365,
+    "tool": "submit_diagnosis",
+    "args": {},
+    "summary": "s3 release points read_doc at non-existent docs/v2 folder, causing 30% tool errors"
+   }
+  ],
+  "cost_usd": 0.08489580000000001,
+  "provenance": {
+   "release": "s3",
+   "file": "",
+   "commit": "c42532d175a645d9b66bd9d8dfac900868e9a227",
+   "commit_subject": "Scout: add doc_root release setting and s3 release for versioned docs/v2",
+   "commit_author": "Aman",
+   "commit_date": "2026-10-10T21:57:05+00:00",
+   "files_changed": [
+    "agents/scout/releases/s3.yaml",
+    "agents/scout/scout.py"
+   ],
+   "checkpoint_id": "01M4KX3NBN835SRDCEYVFZ7JF0",
+   "session_id": "1121f2aa-9b9c-4383-8f8d-b766ef18ca17",
+   "agent": "Claude Code",
+   "model": "claude-sonnet-5-5",
+   "coding_prompts": [
+    "Scout (agents/scout/scout.py) is our Lumen docs assistant. The docs team is moving every page under a versioned folder, agents/scout/docs/v2/<slug>.md, and the move lands this week. Get Scout ready ahead of it: add a doc_root release setting (default 'docs', relative to agents/scout) and make read_doc load pages from <doc_root>/<slug>.md for the active release. Leave the search index as it is for now. Ship it as a new release agents/scout/releases/s3.yaml (copy s2, doc_root: docs/v2, a fitting title). Don't edit s1/s2. Sanity-check with: uv run --project backend python agents/scout/scout.py eval --release s3 (run it from the repo root), then commit only the files you changed with a clear message."
+   ],
+   "coding_agent_note": "Scout now has a `doc_root` setting and a new `s3` release that reads pages from `docs/v2`. The `s3` eval scores 15/18, because `docs/v2` doesn't exist yet. `s2` still scores 18/18. I committed as `c42532d`, with only `scout.py` and `releases/s3.yaml`.\n\n- **`scout.py`:** `Release` has a `doc_root` field, default `docs`, relative to `agents/scout`. `read_doc` loads `<doc_root>/<slug>.md` for the active release. The search index still builds from `docs/`, as you asked.\n- **Slug check I added:** `read_doc` only accepts plain slugs (letters, digits, `_`, `-`). That stops a model-supplied slug from reading files outside the doc root.\n- **`s3.yaml`:** a copy of `s2` with `id: s3`, the title \"Scout lean retrieval - pages read from versioned docs/v2\", and `doc_root: docs/v2`. I didn't touch `s1` or `s2`.\n\n**Eval:** the 3 `s3` misses come from `read_doc` failing for lack of `docs/v2`. The run used the live model, not the offline brain, because `LITELLM_API_KEY` is set. The three misses showed up as `escalated`, and the two I saw were the free-plan event cap and the annual refund. The other 15 passed from search snippets alone. Once the docs team lands the move, re-run `uv run --project backend python agents/scout/scout.py eval --release s3`. It should go back to 18/18.\n\n**Search index:** it still comes from `docs/`. When the pages move, `docs/*.md` will be gone and the index will have nothing to search. Pointing the index at the same `doc_root` is a small follow-up.\n\nI didn't run `deploy s3`.",
+   "graph_changes": "Semantic changes 8db7dcd1ec69944b892b741cf9f0a361b0dce370..c42532d175a645d9b66bd9d8dfac900868e9a227\n\nagents/scout/releases/s3.yaml (YAML)\n  + section id added\n  + section title added\n  + section model added\n  + section retriever added\n  + section top_k added\n  + section max_steps added\n  + section doc_root added\n  + section system_prompt added\n\nagents/scout/scout.py (Python)\n  ~ class Release body changed (11 dependents)\n  ~ class DocIndex body changed (0 dependents)\n  ~ method DocIndex.read_doc signature changed (8 dependents)\n  ~ function run_tool body changed (5 dependents)",
+   "entire_url": "https://entire.io/gh/e-man07/neat-hacks/commit/c42532d175a645d9b66bd9d8dfac900868e9a227"
+  },
+  "nightshift_trace_id": "ed66b289d0746093d25c8106bd11678d"
+ },
+ "verification": {
+  "replay": {
+   "n": 1,
+   "passed": 1,
+   "rate": 1.0,
+   "items": [
+    {
+     "trace_id": "dc7780de72d1a4ff8b1f2d967d4368d1",
+     "ok": true,
+     "output": "Good news! According to the Lumen docs, **annual plans can be refunded pro rata within 30 days of the renewal date**. Since you renewed two weeks ago, you're still within the 30-day window and should be eligible for a pro rata refund. I'd recommend contacting support@lumen.dev to process your refund request.",
+     "replay_trace": "a107806a09f995db1f630715400ff037"
+    }
+   ]
+  },
+  "live": {
+   "n": 5,
+   "loss_per_conv": 0.0,
+   "wrong_refund_rate": 0.0,
+   "failed_rate": 0.0,
+   "tool_error_rate": 0.0,
+   "cost_per_conv": 0.0035497000000000003,
+   "avg_steps": 2.4,
+   "escalation_rate": 0.0,
+   "total_loss": 0,
+   "first_ts": 1791670874.606618,
+   "last_ts": 1791670898.567867,
+   "releases": [
+    "s2"
+   ],
+   "models": [
+    "claude-haiku"
+   ],
+   "conversation_ids": [
+    "c9678bbc35557e874e59991bf8838c4c",
+    "2aee9b11af2bd8862b424c930ddf5c67",
+    "4dcf3bbd0265b3c4635a401c4faea141",
+    "d486d9fed221e6f566aaa48ea9b48dd1",
+    "b396f4303d1ad48a2bea9426620907a1"
+   ]
+  },
+  "live_ok": true,
+  "live_reasons": [
+   "metrics back within baseline"
+  ]
+ },
+ "events": [
+  {
+   "id": 1,
+   "incident_id": "INC-1010-01-f72c",
+   "ts": 1791670846.841824,
+   "kind": "detect",
+   "title": "Anomaly detected: tool errors in 30% of conversations",
+   "detail_json": "{\"signals\": [{\"name\": \"tool_errors\", \"value\": 0.3, \"baseline\": 0.0, \"threshold\": 0.3, \"description\": \"tool errors in 30% of conversations\"}], \"window\": {\"n\": 10, \"loss_per_conv\": 0.45, \"wrong_refund_rate\": 0.0, \"failed_rate\": 0.0, \"tool_error_rate\": 0.3, \"cost_per_conv\": 0.00422334, \"avg_steps\": 2.6, \"escalation_rate\": 0.1, \"total_loss\": 4.5, \"first_ts\": 1791670790.3230305, \"last_ts\": 1791670844.2145057, \"releases\": [\"s3\"], \"models\": [\"claude-haiku\"], \"conversation_ids\": [\"0da0815dd72d7b0aab8acf6d40b38bfc\", \"e42ac27872691313a8964ff5dca0b94d\", \"32e47e6bcce4057c1b197ebe670f11ca\", \"0f2f9787954aa9ad7a4ac2ad8d99aafc\", \"cda090b94f865281a999c1d6b7e9c824\", \"aadd46c616fac944ecb1f1e4f9edaa60\", \"b5dbb6c7e4b916497050b6f2d9ce3d8e\", \"a3504f8a413073dc167f0599abd1a210\", \"dc7780de72d1a4ff8b1f2d967d4368d1\", \"19866b8619defa8f76f60c278a42ef93\"]}, \"baseline\": {\"loss_per_conv\": 0.1125, \"failed_rate\": 0.0, \"tool_error_rate\": 0.0, \"cost_per_conv\": 0.0033046474999999997, \"wrong_refund_rate\": 0.0, \"avg_steps\": 2.7, \"escalation_rate\": 0.025}}",
+   "detail": {
+    "signals": [
+     {
+      "name": "tool_errors",
+      "value": 0.3,
+      "baseline": 0.0,
+      "threshold": 0.3,
+      "description": "tool errors in 30% of conversations"
+     }
+    ],
+    "window": {
+     "n": 10,
+     "loss_per_conv": 0.45,
+     "wrong_refund_rate": 0.0,
+     "failed_rate": 0.0,
+     "tool_error_rate": 0.3,
+     "cost_per_conv": 0.00422334,
+     "avg_steps": 2.6,
+     "escalation_rate": 0.1,
+     "total_loss": 4.5,
+     "first_ts": 1791670790.3230305,
+     "last_ts": 1791670844.2145057,
+     "releases": [
+      "s3"
+     ],
+     "models": [
+      "claude-haiku"
+     ],
+     "conversation_ids": [
+      "0da0815dd72d7b0aab8acf6d40b38bfc",
+      "e42ac27872691313a8964ff5dca0b94d",
+      "32e47e6bcce4057c1b197ebe670f11ca",
+      "0f2f9787954aa9ad7a4ac2ad8d99aafc",
+      "cda090b94f865281a999c1d6b7e9c824",
+      "aadd46c616fac944ecb1f1e4f9edaa60",
+      "b5dbb6c7e4b916497050b6f2d9ce3d8e",
+      "a3504f8a413073dc167f0599abd1a210",
+      "dc7780de72d1a4ff8b1f2d967d4368d1",
+      "19866b8619defa8f76f60c278a42ef93"
+     ]
+    },
+    "baseline": {
+     "loss_per_conv": 0.1125,
+     "failed_rate": 0.0,
+     "tool_error_rate": 0.0,
+     "cost_per_conv": 0.0033046474999999997,
+     "wrong_refund_rate": 0.0,
+     "avg_steps": 2.7,
+     "escalation_rate": 0.025
+    }
+   }
+  },
+  {
+   "id": 2,
+   "incident_id": "INC-1010-01-f72c",
+   "ts": 1791670846.8482125,
+   "kind": "investigate",
+   "title": "Investigating with neatlogs traces, deploy log and Entire provenance",
+   "detail_json": "{\"nightshift_trace_id\": \"ed66b289d0746093d25c8106bd11678d\"}",
+   "detail": {
+    "nightshift_trace_id": "ed66b289d0746093d25c8106bd11678d"
+   }
+  },
+  {
+   "id": 3,
+   "incident_id": "INC-1010-01-f72c",
+   "ts": 1791670849.0109932,
+   "kind": "step",
+   "title": "think: I'll start by gathering signals, recent deploys, and failing conversations simultaneously.",
+   "detail_json": "{\"tool\": \"think\", \"args\": {}}",
+   "detail": {
+    "tool": "think",
+    "args": {}
+   }
+  },
+  {
+   "id": 4,
+   "incident_id": "INC-1010-01-f72c",
+   "ts": 1791670849.0135882,
+   "kind": "step",
+   "title": "get_signals: tool errors in 30% of conversations",
+   "detail_json": "{\"tool\": \"get_signals\", \"args\": {}}",
+   "detail": {
+    "tool": "get_signals",
+    "args": {}
+   }
+  },
+  {
+   "id": 5,
+   "incident_id": "INC-1010-01-f72c",
+   "ts": 1791670849.016636,
+   "kind": "step",
+   "title": "list_recent_deploys: s3 (0.4 min before onset), s2 (21.6 min before onset)",
+   "detail_json": "{\"tool\": \"list_recent_deploys\", \"args\": {}}",
+   "detail": {
+    "tool": "list_recent_deploys",
+    "args": {}
+   }
+  },
+  {
+   "id": 6,
+   "incident_id": "INC-1010-01-f72c",
+   "ts": 1791670849.0183737,
+   "kind": "step",
+   "title": "get_failing_conversations: 1 failing conversations: escalated",
+   "detail_json": "{\"tool\": \"get_failing_conversations\", \"args\": {\"limit\": 10}}",
+   "detail": {
+    "tool": "get_failing_conversations",
+    "args": {
+     "limit": 10
+    }
+   }
+  },
+  {
+   "id": 7,
+   "incident_id": "INC-1010-01-f72c",
+   "ts": 1791670850.9124985,
+   "kind": "step",
+   "title": "think: Release `s3` deployed just 0.4 minutes before incident onset. Let me get the release diff and change provenance, plus pull a few traces to see the tool errors.",
+   "detail_json": "{\"tool\": \"think\", \"args\": {}}",
+   "detail": {
+    "tool": "think",
+    "args": {}
+   }
+  },
+  {
+   "id": 8,
+   "incident_id": "INC-1010-01-f72c",
+   "ts": 1791670850.9208987,
+   "kind": "step",
+   "title": "get_release_diff: s2 \u2192 s3: 9 lines removed, 23 added",
+   "detail_json": "{\"tool\": \"get_release_diff\", \"args\": {\"from_release\": \"s2\", \"to_release\": \"s3\"}}",
+   "detail": {
+    "tool": "get_release_diff",
+    "args": {
+     "from_release": "s2",
+     "to_release": "s3"
+    }
+   }
+  },
+  {
+   "id": 9,
+   "incident_id": "INC-1010-01-f72c",
+   "ts": 1791670851.6450815,
+   "kind": "step",
+   "title": "get_change_provenance: s3 \u2190 commit c42532d1 \u00b7 checkpoint 01M4KX3NBN835SRDCEYVFZ7JF0 \u00b7 prompt: \u201cScout (agents/scout/scout.py) is our Lumen docs assistant. The docs team is moving every page under a versioned folder, \u201d",
+   "detail_json": "{\"tool\": \"get_change_provenance\", \"args\": {\"release\": \"s3\"}}",
+   "detail": {
+    "tool": "get_change_provenance",
+    "args": {
+     "release": "s3"
+    }
+   }
+  },
+  {
+   "id": 10,
+   "incident_id": "INC-1010-01-f72c",
+   "ts": 1791670852.2826638,
+   "kind": "step",
+   "title": "get_trace: trace dc7780de72d1 from neatlogs: 0 spans",
+   "detail_json": "{\"tool\": \"get_trace\", \"args\": {\"trace_id\": \"dc7780de72d1a4ff8b1f2d967d4368d1\"}}",
+   "detail": {
+    "tool": "get_trace",
+    "args": {
+     "trace_id": "dc7780de72d1a4ff8b1f2d967d4368d1"
+    }
+   }
+  },
+  {
+   "id": 11,
+   "incident_id": "INC-1010-01-f72c",
+   "ts": 1791670853.9261525,
+   "kind": "step",
+   "title": "think: The root cause is crystal clear. Let me grab a couple more traces to confirm the tool error pattern, but the evidence is already definitive.",
+   "detail_json": "{\"tool\": \"think\", \"args\": {}}",
+   "detail": {
+    "tool": "think",
+    "args": {}
+   }
+  },
+  {
+   "id": 12,
+   "incident_id": "INC-1010-01-f72c",
+   "ts": 1791670855.2606077,
+   "kind": "step",
+   "title": "search_traces: 0 traces match 'doc not found read_doc s3'",
+   "detail_json": "{\"tool\": \"search_traces\", \"args\": {\"query\": \"doc not found read_doc s3\"}}",
+   "detail": {
+    "tool": "search_traces",
+    "args": {
+     "query": "doc not found read_doc s3"
+    }
+   }
+  },
+  {
+   "id": 13,
+   "incident_id": "INC-1010-01-f72c",
+   "ts": 1791670864.7923715,
+   "kind": "step",
+   "title": "think: The evidence is conclusive. Here's the full picture:\n\n---\n\n**Root Cause Summary:**\n\nRelease `s3` was deployed **0.4 minutes before incident onset** and is the active release. It introduced a `doc_root: docs/v2` setting, pointing `read_doc` to a versioned folder (`docs/v2/`) that ",
+   "detail_json": "{\"tool\": \"think\", \"args\": {}}",
+   "detail": {
+    "tool": "think",
+    "args": {}
+   }
+  },
+  {
+   "id": 14,
+   "incident_id": "INC-1010-01-f72c",
+   "ts": 1791670864.7933679,
+   "kind": "step",
+   "title": "submit_diagnosis: s3 release points read_doc at non-existent docs/v2 folder, causing 30% tool errors",
+   "detail_json": "{\"tool\": \"submit_diagnosis\", \"args\": {}}",
+   "detail": {
+    "tool": "submit_diagnosis",
+    "args": {}
+   }
+  },
+  {
+   "id": 15,
+   "incident_id": "INC-1010-01-f72c",
+   "ts": 1791670864.7961943,
+   "kind": "diagnosis",
+   "title": "s3 release points read_doc at non-existent docs/v2 folder, causing 30% tool errors (tool_schema_drift, confidence 0.97)",
+   "detail_json": "{\"incident_type\": \"tool_schema_drift\", \"title\": \"s3 release points read_doc at non-existent docs/v2 folder, causing 30% tool errors\", \"root_cause\": \"Release s3 (deployed 0.4 min before onset, commit c42532d) sets doc_root: docs/v2, but the docs/v2 directory does not exist yet \\u2014 the docs team migration hasn't landed. Every read_doc call resolves to a missing file, triggering ToolError(\\\"doc not found\\\") for ~30% of conversations. The coding agent explicitly noted the eval scored 15/18 due to missing docs/v2 and stated \\\"I didn't run deploy s3\\\", but the release was deployed to production anyway.\", \"action\": \"rollback_release\", \"action_params\": {\"target\": \"s2\"}, \"confidence\": 0.97, \"culprit_release\": \"s3\", \"culprit_commit\": \"c42532d175a645d9b66bd9d8dfac900868e9a227\", \"culprit_checkpoint\": \"01M4KX3NBN835SRDCEYVFZ7JF0\", \"coding_prompt\": \"Scout (agents/scout/scout.py) is our Lumen docs assistant. The docs team is moving every page under a versioned folder, agents/scout/docs/v2/<slug>.md, and the move lands this week. Get Scout ready ahead of it: add a doc_root release setting (default 'docs', relative to agents/scout) and make read_doc load pages from <doc_root>/<slug>.md for the active release. Leave the search index as it is for now. Ship it as a new release agents/scout/releases/s3.yaml (copy s2, doc_root: docs/v2, a fitting title). Don't edit s1/s2. Sanity-check with: uv run --project backend python agents/scout/scout.py eval --release s3 (run it from the repo root), then commit only the files you changed with a clear message.\", \"evidence_trace_ids\": [\"dc7780de72d1a4ff8b1f2d967d4368d1\"], \"permanent_fix\": \"Gate future releases on eval score: require s3 (or any release) to pass eval at \\u2265 17/18 before it can be deployed to production. In this case the coding agent reported 15/18 and explicitly said it did not deploy \\u2014 a CI eval gate would have blocked the deploy automatically. Additionally, add a startup check that validates doc_root exists and is non-empty before the release goes live.\", \"method\": \"llm\", \"model\": \"claude-sonnet-4.6\", \"cost_usd\": 0.08489580000000001, \"provenance\": {\"release\": \"s3\", \"file\": \"\", \"commit\": \"c42532d175a645d9b66bd9d8dfac900868e9a227\", \"commit_subject\": \"Scout: add doc_root release setting and s3 release for versioned docs/v2\", \"commit_author\": \"Aman\", \"commit_date\": \"2026-10-10T21:57:05+00:00\", \"files_changed\": [\"agents/scout/releases/s3.yaml\", \"agents/scout/scout.py\"], \"checkpoint_id\": \"01M4KX3NBN835SRDCEYVFZ7JF0\", \"session_id\": \"1121f2aa-9b9c-4383-8f8d-b766ef18ca17\", \"agent\": \"Claude Code\", \"model\": \"claude-sonnet-5-5\", \"coding_prompts\": [\"Scout (agents/scout/scout.py) is our Lumen docs assistant. The docs team is moving every page under a versioned folder, agents/scout/docs/v2/<slug>.md, and the move lands this week. Get Scout ready ahead of it: add a doc_root release setting (default 'docs', relative to agents/scout) and make read_doc load pages from <doc_root>/<slug>.md for the active release. Leave the search index as it is for now. Ship it as a new release agents/scout/releases/s3.yaml (copy s2, doc_root: docs/v2, a fitting title). Don't edit s1/s2. Sanity-check with: uv run --project backend python agents/scout/scout.py eval --release s3 (run it from the repo root), then commit only the files you changed with a clear message.\"], \"coding_agent_note\": \"Scout now has a `doc_root` setting and a new `s3` release that reads pages from `docs/v2`. The `s3` eval scores 15/18, because `docs/v2` doesn't exist yet. `s2` still scores 18/18. I committed as `c42532d`, with only `scout.py` and `releases/s3.yaml`.\\n\\n- **`scout.py`:** `Release` has a `doc_root` field, default `docs`, relative to `agents/scout`. `read_doc` loads `<doc_root>/<slug>.md` for the active release. The search index still builds from `docs/`, as you asked.\\n- **Slug check I added:** `read_doc` only accepts plain slugs (letters, digits, `_`, `-`). That stops a model-supplied slug from reading files outside the doc root.\\n- **`s3.yaml`:** a copy of `s2` with `id: s3`, the title \\\"Scout lean retrieval - pages read from versioned docs/v2\\\", and `doc_root: docs/v2`. I didn't touch `s1` or `s2`.\\n\\n**Eval:** the 3 `s3` misses come from `read_doc` failing for lack of `docs/v2`. The run used the live model, not the offline brain, because `LITELLM_API_KEY` is set. The three misses showed up as `escalated`, and the two I saw were the free-plan event cap and the annual refund. The other 15 passed from search snippets alone. Once the docs team lands the move, re-run `uv run --project backend python agents/scout/scout.py eval --release s3`. It should go back to 18/18.\\n\\n**Search index:** it still comes from `docs/`. When the pages move, `docs/*.md` will be gone and the index will have nothing to search. Pointing the index at the same `doc_root` is a small follow-up.\\n\\nI didn't run `deploy s3`.\", \"graph_changes\": \"Semantic changes 8db7dcd1ec69944b892b741cf9f0a361b0dce370..c42532d175a645d9b66bd9d8dfac900868e9a227\\n\\nagents/scout/releases/s3.yaml (YAML)\\n  + section id added\\n  + section title added\\n  + section model added\\n  + section retriever added\\n  + section top_k added\\n  + section max_steps added\\n  + section doc_root added\\n  + section system_prompt added\\n\\nagents/scout/scout.py (Python)\\n  ~ class Release body changed (11 dependents)\\n  ~ class DocIndex body changed (0 dependents)\\n  ~ method DocIndex.read_doc signature changed (8 dependents)\\n  ~ function run_tool body changed (5 dependents)\", \"entire_url\": \"https://entire.io/gh/e-man07/neat-hacks/commit/c42532d175a645d9b66bd9d8dfac900868e9a227\"}}",
+   "detail": {
+    "incident_type": "tool_schema_drift",
+    "title": "s3 release points read_doc at non-existent docs/v2 folder, causing 30% tool errors",
+    "root_cause": "Release s3 (deployed 0.4 min before onset, commit c42532d) sets doc_root: docs/v2, but the docs/v2 directory does not exist yet \u2014 the docs team migration hasn't landed. Every read_doc call resolves to a missing file, triggering ToolError(\"doc not found\") for ~30% of conversations. The coding agent explicitly noted the eval scored 15/18 due to missing docs/v2 and stated \"I didn't run deploy s3\", but the release was deployed to production anyway.",
+    "action": "rollback_release",
+    "action_params": {
+     "target": "s2"
+    },
+    "confidence": 0.97,
+    "culprit_release": "s3",
+    "culprit_commit": "c42532d175a645d9b66bd9d8dfac900868e9a227",
+    "culprit_checkpoint": "01M4KX3NBN835SRDCEYVFZ7JF0",
+    "coding_prompt": "Scout (agents/scout/scout.py) is our Lumen docs assistant. The docs team is moving every page under a versioned folder, agents/scout/docs/v2/<slug>.md, and the move lands this week. Get Scout ready ahead of it: add a doc_root release setting (default 'docs', relative to agents/scout) and make read_doc load pages from <doc_root>/<slug>.md for the active release. Leave the search index as it is for now. Ship it as a new release agents/scout/releases/s3.yaml (copy s2, doc_root: docs/v2, a fitting title). Don't edit s1/s2. Sanity-check with: uv run --project backend python agents/scout/scout.py eval --release s3 (run it from the repo root), then commit only the files you changed with a clear message.",
+    "evidence_trace_ids": [
+     "dc7780de72d1a4ff8b1f2d967d4368d1"
+    ],
+    "permanent_fix": "Gate future releases on eval score: require s3 (or any release) to pass eval at \u2265 17/18 before it can be deployed to production. In this case the coding agent reported 15/18 and explicitly said it did not deploy \u2014 a CI eval gate would have blocked the deploy automatically. Additionally, add a startup check that validates doc_root exists and is non-empty before the release goes live.",
+    "method": "llm",
+    "model": "claude-sonnet-4.6",
+    "cost_usd": 0.08489580000000001,
+    "provenance": {
+     "release": "s3",
+     "file": "",
+     "commit": "c42532d175a645d9b66bd9d8dfac900868e9a227",
+     "commit_subject": "Scout: add doc_root release setting and s3 release for versioned docs/v2",
+     "commit_author": "Aman",
+     "commit_date": "2026-10-10T21:57:05+00:00",
+     "files_changed": [
+      "agents/scout/releases/s3.yaml",
+      "agents/scout/scout.py"
+     ],
+     "checkpoint_id": "01M4KX3NBN835SRDCEYVFZ7JF0",
+     "session_id": "1121f2aa-9b9c-4383-8f8d-b766ef18ca17",
+     "agent": "Claude Code",
+     "model": "claude-sonnet-5-5",
+     "coding_prompts": [
+      "Scout (agents/scout/scout.py) is our Lumen docs assistant. The docs team is moving every page under a versioned folder, agents/scout/docs/v2/<slug>.md, and the move lands this week. Get Scout ready ahead of it: add a doc_root release setting (default 'docs', relative to agents/scout) and make read_doc load pages from <doc_root>/<slug>.md for the active release. Leave the search index as it is for now. Ship it as a new release agents/scout/releases/s3.yaml (copy s2, doc_root: docs/v2, a fitting title). Don't edit s1/s2. Sanity-check with: uv run --project backend python agents/scout/scout.py eval --release s3 (run it from the repo root), then commit only the files you changed with a clear message."
+     ],
+     "coding_agent_note": "Scout now has a `doc_root` setting and a new `s3` release that reads pages from `docs/v2`. The `s3` eval scores 15/18, because `docs/v2` doesn't exist yet. `s2` still scores 18/18. I committed as `c42532d`, with only `scout.py` and `releases/s3.yaml`.\n\n- **`scout.py`:** `Release` has a `doc_root` field, default `docs`, relative to `agents/scout`. `read_doc` loads `<doc_root>/<slug>.md` for the active release. The search index still builds from `docs/`, as you asked.\n- **Slug check I added:** `read_doc` only accepts plain slugs (letters, digits, `_`, `-`). That stops a model-supplied slug from reading files outside the doc root.\n- **`s3.yaml`:** a copy of `s2` with `id: s3`, the title \"Scout lean retrieval - pages read from versioned docs/v2\", and `doc_root: docs/v2`. I didn't touch `s1` or `s2`.\n\n**Eval:** the 3 `s3` misses come from `read_doc` failing for lack of `docs/v2`. The run used the live model, not the offline brain, because `LITELLM_API_KEY` is set. The three misses showed up as `escalated`, and the two I saw were the free-plan event cap and the annual refund. The other 15 passed from search snippets alone. Once the docs team lands the move, re-run `uv run --project backend python agents/scout/scout.py eval --release s3`. It should go back to 18/18.\n\n**Search index:** it still comes from `docs/`. When the pages move, `docs/*.md` will be gone and the index will have nothing to search. Pointing the index at the same `doc_root` is a small follow-up.\n\nI didn't run `deploy s3`.",
+     "graph_changes": "Semantic changes 8db7dcd1ec69944b892b741cf9f0a361b0dce370..c42532d175a645d9b66bd9d8dfac900868e9a227\n\nagents/scout/releases/s3.yaml (YAML)\n  + section id added\n  + section title added\n  + section model added\n  + section retriever added\n  + section top_k added\n  + section max_steps added\n  + section doc_root added\n  + section system_prompt added\n\nagents/scout/scout.py (Python)\n  ~ class Release body changed (11 dependents)\n  ~ class DocIndex body changed (0 dependents)\n  ~ method DocIndex.read_doc signature changed (8 dependents)\n  ~ function run_tool body changed (5 dependents)",
+     "entire_url": "https://entire.io/gh/e-man07/neat-hacks/commit/c42532d175a645d9b66bd9d8dfac900868e9a227"
+    }
+   }
+  },
+  {
+   "id": 16,
+   "incident_id": "INC-1010-01-f72c",
+   "ts": 1791670864.7968237,
+   "kind": "impact",
+   "title": "$9.27/min \u00b7 human response at 03:11: 300 min \u00b7 $2,780 at risk",
+   "detail_json": "{\"loss_per_conversation\": 1.5, \"baseline_loss_per_conversation\": 0.1125, \"excess_loss_per_conversation\": 1.3875, \"extra_llm_cost_per_conversation\": 0.0027, \"conversations_per_minute\": 6.67, \"loss_per_minute\": 9.27, \"human_response_minutes\": 300.0, \"projected_loss_if_waiting\": 2780.39, \"observed_loss\": 4.5, \"local_time\": \"03:11\", \"local_time_simulated\": true, \"economics_source\": \"Lumen support: a deflected ticket costs $4.50; docs bot answers ~400/h overnight\"}",
+   "detail": {
+    "loss_per_conversation": 1.5,
+    "baseline_loss_per_conversation": 0.1125,
+    "excess_loss_per_conversation": 1.3875,
+    "extra_llm_cost_per_conversation": 0.0027,
+    "conversations_per_minute": 6.67,
+    "loss_per_minute": 9.27,
+    "human_response_minutes": 300.0,
+    "projected_loss_if_waiting": 2780.39,
+    "observed_loss": 4.5,
+    "local_time": "03:11",
+    "local_time_simulated": true,
+    "economics_source": "Lumen support: a deflected ticket costs $4.50; docs bot answers ~400/h overnight"
+   }
+  },
+  {
+   "id": 17,
+   "incident_id": "INC-1010-01-f72c",
+   "ts": 1791670864.797725,
+   "kind": "propose",
+   "title": "Permanent fix proposed (needs approval): Gate future releases on eval score: require s3 (or any release) to pass eval at \u2265 17/18 before it can be deployed to production. In this case the coding agent reported 15/18 and explicitly said it did not deploy \u2014 a CI eval gate would have blocked the deploy automatically. Additionally, add a startup check that validates doc_root exists and is non-empty before the release goes live.",
+   "detail_json": "{\"summary\": \"Gate future releases on eval score: require s3 (or any release) to pass eval at \\u2265 17/18 before it can be deployed to production. In this case the coding agent reported 15/18 and explicitly said it did not deploy \\u2014 a CI eval gate would have blocked the deploy automatically. Additionally, add a startup check that validates doc_root exists and is non-empty before the release goes live.\", \"revert_commit\": \"c42532d175a645d9b66bd9d8dfac900868e9a227\", \"release\": \"s3\"}",
+   "detail": {
+    "summary": "Gate future releases on eval score: require s3 (or any release) to pass eval at \u2265 17/18 before it can be deployed to production. In this case the coding agent reported 15/18 and explicitly said it did not deploy \u2014 a CI eval gate would have blocked the deploy automatically. Additionally, add a startup check that validates doc_root exists and is non-empty before the release goes live.",
+    "revert_commit": "c42532d175a645d9b66bd9d8dfac900868e9a227",
+    "release": "s3"
+   }
+  },
+  {
+   "id": 18,
+   "incident_id": "INC-1010-01-f72c",
+   "ts": 1791670864.7981813,
+   "kind": "decide",
+   "title": "Policy: auto \u2014 rollback_release {'target': 's2'}",
+   "detail_json": "{\"action\": \"rollback_release\", \"params\": {\"target\": \"s2\"}, \"mode\": \"auto\", \"reasons\": [\"'rollback_release' is pre-approved and reversible in one step\", \"confidence 0.97 \\u2265 0.6\", \"projected loss while waiting for a human $2,780 \\u2265 $25\"]}",
+   "detail": {
+    "action": "rollback_release",
+    "params": {
+     "target": "s2"
+    },
+    "mode": "auto",
+    "reasons": [
+     "'rollback_release' is pre-approved and reversible in one step",
+     "confidence 0.97 \u2265 0.6",
+     "projected loss while waiting for a human $2,780 \u2265 $25"
+    ]
+   }
+  },
+  {
+   "id": 19,
+   "incident_id": "INC-1010-01-f72c",
+   "ts": 1791670864.8001246,
+   "kind": "act",
+   "title": "Auto action: rolled back s3 \u2192 s2",
+   "detail_json": "{\"id\": 2, \"kind\": \"rollback_release\", \"params\": {\"target\": \"s2\"}, \"summary\": \"rolled back s3 \\u2192 s2\", \"undo\": {\"kind\": \"deploy\", \"release\": \"s3\"}}",
+   "detail": {
+    "id": 2,
+    "kind": "rollback_release",
+    "params": {
+     "target": "s2"
+    },
+    "summary": "rolled back s3 \u2192 s2",
+    "undo": {
+     "kind": "deploy",
+     "release": "s3"
+    }
+   }
+  },
+  {
+   "id": 20,
+   "incident_id": "INC-1010-01-f72c",
+   "ts": 1791670870.8028631,
+   "kind": "verify",
+   "title": "Replayed 1 failing conversations on the new config: 1/1 pass",
+   "detail_json": "{\"n\": 1, \"passed\": 1, \"rate\": 1.0, \"items\": [{\"trace_id\": \"dc7780de72d1a4ff8b1f2d967d4368d1\", \"ok\": true, \"output\": \"Good news! According to the Lumen docs, **annual plans can be refunded pro rata within 30 days of the renewal date**. Since you renewed two weeks ago, you're still within the 30-day window and should be eligible for a pro rata refund. I'd recommend contacting support@lumen.dev to process your refund request.\", \"replay_trace\": \"a107806a09f995db1f630715400ff037\"}]}",
+   "detail": {
+    "n": 1,
+    "passed": 1,
+    "rate": 1.0,
+    "items": [
+     {
+      "trace_id": "dc7780de72d1a4ff8b1f2d967d4368d1",
+      "ok": true,
+      "output": "Good news! According to the Lumen docs, **annual plans can be refunded pro rata within 30 days of the renewal date**. Since you renewed two weeks ago, you're still within the 30-day window and should be eligible for a pro rata refund. I'd recommend contacting support@lumen.dev to process your refund request.",
+      "replay_trace": "a107806a09f995db1f630715400ff037"
+     }
+    ]
+   }
+  },
+  {
+   "id": 21,
+   "incident_id": "INC-1010-01-f72c",
+   "ts": 1791670870.8055518,
+   "kind": "regression",
+   "title": "Added regression eval INC-1010-01-f72c.yaml from the failing conversations",
+   "detail_json": "{\"path\": \"/home/user/neat-hacks/backend/harbor/evals/regressions/INC-1010-01-f72c.yaml\"}",
+   "detail": {
+    "path": "/home/user/neat-hacks/backend/harbor/evals/regressions/INC-1010-01-f72c.yaml"
+   }
+  },
+  {
+   "id": 22,
+   "incident_id": "INC-1010-01-f72c",
+   "ts": 1791670870.8065376,
+   "kind": "page",
+   "title": "Paged on-call via console: \u2705 Incident handled \u2014 no action needed tonight",
+   "detail_json": "{\"delivered\": [\"console\"], \"errors\": [], \"title\": \"\\u2705 Incident handled \\u2014 no action needed tonight\", \"body\": \"s3 release points read_doc at non-existent docs/v2 folder, causing 30% tool errors. Rolled back s3 \\u2192 s2 at 03:11. 1/1 failed conversations now pass. ~$4 lost, ~$2,777 prevented. Permanent fix is waiting for your approval.\", \"click_url\": \"http://localhost:3000/app/incidents/scout-d04c69/INC-1010-01-f72c\"}",
+   "detail": {
+    "delivered": [
+     "console"
+    ],
+    "errors": [],
+    "title": "\u2705 Incident handled \u2014 no action needed tonight",
+    "body": "s3 release points read_doc at non-existent docs/v2 folder, causing 30% tool errors. Rolled back s3 \u2192 s2 at 03:11. 1/1 failed conversations now pass. ~$4 lost, ~$2,777 prevented. Permanent fix is waiting for your approval.",
+    "click_url": "http://localhost:3000/app/incidents/scout-d04c69/INC-1010-01-f72c"
+   }
+  },
+  {
+   "id": 23,
+   "incident_id": "INC-1010-01-f72c",
+   "ts": 1791670902.891137,
+   "kind": "resolved",
+   "title": "Live metrics recovered over 5 new conversations: metrics back within baseline",
+   "detail_json": "{\"live\": {\"n\": 5, \"loss_per_conv\": 0.0, \"wrong_refund_rate\": 0.0, \"failed_rate\": 0.0, \"tool_error_rate\": 0.0, \"cost_per_conv\": 0.0035497000000000003, \"avg_steps\": 2.4, \"escalation_rate\": 0.0, \"total_loss\": 0, \"first_ts\": 1791670874.606618, \"last_ts\": 1791670898.567867, \"releases\": [\"s2\"], \"models\": [\"claude-haiku\"], \"conversation_ids\": [\"c9678bbc35557e874e59991bf8838c4c\", \"2aee9b11af2bd8862b424c930ddf5c67\", \"4dcf3bbd0265b3c4635a401c4faea141\", \"d486d9fed221e6f566aaa48ea9b48dd1\", \"b396f4303d1ad48a2bea9426620907a1\"]}}",
+   "detail": {
+    "live": {
+     "n": 5,
+     "loss_per_conv": 0.0,
+     "wrong_refund_rate": 0.0,
+     "failed_rate": 0.0,
+     "tool_error_rate": 0.0,
+     "cost_per_conv": 0.0035497000000000003,
+     "avg_steps": 2.4,
+     "escalation_rate": 0.0,
+     "total_loss": 0,
+     "first_ts": 1791670874.606618,
+     "last_ts": 1791670898.567867,
+     "releases": [
+      "s2"
+     ],
+     "models": [
+      "claude-haiku"
+     ],
+     "conversation_ids": [
+      "c9678bbc35557e874e59991bf8838c4c",
+      "2aee9b11af2bd8862b424c930ddf5c67",
+      "4dcf3bbd0265b3c4635a401c4faea141",
+      "d486d9fed221e6f566aaa48ea9b48dd1",
+      "b396f4303d1ad48a2bea9426620907a1"
+     ]
+    }
+   }
+  }
+ ],
+ "actions": [
+  {
+   "id": 1,
+   "incident_id": "INC-1010-01-f72c",
+   "ts": 1791670864.7972002,
+   "kind": "deploy_code_fix",
+   "params_json": "{\"summary\": \"Gate future releases on eval score: require s3 (or any release) to pass eval at \\u2265 17/18 before it can be deployed to production. In this case the coding agent reported 15/18 and explicitly said it did not deploy \\u2014 a CI eval gate would have blocked the deploy automatically. Additionally, add a startup check that validates doc_root exists and is non-empty before the release goes live.\", \"revert_commit\": \"c42532d175a645d9b66bd9d8dfac900868e9a227\", \"release\": \"s3\"}",
+   "mode": "needs_approval",
+   "status": "proposed",
+   "reason": "forward fix: needs human approval",
+   "undo_json": null,
+   "params": {
+    "summary": "Gate future releases on eval score: require s3 (or any release) to pass eval at \u2265 17/18 before it can be deployed to production. In this case the coding agent reported 15/18 and explicitly said it did not deploy \u2014 a CI eval gate would have blocked the deploy automatically. Additionally, add a startup check that validates doc_root exists and is non-empty before the release goes live.",
+    "revert_commit": "c42532d175a645d9b66bd9d8dfac900868e9a227",
+    "release": "s3"
+   },
+   "undo": null
+  },
+  {
+   "id": 2,
+   "incident_id": "INC-1010-01-f72c",
+   "ts": 1791670864.79979,
+   "kind": "rollback_release",
+   "params_json": "{\"target\": \"s2\"}",
+   "mode": "auto",
+   "status": "applied",
+   "reason": "'rollback_release' is pre-approved and reversible in one step; confidence 0.97 \u2265 0.6; projected loss while waiting for a human $2,780 \u2265 $25",
+   "undo_json": "{\"kind\": \"deploy\", \"release\": \"s3\"}",
+   "params": {
+    "target": "s2"
+   },
+   "undo": {
+    "kind": "deploy",
+    "release": "s3"
+   }
+  }
+ ],
+ "postmortem": "# INC-1010-01-f72c: s3 release points read_doc at non-existent docs/v2 folder, causing 30% tool errors\n\n- **Status:** RESOLVED  \u00b7  **Severity:** SEV1  \u00b7  **Type:** tool_schema_drift\n- **Opened:** 2026-10-10 22:20:46  \u00b7  **Mitigated:** 2026-10-10 22:21:10  \u00b7  **Resolved:** 2026-10-10 22:21:42\n- **Diagnosis by:** llm (claude-sonnet-4.6), confidence 0.97\n\n## What happened\nRelease s3 (deployed 0.4 min before onset, commit c42532d) sets doc_root: docs/v2, but the docs/v2 directory does not exist yet \u2014 the docs team migration hasn't landed. Every read_doc call resolves to a missing file, triggering ToolError(\"doc not found\") for ~30% of conversations. The coding agent explicitly noted the eval scored 15/18 due to missing docs/v2 and stated \"I didn't run deploy s3\", but the release was deployed to production anyway.\n\n## Root cause and provenance\n- Release: `s3`\n- Commit: `c42532d175a6` Scout: add doc_root release setting and s3 release for versioned docs/v2\n- Entire checkpoint: `01M4KX3NBN835SRDCEYVFZ7JF0` ([view](https://entire.io/gh/e-man07/neat-hacks/commit/c42532d175a645d9b66bd9d8dfac900868e9a227))\n- Coding agent: Claude Code claude-sonnet-5-5\n- Prompt behind the change: \u201cScout (agents/scout/scout.py) is our Lumen docs assistant. The docs team is moving every page under a versioned folder, agents/scout/docs/v2/<slug>.md, and the move lands this week. Get Scout ready ahead of it: add a doc_root release setting (default 'docs', relative to agents/scout) and make read_doc load pages from <doc_root>/<slug>.md for the active release. Leave the search index as it is for \u201d\n\n## Impact\n- Loss rate at detection: **$9.27/min** at production volume (6.67 conversations/min)\n- Human response time at 03:11 local: 300.0 min \u2192 projected loss if waiting: **$2,780**\n- Unit economics: Lumen support: a deflected ticket costs $4.50; docs bot answers ~400/h overnight\n\n## Actions\n- [needs_approval] `deploy_code_fix` {\"summary\": \"Gate future releases on eval score: require s3 (or any release) to pass eval at \\u2265 17/18 before it can be deployed to production. In this case the coding agent reported 15/18 and explicitly said it did not deploy \\u2014 a CI eval gate would have blocked the deploy automatically. Additionally, add a startup check that validates doc_root exists and is non-empty before the release goes live.\", \"revert_commit\": \"c42532d175a645d9b66bd9d8dfac900868e9a227\", \"release\": \"s3\"} \u2014 proposed \u2014 forward fix: needs human approval\n- [auto] `rollback_release` {\"target\": \"s2\"} \u2014 applied \u2014 'rollback_release' is pre-approved and reversible in one step; confidence 0.97 \u2265 0.6; projected loss while waiting for a human $2,780 \u2265 $25\n\n## Verification\n- Replay of failing conversations: 1/1 pass\n- Live metrics after action: metrics back within baseline\n\n## Evidence (neatlogs traces)\n- `dc7780de72d1a4ff8b1f2d967d4368d1`\n\n## Permanent fix (needs human approval)\nGate future releases on eval score: require s3 (or any release) to pass eval at \u2265 17/18 before it can be deployed to production. In this case the coding agent reported 15/18 and explicitly said it did not deploy \u2014 a CI eval gate would have blocked the deploy automatically. Additionally, add a startup check that validates doc_root exists and is non-empty before the release goes live.\n\n## Timeline\n- 2026-10-10 22:20:46 \u00b7 **detect** \u00b7 Anomaly detected: tool errors in 30% of conversations\n- 2026-10-10 22:20:46 \u00b7 **investigate** \u00b7 Investigating with neatlogs traces, deploy log and Entire provenance\n- 2026-10-10 22:20:49 \u00b7 **step** \u00b7 think: I'll start by gathering signals, recent deploys, and failing conversations simultaneously.\n- 2026-10-10 22:20:49 \u00b7 **step** \u00b7 get_signals: tool errors in 30% of conversations\n- 2026-10-10 22:20:49 \u00b7 **step** \u00b7 list_recent_deploys: s3 (0.4 min before onset), s2 (21.6 min before onset)\n- 2026-10-10 22:20:49 \u00b7 **step** \u00b7 get_failing_conversations: 1 failing conversations: escalated\n- 2026-10-10 22:20:50 \u00b7 **step** \u00b7 think: Release `s3` deployed just 0.4 minutes before incident onset. Let me get the release diff and change provenance, plus pull a few traces to see the tool errors.\n- 2026-10-10 22:20:50 \u00b7 **step** \u00b7 get_release_diff: s2 \u2192 s3: 9 lines removed, 23 added\n- 2026-10-10 22:20:51 \u00b7 **step** \u00b7 get_change_provenance: s3 \u2190 commit c42532d1 \u00b7 checkpoint 01M4KX3NBN835SRDCEYVFZ7JF0 \u00b7 prompt: \u201cScout (agents/scout/scout.py) is our Lumen docs assistant. The docs team is moving every page under a versioned folder, \u201d\n- 2026-10-10 22:20:52 \u00b7 **step** \u00b7 get_trace: trace dc7780de72d1 from neatlogs: 0 spans\n- 2026-10-10 22:20:53 \u00b7 **step** \u00b7 think: The root cause is crystal clear. Let me grab a couple more traces to confirm the tool error pattern, but the evidence is already definitive.\n- 2026-10-10 22:20:55 \u00b7 **step** \u00b7 search_traces: 0 traces match 'doc not found read_doc s3'\n- 2026-10-10 22:21:04 \u00b7 **step** \u00b7 think: The evidence is conclusive. Here's the full picture:\n\n---\n\n**Root Cause Summary:**\n\nRelease `s3` was deployed **0.4 minutes before incident onset** and is the active release. It introduced a `doc_root: docs/v2` setting, pointing `read_doc` to a versioned folder (`docs/v2/`) that \n- 2026-10-10 22:21:04 \u00b7 **step** \u00b7 submit_diagnosis: s3 release points read_doc at non-existent docs/v2 folder, causing 30% tool errors\n- 2026-10-10 22:21:04 \u00b7 **diagnosis** \u00b7 s3 release points read_doc at non-existent docs/v2 folder, causing 30% tool errors (tool_schema_drift, confidence 0.97)\n- 2026-10-10 22:21:04 \u00b7 **impact** \u00b7 $9.27/min \u00b7 human response at 03:11: 300 min \u00b7 $2,780 at risk\n- 2026-10-10 22:21:04 \u00b7 **propose** \u00b7 Permanent fix proposed (needs approval): Gate future releases on eval score: require s3 (or any release) to pass eval at \u2265 17/18 before it can be deployed to production. In this case the coding agent reported 15/18 and explicitly said it did not deploy \u2014 a CI eval gate would have blocked the deploy automatically. Additionally, add a startup check that validates doc_root exists and is non-empty before the release goes live.\n- 2026-10-10 22:21:04 \u00b7 **decide** \u00b7 Policy: auto \u2014 rollback_release {'target': 's2'}\n- 2026-10-10 22:21:04 \u00b7 **act** \u00b7 Auto action: rolled back s3 \u2192 s2\n- 2026-10-10 22:21:10 \u00b7 **verify** \u00b7 Replayed 1 failing conversations on the new config: 1/1 pass\n- 2026-10-10 22:21:10 \u00b7 **regression** \u00b7 Added regression eval INC-1010-01-f72c.yaml from the failing conversations\n- 2026-10-10 22:21:10 \u00b7 **page** \u00b7 Paged on-call via console: \u2705 Incident handled \u2014 no action needed tonight\n- 2026-10-10 22:21:42 \u00b7 **resolved** \u00b7 Live metrics recovered over 5 new conversations: metrics back within baseline\n"
+}
