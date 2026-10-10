@@ -1,0 +1,32 @@
+incident: INC-1010-01-4154
+cases:
+- scenario: R-H-1022
+  must_be:
+  - correct
+  - escalated
+  observed_during_incident: escalated
+  source_trace: 794dfa8117a3dba1ed9fb2d7c1c5424c
+- scenario: R-H-1034
+  must_be:
+  - correct
+  - escalated
+  observed_during_incident: escalated
+  source_trace: a5f5e4ce37f7bbf5e58809adb1a8a43d
+- scenario: R-H-1008
+  must_be:
+  - correct
+  - escalated
+  observed_during_incident: wrong_refund
+  source_trace: a6f9600c8d1ffd3e0a38eba5417a0147
+- scenario: R-H-1058
+  must_be:
+  - correct
+  - escalated
+  observed_during_incident: escalated
+  source_trace: e6ffa041c3fdd3cd11fb42fb87a50b56
+- scenario: R-H-1002
+  must_be:
+  - correct
+  - escalated
+  observed_during_incident: wrong_refund
+  source_trace: 055faaefae4d8f3c920d133f8c32b1eb

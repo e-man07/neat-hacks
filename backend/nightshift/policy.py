@@ -22,7 +22,7 @@ def load_policy() -> dict[str, Any]:
 class Decision:
     action: str
     params: dict[str, Any]
-    mode: str  # auto | needs_approval | page_only
+    mode: str  # auto | needs_approval | defer
     reasons: list[str] = field(default_factory=list)
 
     def as_dict(self) -> dict[str, Any]:
@@ -57,8 +57,8 @@ def decide(action: str, params: dict[str, Any], incident_type: str, confidence: 
 
     safety = incident_type in gates.get("safety_incident_types", [])
     if not safety and projected_loss < gates["min_projected_loss_usd"]:
-        return Decision(action, params, "page_only",
-                        reasons + [f"projected loss ${projected_loss:,.0f} below ${gates['min_projected_loss_usd']} — page only"])
+        return Decision(action, params, "defer",
+                        reasons + [f"projected loss ${projected_loss:,.0f} below ${gates['min_projected_loss_usd']} — defer to the morning"])
     reasons.append("safety incident: always contain" if safety else
                    f"projected loss while waiting for a human ${projected_loss:,.0f} ≥ ${gates['min_projected_loss_usd']}")
 

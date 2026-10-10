@@ -1,0 +1,32 @@
+incident: INC-1010-01-56af
+cases:
+- scenario: R-H-1013
+  must_be:
+  - correct
+  - escalated
+  observed_during_incident: escalated
+  source_trace: acda5ca820c03617320d2fb5209650dd
+- scenario: S-H-1050
+  must_be:
+  - correct
+  - escalated
+  observed_during_incident: failed
+  source_trace: b1765d6ceaaeaba016598a23e43be74c
+- scenario: R-H-1011
+  must_be:
+  - correct
+  - escalated
+  observed_during_incident: failed
+  source_trace: 5d49641aa27c70d42b97de9c8c5de0cc
+- scenario: R-H-1034
+  must_be:
+  - correct
+  - escalated
+  observed_during_incident: failed
+  source_trace: 22e06f0c0f5dacafb56e168112e184a1
+- scenario: R-H-1022
+  must_be:
+  - correct
+  - escalated
+  observed_during_incident: escalated
+  source_trace: 1b4f04e420ad53f4f9b4c1ce74943bd6

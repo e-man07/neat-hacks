@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import logging
 import threading
+import time
 from dataclasses import dataclass
 from typing import Any
 
@@ -113,13 +114,19 @@ def chat(
     }
     if tools:
         kwargs["tools"] = tools
-    try:
-        resp = client().chat.completions.create(**kwargs)
-    except Exception as exc:
-        status = getattr(exc, "status_code", None)
-        if status in (429, 500, 502, 503, 504) or "unavailable" in str(exc).lower():
-            raise ProviderOutage(f"{status or 'error'} from provider for model '{model}': {exc}") from exc
-        raise
+    resp = None
+    for attempt in range(4):
+        try:
+            resp = client().chat.completions.create(**kwargs)
+            break
+        except Exception as exc:
+            status = getattr(exc, "status_code", None)
+            if status == 429 and attempt < 3:  # gateway rate limit (60 rpm): back off, not an outage
+                time.sleep(4 * (attempt + 1))
+                continue
+            if status in (500, 502, 503, 504) or "unavailable" in str(exc).lower():
+                raise ProviderOutage(f"{status or 'error'} from provider for model '{model}': {exc}") from exc
+            raise
     usage = Usage(
         prompt_tokens=getattr(resp.usage, "prompt_tokens", 0) or 0,
         completion_tokens=getattr(resp.usage, "completion_tokens", 0) or 0,

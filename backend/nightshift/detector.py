@@ -18,7 +18,8 @@ MIN_SAMPLES = 6        # don't judge on fewer
 MAX_AGE_S = 15 * 60    # ignore stale conversations
 
 DEFAULT_BASELINE = {"loss_per_conv": 0.0, "failed_rate": 0.0, "tool_error_rate": 0.0,
-                    "cost_per_conv": 0.0055, "wrong_refund_rate": 0.0, "avg_steps": 2.6}
+                    "cost_per_conv": 0.0055, "wrong_refund_rate": 0.0, "avg_steps": 2.6,
+                    "escalation_rate": 0.1}
 
 
 @dataclass
@@ -91,7 +92,8 @@ def baseline(db: OpsDB, before: float) -> dict[str, float]:
     s = _stats(rows)
     return {"loss_per_conv": s.loss_per_conv, "failed_rate": s.failed_rate,
             "tool_error_rate": s.tool_error_rate, "cost_per_conv": s.cost_per_conv,
-            "wrong_refund_rate": s.wrong_refund_rate, "avg_steps": s.avg_steps}
+            "wrong_refund_rate": s.wrong_refund_rate, "avg_steps": s.avg_steps,
+            "escalation_rate": s.escalation_rate}
 
 
 def evaluate(stats: WindowStats, base: dict[str, float]) -> list[Signal]:
@@ -108,6 +110,11 @@ def evaluate(stats: WindowStats, base: dict[str, float]) -> list[Signal]:
     if stats.tool_error_rate >= 0.3 and stats.tool_error_rate > base["tool_error_rate"] + 0.2:
         sig.append(Signal("tool_errors", stats.tool_error_rate, base["tool_error_rate"], 0.3,
                           f"tool errors in {stats.tool_error_rate:.0%} of conversations"))
+    esc_base = base.get("escalation_rate", 0.1)
+    if stats.escalation_rate >= 0.3 and stats.escalation_rate > esc_base + 0.2:
+        sig.append(Signal("escalations", stats.escalation_rate, esc_base, 0.3,
+                          f"{stats.escalation_rate:.0%} of conversations handed to humans "
+                          f"(baseline {esc_base:.0%}): ticket flood"))
     cost_threshold = max(3 * base["cost_per_conv"], 0.015)
     if stats.cost_per_conv >= cost_threshold:
         sig.append(Signal("cost_spike", stats.cost_per_conv, base["cost_per_conv"], cost_threshold,

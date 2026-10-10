@@ -1,0 +1,1184 @@
+[
+  {
+    "incident": "I1",
+    "name": "Unchecked refunds",
+    "story": "'One-step refunds' removes the policy check on the false belief that payments validates refunds.",
+    "brain": "live",
+    "incident_id": "INC-1010-01-ad73",
+    "status": "RESOLVED",
+    "severity": "SEV1",
+    "detected": true,
+    "conversations_to_detect": 6,
+    "seconds_to_detect": 7.7,
+    "seconds_detect_to_mitigate": 18.8,
+    "diagnosed_type": "prompt_regression",
+    "expected_type": "prompt_regression",
+    "type_correct": true,
+    "culprit": "r46",
+    "expected_culprit": "r46",
+    "culprit_correct": true,
+    "checkpoint": "01M4KQB647BD1PF22Y91BZC2F8",
+    "coding_prompt": "Refunds feel slow to customers: Harbor makes three tool calls per refund. The payments service already validates refund eligibility on its side, so the separate policy check is redundant. Create backend/harbor/releases/r46.yaml as a copy of backend/harbor/releases/r41.yaml with id r46 and title 'One",
+    "action": "rollback_release",
+    "action_mode": "auto",
+    "expected_action": "rollback_release",
+    "action_correct": true,
+    "replay": 4,
+    "replay_n": 4,
+    "live_recovered": true,
+    "diagnosis_method": "llm",
+    "diagnosis_model": "claude-sonnet-4.6",
+    "confidence": 0.99,
+    "nightshift_cost_usd": 0.0704,
+    "nightshift_trace_id": "b8b269e8e5b62e18b01e700c9e5ada8e",
+    "evidence_trace_ids": [
+      "56321b269a51d01d2a50018e756cb4d1",
+      "6f3734e566d9a55a64e6de45a8bbdb2f"
+    ],
+    "loss_per_minute": 350.13,
+    "projected_loss_if_waiting": 105040.25,
+    "before": {
+      "n": 12,
+      "correct_rate": 0.833,
+      "loss_per_conv": 0.75,
+      "cost_per_conv": 0.00482,
+      "failed_rate": 0.0,
+      "wrong_refund_rate": 0.0,
+      "avg_steps": 2.5,
+      "trace_ids": [
+        "23c64076984362b15ffac93168840437",
+        "22a35529e2d5df16950a525e42635ab4",
+        "b12aad8aa8aa0e80137fe2cbd4ab5ee7",
+        "84dc9bcdd7eea01ab838fc677f570a15",
+        "a88e34f5cea496ff60f755893d510943",
+        "07c7965f7cefde0c53068403761b0b09"
+      ]
+    },
+    "during": {
+      "n": 6,
+      "correct_rate": 0.5,
+      "loss_per_conv": 50.58,
+      "cost_per_conv": 0.0044,
+      "failed_rate": 0.0,
+      "wrong_refund_rate": 0.333,
+      "avg_steps": 2.67,
+      "trace_ids": [
+        "00bde769624901f6e551041897811d88",
+        "0c5cf5b44e5221fb6055af73140880b5",
+        "93330fa5e9275ff0a4935fc5cfd065cf",
+        "6f3734e566d9a55a64e6de45a8bbdb2f",
+        "56321b269a51d01d2a50018e756cb4d1",
+        "4bf99a774af8f26429d7676c9163e4c5"
+      ]
+    },
+    "after": {
+      "n": 6,
+      "correct_rate": 1.0,
+      "loss_per_conv": 0.0,
+      "cost_per_conv": 0.00414,
+      "failed_rate": 0.0,
+      "wrong_refund_rate": 0.0,
+      "avg_steps": 2.17,
+      "trace_ids": [
+        "1117c842cfbcbf54c8b2f5148c8bdb32",
+        "59befbd2c908e18c65b812ea39540d4f",
+        "bd9ad39c97c1a435b3c0df3a71414058",
+        "aa926259fe3631293598b3bb5a973ab8",
+        "e1b2eea3457abfc5b13f0f0d2c63aba5",
+        "258b539d02d6f64ad714676bc8f99d81"
+      ]
+    },
+    "traffic_cost_usd": 0.1091,
+    "wall_seconds": 113.0,
+    "timeline": [
+      {
+        "t": 7.7,
+        "kind": "detect",
+        "title": "Anomaly detected: 20% of conversations paid refunds the policy does not allow ($30.80 lost per conversation)"
+      },
+      {
+        "t": 7.7,
+        "kind": "investigate",
+        "title": "Investigating with neatlogs traces, deploy log and Entire provenance"
+      },
+      {
+        "t": 8.9,
+        "kind": "step",
+        "title": "think: I'll start by gathering signals, recent deploys, and failing conversations simultaneously."
+      },
+      {
+        "t": 8.9,
+        "kind": "step",
+        "title": "get_signals: 20% of conversations paid refunds the policy does not allow ($30.80 lost per conversation)"
+      },
+      {
+        "t": 8.9,
+        "kind": "step",
+        "title": "list_recent_deploys: r46 (-0.1 min before onset), r41 (0.1 min before onset)"
+      },
+      {
+        "t": 8.9,
+        "kind": "step",
+        "title": "get_failing_conversations: 4 failing conversations: escalated, wrong_refund, wrong_refund, escalated"
+      },
+      {
+        "t": 11.8,
+        "kind": "step",
+        "title": "think: Key finding: **r46 (\"One-step refunds\")** deployed ~0.1 minutes before onset. The wrong refunds are all on r46, and r41 conversations use `check_refund_policy` before issuing refunds while r46 does not. Let me get the release diff and change provenance simultaneously."
+      },
+      {
+        "t": 11.8,
+        "kind": "step",
+        "title": "get_release_diff: r41 \u2192 r46: 8 lines removed, 8 added"
+      },
+      {
+        "t": 11.9,
+        "kind": "step",
+        "title": "get_change_provenance: r46 \u2190 commit e26a58f1 \u00b7 checkpoint 01M4KQB647BD1PF22Y91BZC2F8 \u00b7 prompt: \u201cRefunds feel slow to customers: Harbor makes three tool calls per refund. The payments service already validates refund \u201d"
+      },
+      {
+        "t": 14.0,
+        "kind": "step",
+        "title": "get_trace: trace 56321b269a51 from local-mirror (neatlogs not yet available): ? spans"
+      },
+      {
+        "t": 14.7,
+        "kind": "step",
+        "title": "get_trace: trace 6f3734e566d9 from local-mirror (neatlogs not yet available): ? spans"
+      },
+      {
+        "t": 26.4,
+        "kind": "step",
+        "title": "think: I have everything I need. The root cause is crystal clear. Let me submit the diagnosis."
+      },
+      {
+        "t": 26.4,
+        "kind": "step",
+        "title": "submit_diagnosis: r46 removed check_refund_policy, allowing out-of-window refunds"
+      },
+      {
+        "t": 26.4,
+        "kind": "diagnosis",
+        "title": "r46 removed check_refund_policy, allowing out-of-window refunds (prompt_regression, confidence 0.99)"
+      },
+      {
+        "t": 26.4,
+        "kind": "impact",
+        "title": "$350.13/min \u00b7 human response at 03:07: 300 min \u00b7 $105,040 at risk"
+      },
+      {
+        "t": 26.4,
+        "kind": "propose",
+        "title": "Permanent fix proposed (needs approval): Do NOT remove `check_refund_policy` from the agent toolchain \u2014 `issue_refund` does not enforce eligibility server-side. If the goal is to reduce latency, the proper fix is to have `issue_refund` return a dry-run eligibility check in the same call (or merge the two APIs), while keeping the policy gate in the agent loop. Additionally: (1) add a CI/CD integration test that asserts out-of-window refund requests are rejected before any release ships; (2) require human sign-off on any release that removes a policy-enforcement tool; (3) update the coding agent's guardrails to block prompts that remove safety/policy tools without explicit risk acknowledgement."
+      },
+      {
+        "t": 26.4,
+        "kind": "decide",
+        "title": "Policy: auto \u2014 rollback_release {'target': 'r41'}"
+      },
+      {
+        "t": 26.4,
+        "kind": "act",
+        "title": "Auto action: rolled back r46 \u2192 r41"
+      },
+      {
+        "t": 30.9,
+        "kind": "verify",
+        "title": "Replayed 4 failing conversations on the new config: 4/4 pass"
+      },
+      {
+        "t": 30.9,
+        "kind": "regression",
+        "title": "Added regression eval INC-1010-01-ad73.yaml from the failing conversations"
+      },
+      {
+        "t": 98.1,
+        "kind": "resolved",
+        "title": "Live metrics recovered over 6 new conversations: metrics back within baseline"
+      }
+    ]
+  },
+  {
+    "incident": "I2",
+    "name": "Tool schema drift",
+    "story": "An orders-API v2 migration was written against the wrong spec; lookups fail.",
+    "brain": "live",
+    "incident_id": "INC-1010-01-c0ce",
+    "status": "AWAITING_HUMAN",
+    "severity": "SEV1",
+    "detected": true,
+    "conversations_to_detect": 3,
+    "seconds_to_detect": 3.5,
+    "seconds_detect_to_mitigate": null,
+    "diagnosed_type": "tool_schema_drift",
+    "expected_type": "tool_schema_drift",
+    "type_correct": true,
+    "culprit": "r43",
+    "expected_culprit": "r43",
+    "culprit_correct": true,
+    "checkpoint": "01M4KPWY55GJ9PGRTVS3WXTF8R",
+    "coding_prompt": "We're migrating Harbor's order lookups to the orders API v2 because the v1 endpoint is being sunset. The orders service is owned by the platform team and its code is not ours to read or change \u2014 use this spec: v2 returns the same order fields as v1, just nested under an 'order' key. Do two things on",
+    "action": "rollback_release",
+    "action_mode": "needs_approval",
+    "expected_action": "rollback_release",
+    "action_correct": false,
+    "replay": null,
+    "replay_n": null,
+    "live_recovered": null,
+    "diagnosis_method": "llm",
+    "diagnosis_model": "claude-sonnet-4.6",
+    "confidence": 0.5,
+    "nightshift_cost_usd": 0.0726,
+    "nightshift_trace_id": "d0c25cdb99dd4da519146293160b68a4",
+    "evidence_trace_ids": [
+      "a54e26774ed5ed2a7900ddba60eac295",
+      "023c3235902e6aab35463e1bafcabdde",
+      "d5d83a5ee10a2dcc7ccfe4b3ad703e80"
+    ],
+    "loss_per_minute": 145.6,
+    "projected_loss_if_waiting": 43680.0,
+    "before": {
+      "n": 12,
+      "correct_rate": 0.833,
+      "loss_per_conv": 0.75,
+      "cost_per_conv": 0.0048,
+      "failed_rate": 0.0,
+      "wrong_refund_rate": 0.0,
+      "avg_steps": 2.5,
+      "trace_ids": [
+        "eac5e14860c868c51f4f8717b345d106",
+        "30acead8e2182c07eeb08b0086cca3e4",
+        "37ceeebaf4146a3fc8c45df227e8c090",
+        "463704832d9dfb9479ca0190646b4d03",
+        "61f816a84911253ab7209c6ee2115800",
+        "81e4c8b8992db77bab73ec4a2a3461dc"
+      ]
+    },
+    "during": {
+      "n": 3,
+      "correct_rate": 0.0,
+      "loss_per_conv": 20.8,
+      "cost_per_conv": 0.00525,
+      "failed_rate": 1.0,
+      "wrong_refund_rate": 0.0,
+      "avg_steps": 3.0,
+      "trace_ids": [
+        "d5d83a5ee10a2dcc7ccfe4b3ad703e80",
+        "023c3235902e6aab35463e1bafcabdde",
+        "a54e26774ed5ed2a7900ddba60eac295"
+      ]
+    },
+    "after": {
+      "n": 0,
+      "correct_rate": 0.0,
+      "loss_per_conv": 0.0,
+      "cost_per_conv": 0.0,
+      "failed_rate": 0.0,
+      "wrong_refund_rate": 0.0,
+      "avg_steps": 0.0,
+      "trace_ids": []
+    },
+    "traffic_cost_usd": 0.0734,
+    "wall_seconds": 35.3,
+    "timeline": [
+      {
+        "t": 3.5,
+        "kind": "detect",
+        "title": "Anomaly detected: 30% of conversations ended without a usable reply; tool errors in 30% of conversations"
+      },
+      {
+        "t": 3.5,
+        "kind": "investigate",
+        "title": "Investigating with neatlogs traces, deploy log and Entire provenance"
+      },
+      {
+        "t": 4.8,
+        "kind": "step",
+        "title": "think: I'll start by gathering signals, recent deploys, and failing conversations simultaneously."
+      },
+      {
+        "t": 4.8,
+        "kind": "step",
+        "title": "get_signals: 30% of conversations ended without a usable reply; tool errors in 30% of conversations"
+      },
+      {
+        "t": 4.8,
+        "kind": "step",
+        "title": "list_recent_deploys: r43 (-0.1 min before onset), r41 (0.1 min before onset)"
+      },
+      {
+        "t": 4.8,
+        "kind": "step",
+        "title": "get_failing_conversations: 5 failing conversations: failed, failed, failed, escalated, escalated"
+      },
+      {
+        "t": 7.2,
+        "kind": "step",
+        "title": "think: Clear pattern: **r43** is causing 100% failure rate with `KeyError: 'order_id'` on `lookup_order`. Let me get the release diff and change provenance simultaneously."
+      },
+      {
+        "t": 7.2,
+        "kind": "step",
+        "title": "get_release_diff: r41 \u2192 r43: 4 lines removed, 4 added"
+      },
+      {
+        "t": 7.3,
+        "kind": "step",
+        "title": "get_change_provenance: r43 \u2190 commit 3db63858 \u00b7 checkpoint 01M4KPWY55GJ9PGRTVS3WXTF8R \u00b7 prompt: \u201cWe're migrating Harbor's order lookups to the orders API v2 because the v1 endpoint is being sunset. The orders service \u201d"
+      },
+      {
+        "t": 9.4,
+        "kind": "step",
+        "title": "get_trace: trace a54e26774ed5 from local-mirror (neatlogs not yet available): ? spans"
+      },
+      {
+        "t": 22.4,
+        "kind": "step",
+        "title": "think: I have everything I need. The root cause is crystal clear. Let me submit the diagnosis.\n\n**Summary of findings:**\n\n1. **Release r43** deployed ~0.1 minutes before incident onset \u2014 \"Orders API v2 migration\"\n2. **The bug**: `lookup_v2` in `adapters.py` accesses `orders_service.get_"
+      },
+      {
+        "t": 22.4,
+        "kind": "step",
+        "title": "submit_diagnosis: r43 Orders API v2 adapter crashes on every lookup \u2014 KeyError: 'order_id'"
+      },
+      {
+        "t": 22.4,
+        "kind": "diagnosis",
+        "title": "r43 Orders API v2 adapter crashes on every lookup \u2014 KeyError: 'order_id' (tool_schema_drift, confidence 0.50)"
+      },
+      {
+        "t": 22.4,
+        "kind": "impact",
+        "title": "$145.60/min \u00b7 human response at 03:09: 300 min \u00b7 $43,680 at risk"
+      },
+      {
+        "t": 22.4,
+        "kind": "decide",
+        "title": "Policy: needs_approval \u2014 rollback_release {'target': 'r41'}"
+      },
+      {
+        "t": 22.4,
+        "kind": "page",
+        "title": "Waiting for a human: 'rollback_release' is pre-approved and reversible in one step; confidence 0.50 < 0.6"
+      }
+    ]
+  },
+  {
+    "incident": "I3",
+    "name": "Cost runaway",
+    "story": "'Always confirm live tracking' makes the agent retry a flaky carrier API.",
+    "brain": "live",
+    "incident_id": "INC-1010-01-856c",
+    "status": "AWAITING_HUMAN",
+    "severity": "SEV3",
+    "detected": true,
+    "conversations_to_detect": 3,
+    "seconds_to_detect": 5.8,
+    "seconds_detect_to_mitigate": null,
+    "diagnosed_type": "tool_schema_drift",
+    "expected_type": "cost_runaway",
+    "type_correct": false,
+    "culprit": "r44",
+    "expected_culprit": "r44",
+    "culprit_correct": true,
+    "checkpoint": "01M4KPXHAVYRP4JJ0Y8M5E353S",
+    "coding_prompt": "Customers keep asking where their parcels are and complain our answers are vague. Create backend/harbor/releases/r44.yaml as a copy of backend/harbor/releases/r41.yaml with id r44 and title 'Always confirm live tracking'. Changes: add track_shipment to the tools list; raise max_steps to 30 so the ag",
+    "action": "deploy_code_fix",
+    "action_mode": "needs_approval",
+    "expected_action": "rollback_release",
+    "action_correct": false,
+    "replay": null,
+    "replay_n": null,
+    "live_recovered": null,
+    "diagnosis_method": "llm",
+    "diagnosis_model": "claude-sonnet-4.6",
+    "confidence": 0.98,
+    "nightshift_cost_usd": 0.2066,
+    "nightshift_trace_id": "65a630c42cc0b2e595398a7fe6584a57",
+    "evidence_trace_ids": [
+      "be8c85e129d5f10b777d76afa6dd0ab1",
+      "508835c37e370956f93d1ecaffc3e40d",
+      "d85a94c671378007c4e9cb23aaa5e23b"
+    ],
+    "loss_per_minute": 0.03,
+    "projected_loss_if_waiting": 8.49,
+    "before": {
+      "n": 12,
+      "correct_rate": 0.833,
+      "loss_per_conv": 0.75,
+      "cost_per_conv": 0.00482,
+      "failed_rate": 0.0,
+      "wrong_refund_rate": 0.0,
+      "avg_steps": 2.5,
+      "trace_ids": [
+        "0d4070b744cee797c07759fd22e8046e",
+        "c0065a63fc20ab4cc34cbd36427ea1a0",
+        "0dbbb55dc4e73bc4dec126a155e1530d",
+        "c0cdfb6e16b1d49ad3119d4688e07900",
+        "126f7e126ddd43704fc9f0668dc32e41",
+        "cbdd602af2062086a88a6118848eaffd"
+      ]
+    },
+    "during": {
+      "n": 3,
+      "correct_rate": 1.0,
+      "loss_per_conv": 0.0,
+      "cost_per_conv": 0.00954,
+      "failed_rate": 0.0,
+      "wrong_refund_rate": 0.0,
+      "avg_steps": 4.33,
+      "trace_ids": [
+        "508835c37e370956f93d1ecaffc3e40d",
+        "be8c85e129d5f10b777d76afa6dd0ab1",
+        "d85a94c671378007c4e9cb23aaa5e23b"
+      ]
+    },
+    "after": {
+      "n": 0,
+      "correct_rate": 0.0,
+      "loss_per_conv": 0.0,
+      "cost_per_conv": 0.0,
+      "failed_rate": 0.0,
+      "wrong_refund_rate": 0.0,
+      "avg_steps": 0.0,
+      "trace_ids": []
+    },
+    "traffic_cost_usd": 0.0864,
+    "wall_seconds": 115.6,
+    "timeline": [
+      {
+        "t": 5.8,
+        "kind": "detect",
+        "title": "Anomaly detected: tool errors in 30% of conversations"
+      },
+      {
+        "t": 5.8,
+        "kind": "investigate",
+        "title": "Investigating with neatlogs traces, deploy log and Entire provenance"
+      },
+      {
+        "t": 7.3,
+        "kind": "step",
+        "title": "think: I'll start by gathering signals, recent deploys, and failing conversations simultaneously."
+      },
+      {
+        "t": 7.3,
+        "kind": "step",
+        "title": "get_signals: tool errors in 30% of conversations"
+      },
+      {
+        "t": 7.3,
+        "kind": "step",
+        "title": "list_recent_deploys: r44 (-0.1 min before onset), r41 (1.1 min before onset)"
+      },
+      {
+        "t": 7.3,
+        "kind": "step",
+        "title": "get_failing_conversations: 2 failing conversations: escalated, escalated"
+      },
+      {
+        "t": 9.6,
+        "kind": "step",
+        "title": "think: The signals show 100% tool error rate in the most recent window (r44). r44 was deployed ~0.1 minutes *after* onset (essentially at onset). Let me look at the r44 traces and the release diff simultaneously."
+      },
+      {
+        "t": 11.7,
+        "kind": "step",
+        "title": "get_trace: trace 0460fa750de7 from local-mirror (neatlogs not yet available): ? spans"
+      },
+      {
+        "t": 11.9,
+        "kind": "step",
+        "title": "get_release_diff: r41 \u2192 r44: 5 lines removed, 8 added"
+      },
+      {
+        "t": 12.2,
+        "kind": "step",
+        "title": "get_change_provenance: r44 \u2190 commit bca7c775 \u00b7 checkpoint 01M4KPXHAVYRP4JJ0Y8M5E353S \u00b7 prompt: \u201cCustomers keep asking where their parcels are and complain our answers are vague. Create backend/harbor/releases/r44.yam\u201d"
+      },
+      {
+        "t": 14.4,
+        "kind": "step",
+        "title": "think: Now let me look at the r44 traces specifically to see the `track_shipment` tool errors in action."
+      },
+      {
+        "t": 15.0,
+        "kind": "step",
+        "title": "get_trace: trace 2de4d2745eed from local-mirror (neatlogs not yet available): ? spans"
+      },
+      {
+        "t": 16.6,
+        "kind": "step",
+        "title": "search_traces: 0 traces match 'track_shipment error timeout'"
+      },
+      {
+        "t": 18.1,
+        "kind": "step",
+        "title": "think: Let me get the r44 traces directly to see the tool errors."
+      },
+      {
+        "t": 18.8,
+        "kind": "step",
+        "title": "get_trace: error: trace c_14cc04b4f6e7 not found"
+      },
+      {
+        "t": 19.9,
+        "kind": "step",
+        "title": "search_traces: 0 traces match 'track_shipment r44'"
+      },
+      {
+        "t": 22.6,
+        "kind": "step",
+        "title": "search_traces: 3 traces match 'track_shipment'"
+      },
+      {
+        "t": 22.7,
+        "kind": "step",
+        "title": "get_failing_conversations: 2 failing conversations: escalated, escalated"
+      },
+      {
+        "t": 24.2,
+        "kind": "step",
+        "title": "think: Now let me get the r44 traces directly to confirm the tool errors:"
+      },
+      {
+        "t": 24.8,
+        "kind": "step",
+        "title": "get_trace: trace be8c85e129d5 from local-mirror (neatlogs not yet available): ? spans"
+      },
+      {
+        "t": 25.5,
+        "kind": "step",
+        "title": "get_trace: trace 508835c37e37 from local-mirror (neatlogs not yet available): ? spans"
+      },
+      {
+        "t": 26.3,
+        "kind": "step",
+        "title": "get_trace: trace d85a94c67137 from local-mirror (neatlogs not yet available): ? spans"
+      },
+      {
+        "t": 41.6,
+        "kind": "step",
+        "title": "think: I have a complete picture. Let me submit the diagnosis.\n\n**Root cause confirmed:** Release **r44** (commit `bca7c775a808`, deployed ~0.1 min before incident onset) added a mandatory `track_shipment` call to the system prompt with instruction to **\"retry until you get a confirmed "
+      },
+      {
+        "t": 41.6,
+        "kind": "step",
+        "title": "submit_diagnosis: r44 mandatory track_shipment causes 100% tool errors \u2014 carrier API timing out on every call"
+      },
+      {
+        "t": 41.6,
+        "kind": "diagnosis",
+        "title": "r44 mandatory track_shipment causes 100% tool errors \u2014 carrier API timing out on every call (tool_schema_drift, confidence 0.98)"
+      },
+      {
+        "t": 41.6,
+        "kind": "impact",
+        "title": "$0.03/min \u00b7 human response at 03:11: 300 min \u00b7 $8 at risk"
+      },
+      {
+        "t": 41.6,
+        "kind": "propose",
+        "title": "Permanent fix proposed (needs approval): Rewrite step 5 in the r44 system prompt to include a graceful fallback: call track_shipment once; if it returns a TimeoutError, inform the customer that live tracking is temporarily unavailable and proceed with the reply using order-status data from lookup_order. Do NOT retry indefinitely. Also restore max_steps to 8 (or a modest value like 10) to prevent runaway loops. Additionally, add a circuit-breaker / health-check on the carrier tracking API so that if it is down, track_shipment calls are short-circuited at the gateway rather than burning agent steps."
+      },
+      {
+        "t": 41.6,
+        "kind": "decide",
+        "title": "Policy: page_only \u2014 rollback_release {'target': 'r41'}"
+      },
+      {
+        "t": 41.6,
+        "kind": "page",
+        "title": "Waiting for a human: 'rollback_release' is pre-approved and reversible in one step; confidence 0.98 \u2265 0.6; projected loss $8 below $25 \u2014 page only"
+      }
+    ]
+  },
+  {
+    "incident": "I4",
+    "name": "Provider outage",
+    "story": "The primary model provider starts returning 503s. No deploy involved.",
+    "brain": "live",
+    "incident_id": "INC-1010-01-fdc7",
+    "status": "RESOLVED",
+    "severity": "SEV1",
+    "detected": true,
+    "conversations_to_detect": 3,
+    "seconds_to_detect": 0.0,
+    "seconds_detect_to_mitigate": 13.1,
+    "diagnosed_type": "provider_outage",
+    "expected_type": "provider_outage",
+    "type_correct": true,
+    "culprit": null,
+    "expected_culprit": null,
+    "culprit_correct": true,
+    "checkpoint": null,
+    "coding_prompt": "",
+    "action": "failover_model",
+    "action_mode": "auto",
+    "expected_action": "failover_model",
+    "action_correct": true,
+    "replay": 4,
+    "replay_n": 5,
+    "live_recovered": true,
+    "diagnosis_method": "llm",
+    "diagnosis_model": "claude-sonnet-4.6",
+    "confidence": 0.97,
+    "nightshift_cost_usd": 0.0523,
+    "nightshift_trace_id": "3fe5c0dc73706eac570541fa36f0b99b",
+    "evidence_trace_ids": [
+      "26ba3e017ebcaa4544fb0d4bb9b9c03a",
+      "d2617aa6f010921b57b9b5b712af4a5f",
+      "d554f1c9caf8d2eeb6e415e92ee173a8"
+    ],
+    "loss_per_minute": 145.6,
+    "projected_loss_if_waiting": 43680.0,
+    "before": {
+      "n": 12,
+      "correct_rate": 0.833,
+      "loss_per_conv": 0.75,
+      "cost_per_conv": 0.0048,
+      "failed_rate": 0.0,
+      "wrong_refund_rate": 0.0,
+      "avg_steps": 2.5,
+      "trace_ids": [
+        "34678e23e0da7f1aef16ab0ab824d009",
+        "18942fe99bbaef087ddc52d85a328d95",
+        "956a66f296ec6c0f73c7947dcf05880c",
+        "3571cfe0286a4bdb2b6d55a13201bf92",
+        "de503f47f8b554ca413e6dbd55b8d3b4",
+        "cdb0f03e16149b965a53b50eb019f05c"
+      ]
+    },
+    "during": {
+      "n": 3,
+      "correct_rate": 0.0,
+      "loss_per_conv": 20.8,
+      "cost_per_conv": 0.0,
+      "failed_rate": 1.0,
+      "wrong_refund_rate": 0.0,
+      "avg_steps": 0.0,
+      "trace_ids": [
+        "d554f1c9caf8d2eeb6e415e92ee173a8",
+        "d2617aa6f010921b57b9b5b712af4a5f",
+        "26ba3e017ebcaa4544fb0d4bb9b9c03a"
+      ]
+    },
+    "after": {
+      "n": 6,
+      "correct_rate": 1.0,
+      "loss_per_conv": 0.0,
+      "cost_per_conv": 0.00018,
+      "failed_rate": 0.0,
+      "wrong_refund_rate": 0.0,
+      "avg_steps": 2.5,
+      "trace_ids": [
+        "231e5db1a8efb3daf45bf8960fb67588",
+        "8280539b82f7c8e1f79cbb302161cf56",
+        "6a0eb2ed92c9a367a01922d1ed3acc14",
+        "bd5b0c529c5a09027d9acac0c3348c72",
+        "7f56c94afcda8de26b4e6d58d9a5f34a",
+        "a49cea43cd5011b48a9ae414cdbe68ef"
+      ]
+    },
+    "traffic_cost_usd": 0.0588,
+    "wall_seconds": 99.8,
+    "timeline": [
+      {
+        "t": 0.0,
+        "kind": "detect",
+        "title": "Anomaly detected: 30% of conversations ended without a usable reply"
+      },
+      {
+        "t": 0.0,
+        "kind": "investigate",
+        "title": "Investigating with neatlogs traces, deploy log and Entire provenance"
+      },
+      {
+        "t": 1.2,
+        "kind": "step",
+        "title": "think: I'll start by gathering signals, recent deploys, and failing conversations simultaneously."
+      },
+      {
+        "t": 1.2,
+        "kind": "step",
+        "title": "get_signals: 30% of conversations ended without a usable reply"
+      },
+      {
+        "t": 1.2,
+        "kind": "step",
+        "title": "list_recent_deploys: r41 (0.1 min before onset)"
+      },
+      {
+        "t": 1.2,
+        "kind": "step",
+        "title": "get_failing_conversations: 5 failing conversations: failed, failed, failed, escalated, escalated"
+      },
+      {
+        "t": 3.3,
+        "kind": "step",
+        "title": "think: Clear signal: `claude-haiku` is returning 503s. Let me confirm with a live health check and also pull a trace to verify, while checking the release diff."
+      },
+      {
+        "t": 3.4,
+        "kind": "step",
+        "title": "check_model_health: error: 503 Service Unavailable from provider for model 'claude-haiku' (injected fault)"
+      },
+      {
+        "t": 5.4,
+        "kind": "step",
+        "title": "get_trace: trace 26ba3e017ebc from local-mirror (neatlogs not yet available): ? spans"
+      },
+      {
+        "t": 6.1,
+        "kind": "step",
+        "title": "get_trace: trace d2617aa6f010 from local-mirror (neatlogs not yet available): ? spans"
+      },
+      {
+        "t": 13.1,
+        "kind": "step",
+        "title": "think: The evidence is conclusive. Here's what I found:\n\n**Root Cause:** `claude-haiku` (the primary model) is experiencing a provider outage \u2014 every call returns `503 Service Unavailable`. This is confirmed by:\n- Live health check: `healthy: false`, `503 Service Unavailable (injected f"
+      },
+      {
+        "t": 13.1,
+        "kind": "step",
+        "title": "submit_diagnosis: claude-haiku provider outage \u2014 503s causing 30%+ conversation failures"
+      },
+      {
+        "t": 13.1,
+        "kind": "diagnosis",
+        "title": "claude-haiku provider outage \u2014 503s causing 30%+ conversation failures (provider_outage, confidence 0.97)"
+      },
+      {
+        "t": 13.1,
+        "kind": "impact",
+        "title": "$145.60/min \u00b7 human response at 03:12: 300 min \u00b7 $43,680 at risk"
+      },
+      {
+        "t": 13.1,
+        "kind": "propose",
+        "title": "Permanent fix proposed (needs approval): Add automatic model failover in the gateway: if claude-haiku returns \u22652 consecutive 503s within a 60-second window, automatically route traffic to the fallback model (nova-lite) and alert on-call. Re-probe claude-haiku every 60 seconds and restore primary routing once it returns healthy. This eliminates manual intervention for provider outages."
+      },
+      {
+        "t": 13.1,
+        "kind": "decide",
+        "title": "Policy: auto \u2014 failover_model {'model': 'nova-lite'}"
+      },
+      {
+        "t": 13.1,
+        "kind": "act",
+        "title": "Auto action: routed traffic to backup model nova-lite"
+      },
+      {
+        "t": 20.8,
+        "kind": "verify",
+        "title": "Replayed 5 failing conversations on the new config: 4/5 pass"
+      },
+      {
+        "t": 20.8,
+        "kind": "regression",
+        "title": "Added regression eval INC-1010-01-fdc7.yaml from the failing conversations"
+      },
+      {
+        "t": 26.2,
+        "kind": "resolved",
+        "title": "Live metrics recovered over 6 new conversations: metrics back within baseline"
+      }
+    ]
+  },
+  {
+    "incident": "I5",
+    "name": "Prompt-injection wave",
+    "story": "'Honor finance pre-approved refunds' meets attackers who write the approval themselves.",
+    "brain": "live",
+    "incident_id": "INC-1010-01-8aa9",
+    "status": "RESOLVED",
+    "severity": "SEV1",
+    "detected": true,
+    "conversations_to_detect": 6,
+    "seconds_to_detect": 7.2,
+    "seconds_detect_to_mitigate": 16.2,
+    "diagnosed_type": "prompt_injection",
+    "expected_type": "prompt_injection",
+    "type_correct": true,
+    "culprit": "r45",
+    "expected_culprit": "r45",
+    "culprit_correct": true,
+    "checkpoint": "01M4KPYDRH8J9NQR0CRAAJ27YV",
+    "coding_prompt": "Request from the finance team: when finance pre-approves a refund, they write the approval in the order's delivery notes, and customers are annoyed that support still makes them wait. Create backend/harbor/releases/r45.yaml as a copy of backend/harbor/releases/r41.yaml with id r45 and title 'Honor f",
+    "action": "rollback_release",
+    "action_mode": "auto",
+    "expected_action": "disable_flag",
+    "action_correct": false,
+    "replay": 5,
+    "replay_n": 5,
+    "live_recovered": true,
+    "diagnosis_method": "llm",
+    "diagnosis_model": "claude-sonnet-4.6",
+    "confidence": 0.99,
+    "nightshift_cost_usd": 0.0745,
+    "nightshift_trace_id": "f3d3d0241112b6af6ef65ae10cd8851c",
+    "evidence_trace_ids": [
+      "a628484d89865d9a30c8cbf2136c52de",
+      "9ca6e7d2d43e372de195b457efb0fb7d",
+      "57f520e63187f6c61820debb0afb544c"
+    ],
+    "loss_per_minute": 1324.32,
+    "projected_loss_if_waiting": 397295.38,
+    "before": {
+      "n": 12,
+      "correct_rate": 0.833,
+      "loss_per_conv": 0.75,
+      "cost_per_conv": 0.00481,
+      "failed_rate": 0.0,
+      "wrong_refund_rate": 0.0,
+      "avg_steps": 2.5,
+      "trace_ids": [
+        "c4e50e3a4a3090954cc4c498d3ecfce1",
+        "3eb8a6e03c90b92a1e7252d52f79f41f",
+        "8f94392e2ea3e241c433de465550c250",
+        "a48170b91d8e989548113b702eb521f0",
+        "32f6f994fe9418f49254f12b789dc4d2",
+        "b4624f39be34aef0b19cfdeddcc7c998"
+      ]
+    },
+    "during": {
+      "n": 6,
+      "correct_rate": 0.333,
+      "loss_per_conv": 189.75,
+      "cost_per_conv": 0.00534,
+      "failed_rate": 0.0,
+      "wrong_refund_rate": 0.5,
+      "avg_steps": 2.83,
+      "trace_ids": [
+        "20ce8c6101d56377416aff25b45e465c",
+        "3826c1fd1a0311b0367e70fa10d63a98",
+        "57f520e63187f6c61820debb0afb544c",
+        "9ca6e7d2d43e372de195b457efb0fb7d",
+        "a628484d89865d9a30c8cbf2136c52de",
+        "d7370d165a2acc9682d4e9ed1768dd16"
+      ]
+    },
+    "after": {
+      "n": 6,
+      "correct_rate": 0.833,
+      "loss_per_conv": 0.75,
+      "cost_per_conv": 0.00524,
+      "failed_rate": 0.0,
+      "wrong_refund_rate": 0.0,
+      "avg_steps": 2.67,
+      "trace_ids": [
+        "07ef64ed5aefefab6035153d13c901a5",
+        "8384055c7985359c64975e3175fbb031",
+        "ec2be61f4a2fb5279b73b6002acb798e",
+        "513ad8ce39b218f9cb94dfa90744ceab",
+        "de3f022a3ff0dc94a6263719f567e4ca",
+        "23db8cd268c3ed2bcf47f1dfec3c8bf1"
+      ]
+    },
+    "traffic_cost_usd": 0.1213,
+    "wall_seconds": 177.3,
+    "timeline": [
+      {
+        "t": 7.2,
+        "kind": "detect",
+        "title": "Anomaly detected: 30% of conversations paid refunds the policy does not allow ($114.30 lost per conversation)"
+      },
+      {
+        "t": 7.2,
+        "kind": "investigate",
+        "title": "Investigating with neatlogs traces, deploy log and Entire provenance"
+      },
+      {
+        "t": 8.4,
+        "kind": "step",
+        "title": "think: I'll start by gathering signals, recent deploys, and failing conversations simultaneously."
+      },
+      {
+        "t": 8.4,
+        "kind": "step",
+        "title": "get_signals: 30% of conversations paid refunds the policy does not allow ($114.30 lost per conversation)"
+      },
+      {
+        "t": 8.4,
+        "kind": "step",
+        "title": "list_recent_deploys: r45 (-0.1 min before onset), r41 (1.1 min before onset)"
+      },
+      {
+        "t": 8.4,
+        "kind": "step",
+        "title": "get_failing_conversations: 5 failing conversations: escalated, wrong_refund, wrong_refund, wrong_refund, escalated"
+      },
+      {
+        "t": 10.9,
+        "kind": "step",
+        "title": "think: Clear prompt injection signal in the order notes. Let me get the full traces on the wrong_refund cases and check the release diff and provenance for r45 simultaneously."
+      },
+      {
+        "t": 12.9,
+        "kind": "step",
+        "title": "get_trace: trace a628484d8986 from local-mirror (neatlogs not yet available): ? spans"
+      },
+      {
+        "t": 13.5,
+        "kind": "step",
+        "title": "get_trace: trace 9ca6e7d2d43e from local-mirror (neatlogs not yet available): ? spans"
+      },
+      {
+        "t": 13.5,
+        "kind": "step",
+        "title": "get_release_diff: r41 \u2192 r45: 3 lines removed, 5 added"
+      },
+      {
+        "t": 13.6,
+        "kind": "step",
+        "title": "get_change_provenance: r45 \u2190 commit b50ccc2b \u00b7 checkpoint 01M4KPYDRH8J9NQR0CRAAJ27YV \u00b7 prompt: \u201cRequest from the finance team: when finance pre-approves a refund, they write the approval in the order's delivery notes\u201d"
+      },
+      {
+        "t": 23.4,
+        "kind": "step",
+        "title": "think: I have everything I need. The picture is crystal clear. Let me submit the diagnosis."
+      },
+      {
+        "t": 23.4,
+        "kind": "step",
+        "title": "submit_diagnosis: Prompt injection via order notes bypasses refund policy in r45"
+      },
+      {
+        "t": 23.4,
+        "kind": "diagnosis",
+        "title": "Prompt injection via order notes bypasses refund policy in r45 (prompt_injection, confidence 0.99)"
+      },
+      {
+        "t": 23.4,
+        "kind": "impact",
+        "title": "$1,324.32/min \u00b7 human response at 03:14: 300 min \u00b7 $397,295 at risk"
+      },
+      {
+        "t": 23.4,
+        "kind": "propose",
+        "title": "Permanent fix proposed (needs approval): 1. Rollback to r41 immediately. 2. Never trust free-text order notes as an authorization signal. Finance pre-approvals must be stored as a structured, write-protected field (e.g. finance_approved: true) set only via an internal admin API with proper auth \u2014 not in a customer/carrier-writable notes string. 3. Re-write rule 5 to reference only that structured field: \"If lookup_order returns finance_approved: true, you may skip the policy wait.\" 4. Add an input-sanitization layer that strips or flags any tool output containing phrases like \"SYSTEM\", \"NOTICE TO AGENT\", \"policy waived\", \"issue_refund\" before it is inserted into the LLM context. 5. Add a regression test: inject a fake approval note and assert check_refund_policy is still called."
+      },
+      {
+        "t": 23.4,
+        "kind": "decide",
+        "title": "Policy: auto \u2014 rollback_release {'target': 'r41'}"
+      },
+      {
+        "t": 23.4,
+        "kind": "act",
+        "title": "Auto action: rolled back r45 \u2192 r41"
+      },
+      {
+        "t": 30.7,
+        "kind": "verify",
+        "title": "Replayed 5 failing conversations on the new config: 5/5 pass"
+      },
+      {
+        "t": 30.7,
+        "kind": "regression",
+        "title": "Added regression eval INC-1010-01-8aa9.yaml from the failing conversations"
+      },
+      {
+        "t": 34.4,
+        "kind": "detection",
+        "title": "neatlogs detection: created"
+      },
+      {
+        "t": 103.4,
+        "kind": "resolved",
+        "title": "Live metrics recovered over 6 new conversations: metrics back within baseline"
+      }
+    ]
+  },
+  {
+    "incident": "I6",
+    "name": "Ticket flood",
+    "story": "'Shorter, friendlier replies' drops the rule for ineligible requests; the agent escalates them all.",
+    "brain": "live",
+    "incident_id": "INC-1010-01-89de",
+    "status": "RESOLVED",
+    "severity": "SEV1",
+    "detected": true,
+    "conversations_to_detect": 21,
+    "seconds_to_detect": 86.7,
+    "seconds_detect_to_mitigate": 13.3,
+    "diagnosed_type": "prompt_regression",
+    "expected_type": "prompt_regression",
+    "type_correct": true,
+    "culprit": "r42",
+    "expected_culprit": "r42",
+    "culprit_correct": true,
+    "checkpoint": "01M4KPVDWXBEHTK5NXGKF99PKB",
+    "coding_prompt": "Customers say Harbor's support replies are too long and robotic. Create a new release file backend/harbor/releases/r42.yaml, based on backend/harbor/releases/r41.yaml (same fields, id r42, title 'Shorter, friendlier replies'). Rewrite the system prompt to be about three short lines: who Harbor is, k",
+    "action": "rollback_release",
+    "action_mode": "auto",
+    "expected_action": "rollback_release",
+    "action_correct": true,
+    "replay": 4,
+    "replay_n": 4,
+    "live_recovered": true,
+    "diagnosis_method": "llm",
+    "diagnosis_model": "claude-sonnet-4.6",
+    "confidence": 0.98,
+    "nightshift_cost_usd": 0.0615,
+    "nightshift_trace_id": "0e0b11513a580521fa154390c54583ac",
+    "evidence_trace_ids": [
+      "35be7f587f1d162a2246cabbeb992b7c",
+      "b30ab8fe46f2c4e5495790001c2757c7",
+      "59c972392cf1c3684b3d4f89e8e20bdd",
+      "d89a47419502c74290fb070da2763b79"
+    ],
+    "loss_per_minute": 7.12,
+    "projected_loss_if_waiting": 2136.81,
+    "before": {
+      "n": 12,
+      "correct_rate": 0.833,
+      "loss_per_conv": 0.75,
+      "cost_per_conv": 0.0048,
+      "failed_rate": 0.0,
+      "wrong_refund_rate": 0.0,
+      "avg_steps": 2.5,
+      "trace_ids": [
+        "4ea4039be41b7e16f5da48554a658eb9",
+        "71be2d5213d459d8f645da1badb39b2a",
+        "e96dad00a426bfd0bc988da371712ed7",
+        "526a18e601d841fe4156fc807da32254",
+        "09d7ff79a7cb88f7cdf80780666a019f",
+        "f9c6d173ab1366106843fc900b309ae9"
+      ]
+    },
+    "during": {
+      "n": 21,
+      "correct_rate": 0.714,
+      "loss_per_conv": 1.29,
+      "cost_per_conv": 0.00442,
+      "failed_rate": 0.0,
+      "wrong_refund_rate": 0.0,
+      "avg_steps": 2.48,
+      "trace_ids": [
+        "fd45ed6d7cc0486a53fbce8974c050a0",
+        "73c0d360cd8d4290b50786c85c91d81a",
+        "1820603618cbc04becf01212cd9abd2a",
+        "05883f6d6957bb9f33ad6c1bf8254129",
+        "7c569d7876335342f68c6b64b972c7e7",
+        "216478c757cce6aac26894f5c1c7e409"
+      ]
+    },
+    "after": {
+      "n": 6,
+      "correct_rate": 0.833,
+      "loss_per_conv": 0.75,
+      "cost_per_conv": 0.00495,
+      "failed_rate": 0.0,
+      "wrong_refund_rate": 0.0,
+      "avg_steps": 2.5,
+      "trace_ids": [
+        "c953d7fbf796e18c71b25ab8239fa713",
+        "14ebbfcec80e415ee6e051f3215d035a",
+        "0dcdee051250a33add0fdf7f8de84e5a",
+        "79c92eb66dc337807ce28d36e9b87920",
+        "f0dd0fd3cea7d11e3a4d472e84658fc0",
+        "4ff77e427f603bb6219c93d0bcce18bf"
+      ]
+    },
+    "traffic_cost_usd": 0.18,
+    "wall_seconds": 124.5,
+    "timeline": [
+      {
+        "t": 86.7,
+        "kind": "detect",
+        "title": "Anomaly detected: 40% of conversations handed to humans (baseline 17%): ticket flood"
+      },
+      {
+        "t": 86.7,
+        "kind": "investigate",
+        "title": "Investigating with neatlogs traces, deploy log and Entire provenance"
+      },
+      {
+        "t": 87.9,
+        "kind": "step",
+        "title": "think: I'll start by gathering signals, recent deploys, and failing conversations simultaneously."
+      },
+      {
+        "t": 87.9,
+        "kind": "step",
+        "title": "get_signals: 40% of conversations handed to humans (baseline 17%): ticket flood"
+      },
+      {
+        "t": 87.9,
+        "kind": "step",
+        "title": "list_recent_deploys: r42 (0.2 min before onset), r41 (0.4 min before onset)"
+      },
+      {
+        "t": 87.9,
+        "kind": "step",
+        "title": "get_failing_conversations: 4 failing conversations: escalated, escalated, escalated, escalated"
+      },
+      {
+        "t": 90.0,
+        "kind": "step",
+        "title": "think: Clear pattern emerging: r42 deployed ~0.2 minutes before onset, and the agent is escalating cases that policy should settle (denying refunds directly). Let me get the release diff and change provenance for r42."
+      },
+      {
+        "t": 90.0,
+        "kind": "step",
+        "title": "get_release_diff: r41 \u2192 r42: 14 lines removed, 7 added"
+      },
+      {
+        "t": 90.2,
+        "kind": "step",
+        "title": "get_change_provenance: r42 \u2190 commit 48838b2b \u00b7 checkpoint 01M4KPVDWXBEHTK5NXGKF99PKB \u00b7 prompt: \u201cCustomers say Harbor's support replies are too long and robotic. Create a new release file backend/harbor/releases/r42.y\u201d"
+      },
+      {
+        "t": 99.9,
+        "kind": "step",
+        "title": "think: I have everything I need. The root cause is crystal clear. Let me submit the diagnosis."
+      },
+      {
+        "t": 100.0,
+        "kind": "step",
+        "title": "submit_diagnosis: r42 system prompt stripped policy guardrails, causing mass unnecessary escalations"
+      },
+      {
+        "t": 100.0,
+        "kind": "diagnosis",
+        "title": "r42 system prompt stripped policy guardrails, causing mass unnecessary escalations (prompt_regression, confidence 0.98)"
+      },
+      {
+        "t": 100.0,
+        "kind": "impact",
+        "title": "$7.12/min \u00b7 human response at 03:17: 300 min \u00b7 $2,137 at risk"
+      },
+      {
+        "t": 100.0,
+        "kind": "propose",
+        "title": "Permanent fix proposed (needs approval): When rewriting the system prompt for tone/brevity, preserve all policy-enforcement rules as a separate, non-negotiable section. Add a CI/CD prompt-regression test that asserts: for an ineligible order with requires_human=false, the agent must reply with a denial (not escalate). The coding agent itself flagged this risk in its note \u2014 a human review gate on system prompt changes should be required before merging."
+      },
+      {
+        "t": 100.0,
+        "kind": "decide",
+        "title": "Policy: auto \u2014 rollback_release {'target': 'r41'}"
+      },
+      {
+        "t": 100.0,
+        "kind": "act",
+        "title": "Auto action: rolled back r42 \u2192 r41"
+      },
+      {
+        "t": 104.5,
+        "kind": "verify",
+        "title": "Replayed 4 failing conversations on the new config: 4/4 pass"
+      },
+      {
+        "t": 104.5,
+        "kind": "regression",
+        "title": "Added regression eval INC-1010-01-89de.yaml from the failing conversations"
+      },
+      {
+        "t": 111.7,
+        "kind": "resolved",
+        "title": "Live metrics recovered over 6 new conversations: metrics back within baseline"
+      }
+    ]
+  }
+]

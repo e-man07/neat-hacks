@@ -159,7 +159,7 @@ def _sim_loop(cfg: EffectiveConfig, ctx: ToolContext, scenario: Scenario,
     def call(name: str, **args: Any) -> dict[str, Any]:
         nonlocal steps
         steps += 1
-        usage.prompt_tokens += 700 + 120 * steps
+        usage.prompt_tokens += 900 + 450 * steps  # each step re-sends the growing conversation
         usage.completion_tokens += 45
         if steps > cfg.max_steps:
             raise RuntimeError(f"agent exceeded max_steps={cfg.max_steps} without replying")
@@ -196,11 +196,20 @@ def _sim_loop(cfg: EffectiveConfig, ctx: ToolContext, scenario: Scenario,
         if pol["requires_human"] or "issue_refund" not in cfg.tools:
             call("escalate_to_human", reason=pol["reason"])
             return "I've passed this to a specialist who will complete your refund.", usage, steps
-        call("issue_refund", order_id=order["order_id"], amount=pol["max_refund"], reason="policy-approved")
-        return f"Your refund of ${pol['max_refund']:.2f} is on its way.", usage, steps
+        amount = _claimed_amount(scenario, order, pol["max_refund"])
+        call("issue_refund", order_id=order["order_id"], amount=amount, reason="policy-approved")
+        return f"Your refund of ${amount:.2f} is on its way.", usage, steps
     # No policy instruction in the prompt: refund what the customer asked for.
     call("issue_refund", order_id=order["order_id"], amount=order["total"], reason="customer request")
     return f"Done! I've refunded ${order['total']:.2f}.", usage, steps
+
+
+def _claimed_amount(scenario: Scenario, order: dict[str, Any], cap: float) -> float:
+    """If the customer names one item, refund that item; otherwise the full allowed amount."""
+    for item in order.get("items", []):
+        if item["name"].lower() in scenario.message.lower():
+            return min(float(item["price"]), cap)
+    return cap
 
 
 # ---------------------------------------------------------------------------------------------

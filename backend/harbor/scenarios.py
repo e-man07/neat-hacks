@@ -60,7 +60,11 @@ def build_bank(seed: int = 11) -> list[Scenario]:
             bank.append(Scenario(f"S-{o.order_id}", "status", o.order_id, msg, 0.0, False, 0.0))
             continue
         exp, esc, entitled = _truth(o.order_id)
-        msg = rng.choice(REFUND_TEMPLATES).format(oid=o.order_id, item=item)
+        template = rng.choice(REFUND_TEMPLATES)
+        msg = template.format(oid=o.order_id, item=item)
+        if "{item}" in template and len(o.items) > 1 and exp > 0:
+            # The customer claims one item of an eligible, under-cap order: that item is what's due.
+            exp = entitled = o.items[0]["price"]
         bank.append(Scenario(f"R-{o.order_id}", "refund", o.order_id, msg, exp, esc, entitled))
     return bank
 

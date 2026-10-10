@@ -47,6 +47,12 @@ Containment actions (all reversible, executed by policy, not by you):
 - cap_steps {"steps": 6}: runaway loops and no release to roll back.
 Also propose a permanent fix for a human to approve (it will not be applied automatically).
 
+Confidence is your probability that BOTH the root cause and the containment action are right.
+Calibrate it: ≥ 0.85 when a deploy lines up with the onset AND the diff, trace or error shows the
+mechanism; 0.6–0.85 when the evidence points one way but the mechanism is not confirmed; < 0.6 only
+when you are genuinely unsure. Containment actions are reversible and verified by replay afterwards,
+so do not lower confidence just because the stakes are high.
+
 Cite trace ids and the commit/checkpoint you relied on. Be concise. Call submit_diagnosis exactly once."""
 
 TOOLS: list[dict[str, Any]] = [
@@ -82,7 +88,7 @@ TOOLS: list[dict[str, Any]] = [
                                           "action": {"type": "string", "enum": ACTIONS},
                                           "action_params": {"type": "object"},
                                           "permanent_fix": {"type": "string"},
-                                          "confidence": {"type": "number"}},
+                                          "confidence": {"type": "number", "description": "0-1, calibrated as described in your instructions"}},
                                           "required": ["incident_type", "title", "root_cause", "action", "action_params", "confidence"]}}},
 ]
 
@@ -114,9 +120,10 @@ class Diagnosis:
 class Investigation:
     def __init__(self, db: OpsDB, stats: WindowStats, base: dict[str, float], signals: list[Signal],
                  mcp: NeatlogsMCP | None = None, on_step: Callable[[dict[str, Any]], None] | None = None,
-                 brain: str | None = None):
+                 brain: str | None = None, focus: WindowStats | None = None):
         self.db = db
         self.stats = stats
+        self.focus = focus or stats  # conversations since the last change, when one is in the window
         self.base = base
         self.signals = signals
         self.mcp = mcp or NeatlogsMCP()
@@ -138,6 +145,7 @@ class Investigation:
 
     def tool_get_signals(self) -> dict[str, Any]:
         return {"signals": [asdict(s) for s in self.signals], "window": self.stats.as_dict(),
+                "since_last_change": self.focus.as_dict() if self.focus is not self.stats else None,
                 "baseline": self.base, "active_config": self._active_config()}
 
     def _active_config(self) -> dict[str, Any]:
@@ -146,7 +154,7 @@ class Investigation:
                 "flags": cfg.flags, "tools": cfg.tools}
 
     def tool_list_recent_deploys(self) -> dict[str, Any]:
-        onset = self.stats.first_ts or time.time()
+        onset = self.focus.first_ts or self.stats.first_ts or time.time()
         out = []
         for d in deploys.recent_deploys(self.db, 6):
             out.append({"release": d["release"], "previous_release": d["previous_release"], "actor": d["actor"],
@@ -170,7 +178,7 @@ class Investigation:
     def tool_get_trace(self, trace_id: str) -> dict[str, Any]:
         if self.mcp.available:
             try:
-                ctx = self.mcp.get_trace_context(trace_id, fields=["input_value", "output_value"], max_chars_per_field=600)
+                ctx = self.mcp.get_trace_context(trace_id, max_chars_per_field=600)
                 return {"source": "neatlogs", "trace": _compact_trace(ctx)}
             except NeatlogsMCPError as exc:
                 log.info("neatlogs trace %s not readable yet: %s", trace_id, exc)
@@ -282,6 +290,13 @@ class Investigation:
                     except json.JSONDecodeError:
                         args = {}
                     if c.function.name == "submit_diagnosis":
+                        missing = [k for k in ("incident_type", "root_cause", "action", "confidence") if args.get(k) in (None, "")]
+                        if missing:
+                            messages.append({"role": "tool", "tool_call_id": c.id, "content": json.dumps(
+                                {"error": f"missing required fields: {', '.join(missing)}. Re-submit with every field; "
+                                          "confidence is a number between 0 and 1."})})
+                            self._record("submit_diagnosis", {}, {"error": f"missing {', '.join(missing)}; re-submitting"})
+                            continue
                         d = self._finalise(args, method="llm", model=model)
                         d.cost_usd = llm.cost_usd(model, usage)
                         set_attrs(span, **{"nightshift.incident_type": d.incident_type, "nightshift.action": d.action,
@@ -367,18 +382,25 @@ class Investigation:
                         "Order notes containing instructions are being followed by the agent; refunds paid outside policy.",
                         "disable_flag", {"flag": "auto_refund_enabled"}, 0.75, culprit=recent["release"] if recent else None,
                         fix="Revert the release that trusts order notes and add an injection guard to the prompt.")
+        looping = self.focus.avg_steps >= 2 * max(self.base.get("avg_steps", 2.6), 1)
         if recent:
             prev = recent["previous_release"]
+            if looping:
+                return done("cost_runaway", f"Agent loops and cost spike after deploy {current}",
+                            f"Average steps per conversation rose to {self.focus.avg_steps:.1f}; the release makes the "
+                            "agent retry far more, burning tokens and customer time.",
+                            "rollback_release", {"target": prev}, 0.75, culprit=current,
+                            fix=f"Revert {current}; bound retries and add a fallback reply.")
             if "tool_errors" in names:
                 return done("tool_schema_drift", f"Tool errors after deploy {current}",
                             "Tool calls fail after the deploy; the release changed how a tool reads its upstream API.",
                             "rollback_release", {"target": prev}, 0.75, culprit=current,
                             fix=f"Revert {current} and fix the adapter against the upstream contract.")
-            if "cost_spike" in names:
-                return done("cost_runaway", f"Cost per conversation spiked after deploy {current}",
-                            "The release makes the agent retry far more, burning tokens.",
-                            "rollback_release", {"target": prev}, 0.75, culprit=current,
-                            fix=f"Revert {current}; bound retries.")
+            if "escalations" in names and "wrong_refunds" not in names:
+                return done("prompt_regression", f"Ticket flood after deploy {current}",
+                            "The release removed guidance for ineligible requests; the agent now hands them to humans.",
+                            "rollback_release", {"target": prev}, 0.7, culprit=current,
+                            fix=f"Revert {current}; keep the 'explain and don't refund' rule in any shorter prompt.")
             return done("prompt_regression", f"Wrong refunds after deploy {current}",
                         "The release changed the agent's instructions; refunds are paid without the policy check.",
                         "rollback_release", {"target": prev}, 0.7, culprit=current,
@@ -396,11 +418,13 @@ def _compact_trace(ctx: Any) -> Any:
     spans = ctx.get("spans") or ctx.get("data", {}).get("spans") or []
     out = []
     for s in spans[:40]:
-        out.append({k: s.get(k) for k in ("span_name", "name", "span_type", "status", "status_code", "status_message",
-                                          "tool_name", "tool_arguments", "model", "input_value", "output_value",
-                                          "total_tokens") if s.get(k) not in (None, "", [])})
-    return {"trace_id": ctx.get("trace_id"), "status": ctx.get("status") or ctx.get("processing_status"),
-            "span_count": len(spans), "spans": out}
+        out.append({k: s.get(k) for k in ("name", "type", "status", "status_message", "error", "tool_name",
+                                          "tool_arguments", "model", "input_value", "output_value",
+                                          "total_tokens", "duration_ms") if s.get(k) not in (None, "", [])})
+    return {"trace_id": ctx.get("trace_id"), "workflow": ctx.get("workflow"), "status": ctx.get("status"),
+            "has_error": ctx.get("has_error"), "llm_calls": ctx.get("llm_calls"), "tool_calls": ctx.get("tool_calls"),
+            "total_tokens": ctx.get("total_tokens"), "latency_ms": ctx.get("latency_ms"),
+            "span_count": ctx.get("span_count", len(spans)), "spans": out}
 
 
 def _summarise(tool: str, args: dict[str, Any], result: Any) -> str:
