@@ -1,0 +1,28 @@
+{
+  "cli_version": "0.11.5-nightly.202610100625.1f44a6f96",
+  "checkpoint_id": "01M4KR3PBGV3PYNCVW3RYZ2AEC",
+  "strategy": "manual-commit",
+  "branch": "nightshift/p3-incidents",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "backend/nightshift/neatlogs_mcp.py",
+    "backend/nightshift/policy.py",
+    "backend/tests/test_nightshift.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 376,
+    "cache_creation_tokens": 488280,
+    "cache_read_tokens": 56995464,
+    "output_tokens": 243489,
+    "api_call_count": 189
+  }
+}
