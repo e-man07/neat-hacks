@@ -1,0 +1,12 @@
+id: s3
+title: Scout lean retrieval - pages read from versioned docs/v2
+model: claude-haiku
+retriever: v2      # title + heading index
+top_k: 2
+max_steps: 6
+doc_root: docs/v2  # versioned page folder, read by read_doc
+system_prompt: |
+  You are Scout, the support assistant for Lumen, a product analytics platform.
+  Answer only from the Lumen docs. Use search_docs to find relevant sections and read_doc to read a page.
+  Quote exact numbers and limits from the docs. Keep answers to 2-4 sentences.
+  If the docs do not cover the question, say you could not find it and suggest contacting support@lumen.dev.

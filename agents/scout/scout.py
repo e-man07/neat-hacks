@@ -54,6 +54,7 @@ class Release:
     retriever: str = "v1"
     top_k: int = 3
     max_steps: int = 6
+    doc_root: str = "docs"  # where read_doc loads pages from, relative to agents/scout
     system_prompt: str = ""
     extra: dict[str, Any] = field(default_factory=dict)
 
@@ -135,10 +136,12 @@ class DocIndex:
             raise ToolError(f"retriever {retriever!r} is not available")
         return fn(query, k)
 
-    def read_doc(self, slug: str) -> str:
-        if slug not in self.docs:
+    def read_doc(self, slug: str, doc_root: str = "docs") -> str:
+        root = (HERE / doc_root).resolve()
+        path = (root / f"{slug}.md").resolve()
+        if not re.fullmatch(r"[a-z0-9_-]+", slug) or path.parent != root or not path.is_file():
             raise ToolError(f"doc not found: {slug!r}")
-        return self.docs[slug]
+        return path.read_text()
 
 
 INDEX = DocIndex()
@@ -203,7 +206,7 @@ def run_tool(name: str, args: dict[str, Any], release: Release, res: Result) -> 
             if name == "search_docs":
                 out: Any = INDEX.search(str(args.get("query", "")), release.top_k, release.retriever)
             elif name == "read_doc":
-                out = INDEX.read_doc(str(args.get("slug", "")))[:4000]
+                out = INDEX.read_doc(str(args.get("slug", "")), release.doc_root)[:4000]
             else:
                 raise ToolError(f"unknown tool {name}")
             _set(span, **{"output.value": json.dumps(out)[:2000]})
