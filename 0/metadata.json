@@ -1,0 +1,23 @@
+{
+  "cli_version": "0.11.5-nightly.202610100625.1f44a6f96",
+  "checkpoint_id": "01M4KQB647BD1PF22Y91BZC2F8",
+  "session_id": "3ee30fca-2a4f-4bff-905a-41ac55e7bfc4",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-10T20:16:23.246299373Z",
+  "branch": "nightshift/p3-incidents",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "backend/harbor/releases/r46.yaml"
+  ],
+  "agent": "Claude Code",
+  "model": "claude-sonnet-5-5",
+  "turn_id": "76a2b79453d9",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 8,
+    "cache_creation_tokens": 9391,
+    "cache_read_tokens": 142166,
+    "output_tokens": 1338,
+    "api_call_count": 4
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "cli_version": "0.11.5-nightly.202610100625.1f44a6f96",
+  "checkpoint_id": "01M4KQB647BD1PF22Y91BZC2F8",
+  "strategy": "manual-commit",
+  "branch": "nightshift/p3-incidents",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "backend/harbor/releases/r46.yaml"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 8,
+    "cache_creation_tokens": 9391,
+    "cache_read_tokens": 142166,
+    "output_tokens": 1338,
+    "api_call_count": 4
+  }
+}
