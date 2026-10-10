@@ -32,10 +32,15 @@ LIVE_WATCH_TIMEOUT_S = 240
 
 class NightShift:
     def __init__(self, db: OpsDB, mcp: NeatlogsMCP | None = None, brain: str | None = None,
-                 on_event: Callable[[dict[str, Any]], None] | None = None, page: bool = True):
+                 on_event: Callable[[dict[str, Any]], None] | None = None, page: bool = True,
+                 adapter: Any = None, pager: Callable[..., dict[str, Any]] | None = None):
+        from nightshift.adapters import HarborAdapter
+
         self.db = db
         self.mcp = mcp or NeatlogsMCP()
         self.brain = brain or settings.harbor_brain
+        self.adapter = adapter or HarborAdapter(db, self.mcp, self.brain)
+        self.pager = pager
         self.on_event = on_event or (lambda e: None)
         self.page = page
         self._lock = threading.Lock()
@@ -109,13 +114,14 @@ class NightShift:
                        {"nightshift_trace_id": trace_id})
             focus = self._since_change(stats)
             inv = Investigation(self.db, stats, base, signals, mcp=self.mcp, brain=self.brain, focus=focus,
+                                adapter=self.adapter,
                                 on_step=lambda s: self.event(iid, "step", f"{s['tool']}: {s['summary']}",
                                                              {"tool": s["tool"], "args": s["args"]}))
             diag = inv.run()
             fresh, _, _ = detector.detect(self.db, since=self.quiet_since())
             focus = self._since_change(fresh, size=20) if fresh.n else focus
-            imp = impact_mod.assess(focus, base)
-            safety = diag.incident_type in policy.load_policy()["gates"]["safety_incident_types"]
+            imp = impact_mod.assess(focus, base, self.adapter.economics)
+            safety = diag.incident_type in self.adapter.policy["gates"].get("safety_incident_types", [])
             severity = "SEV1" if safety or imp.projected_loss_if_waiting >= 1000 else (
                 "SEV2" if imp.projected_loss_if_waiting >= 25 else "SEV3")
             self._set(iid, title=diag.title, type=diag.incident_type, severity=severity, summary=diag.root_cause,
@@ -139,7 +145,7 @@ class NightShift:
             return self._await_human(iid, diag, imp, "No safe containment action identified")
         taken = (self.db.one("SELECT COUNT(*) n FROM actions WHERE incident_id = ? AND mode = 'auto'", [iid]) or {"n": 0})["n"]
         dec = policy.decide(diag.action, diag.action_params, diag.incident_type, diag.confidence,
-                            imp.projected_loss_if_waiting, taken)
+                            imp.projected_loss_if_waiting, taken, pol=self.adapter.policy)
         self.event(iid, "decide", f"Policy: {dec.mode} — {diag.action} {diag.action_params}", dec.as_dict())
         if dec.mode == "defer":
             actions.record_proposal(self.db, iid, diag.action, diag.action_params, "; ".join(dec.reasons))
@@ -149,15 +155,15 @@ class NightShift:
             return self._await_human(iid, diag, imp, "; ".join(dec.reasons))
 
         self._set(iid, status="MITIGATING")
-        applied = actions.apply(self.db, iid, diag.action, diag.action_params, "auto", "; ".join(dec.reasons))
+        applied = actions.apply(self.adapter, iid, diag.action, diag.action_params, "auto", "; ".join(dec.reasons))
         self.event(iid, "act", f"Auto action: {applied['summary']}", applied)
 
-        rep = verifier.replay(self.db, stats.conversation_ids, brain=self.brain)
+        rep = self.adapter.replay(stats.conversation_ids, incident_id=iid)
         self.event(iid, "verify", f"Replayed {rep.n} failing conversations on the new config: {rep.passed}/{rep.n} pass",
                    rep.as_dict())
-        gate = policy.load_policy()["gates"]["verify_replay_min_pass_rate"]
+        gate = self.adapter.policy["gates"]["verify_replay_min_pass_rate"]
         if rep.n and rep.rate < gate:
-            note = actions.undo(self.db, applied["id"])
+            note = actions.undo(self.adapter, applied["id"])
             self.event(iid, "undo", f"Verification failed ({rep.rate:.0%} < {gate:.0%}); {note}", {"replay": rep.as_dict()})
             self._set(iid, status="ESCALATED", verification_json=dumps({"replay": rep.as_dict()}))
             self._page(iid, "🚨 Night Shift needs you", f"{diag.title}. My containment didn't verify, so I undid it. "
@@ -195,7 +201,7 @@ class NightShift:
         else:
             last = self.db.one("SELECT id FROM actions WHERE incident_id = ? AND mode = 'auto' AND status = 'applied' "
                                "ORDER BY ts DESC LIMIT 1", [iid])
-            note = actions.undo(self.db, last["id"]) if last else "no action to undo"
+            note = actions.undo(self.adapter, last["id"]) if last else "no action to undo"
             self._set(iid, status="ESCALATED", verification_json=dumps(verify))
             self.event(iid, "undo", "Live metrics did not recover: " + "; ".join(reasons) + f"; {note}", {"live": stats.as_dict()})
             self._page(iid, "🚨 Night Shift needs you", "Containment did not hold in production; I rolled my change back.", "urgent")
@@ -262,24 +268,30 @@ class NightShift:
     def _page(self, iid: str, title: str, body: str, priority: str) -> None:
         if not self.page:
             return
-        res = notifier.send(notifier.Page(title=title, body=body, priority=priority,
-                                          click_url=f"{settings.public_base_url}/incidents/{iid}"))
+        page = notifier.Page(title=title, body=body, priority=priority,
+                             click_url=f"{settings.public_base_url}/app/incidents/{self.adapter.agent_id}/{iid}")
+        res = self.pager(self.adapter, iid, page) if self.pager else notifier.send(page)
         self.event(iid, "page", f"Paged on-call via {', '.join(res['delivered'])}: {title}", res)
 
 
-def approve(db: OpsDB, action_id: int, actor: str = "human") -> dict[str, Any]:
+def approve(adapter: Any, action_id: int, actor: str = "human") -> dict[str, Any]:
     """A human approves a proposed action. Containment actions are applied; code fixes are marked approved."""
+    db = adapter.db if not isinstance(adapter, OpsDB) else adapter
+    if isinstance(adapter, OpsDB):
+        from nightshift.adapters import HarborAdapter
+
+        adapter = HarborAdapter(adapter)
     row = db.one("SELECT * FROM actions WHERE id = ?", [action_id])
     if row is None or row["status"] != "proposed":
         return {"error": "not a pending proposal"}
     params = loads(row["params_json"], {})
     if row["kind"] in ("rollback_release", "failover_model", "disable_flag", "cap_steps"):
         db.update("actions", "id", action_id, {"status": "approved"})
-        applied = actions.apply(db, row["incident_id"], row["kind"], params, "approved", f"approved by {actor}")
+        applied = actions.apply(adapter, row["incident_id"], row["kind"], params, "approved", f"approved by {actor}")
         return {"status": "applied", "action": applied}
     if row["kind"] == "deploy_code_fix" and params.get("release"):
         # The forward fix for a bad release is to make the known-good release the new baseline.
-        target = deploys.last_known_good(db, params["release"])
+        target = adapter.last_known_good(params["release"])
         db.update("actions", "id", action_id, {"status": "approved"})
         return {"status": "approved", "note": f"fix approved by {actor}; revert of {params.get('revert_commit', '')[:8]} "
                                               f"queued as a PR against main (baseline {target})"}

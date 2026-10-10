@@ -1,22 +1,26 @@
-"""Containment actions on Harbor's control plane. Every action records how to undo itself."""
+"""Containment actions on an agent's control plane. Every action records how to undo itself."""
 
 from __future__ import annotations
 
 import time
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from harbor import deploy as deploys
 from ops.db import OpsDB, dumps, loads
+
+if TYPE_CHECKING:
+    from nightshift.adapters import AgentAdapter
 
 ACTOR = "nightshift"
 
 
-def apply(db: OpsDB, incident_id: str, kind: str, params: dict[str, Any], mode: str, reason: str) -> dict[str, Any]:
+def apply(adapter: "AgentAdapter", incident_id: str, kind: str, params: dict[str, Any], mode: str,
+          reason: str) -> dict[str, Any]:
+    db = adapter.db
     undo: dict[str, Any]
     if kind == "rollback_release":
         target = params["target"]
-        prev = deploys.active_release(db)
-        deploys.deploy(db, target, actor=ACTOR)
+        prev = adapter.active_release()
+        adapter.deploy(target, actor=ACTOR)
         undo = {"kind": "deploy", "release": prev}
         summary = f"rolled back {prev} → {target}"
     elif kind == "failover_model":
@@ -41,13 +45,14 @@ def apply(db: OpsDB, incident_id: str, kind: str, params: dict[str, Any], mode: 
     return {"id": action_id, "kind": kind, "params": params, "summary": summary, "undo": undo}
 
 
-def undo(db: OpsDB, action_id: int) -> str:
+def undo(adapter: "AgentAdapter", action_id: int) -> str:
+    db = adapter.db
     row = db.one("SELECT * FROM actions WHERE id = ?", [action_id])
     if row is None or row["status"] != "applied":
         return "nothing to undo"
     u = loads(row["undo_json"], {})
     if u.get("kind") == "deploy":
-        deploys.deploy(db, u["release"], actor=ACTOR)
+        adapter.deploy(u["release"], actor=ACTOR)
     elif u.get("kind") == "control":
         db.set_control(u["key"], u.get("value"), ACTOR)
     db.update("actions", "id", action_id, {"status": "undone"})

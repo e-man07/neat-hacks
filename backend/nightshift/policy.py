@@ -30,8 +30,8 @@ class Decision:
 
 
 def decide(action: str, params: dict[str, Any], incident_type: str, confidence: float,
-           projected_loss: float, auto_actions_taken: int = 0) -> Decision:
-    pol = load_policy()
+           projected_loss: float, auto_actions_taken: int = 0, pol: dict[str, Any] | None = None) -> Decision:
+    pol = pol or load_policy()
     gates = pol["gates"]
     reasons: list[str] = []
     auto = pol.get("auto", {})

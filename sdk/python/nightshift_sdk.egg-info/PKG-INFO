@@ -1,0 +1,30 @@
+Metadata-Version: 2.4
+Name: nightshift-sdk
+Version: 0.1.0
+Summary: Connect an LLM agent to Night Shift: the on-call engineer for AI agents
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+
+# nightshift-sdk
+
+Three calls connect an agent to Night Shift. Night Shift can then roll back a release, fail over a
+model or switch off a capability for you — within the policy you set — and verify the fix by
+replaying failed inputs through your own agent.
+
+```python
+from nightshift_sdk import NightShift
+
+ns = NightShift()   # reads NIGHTSHIFT_API_URL and NIGHTSHIFT_AGENT_TOKEN
+
+prompt = load_prompt(ns.release("v12"))          # which release to run
+model = ns.model("claude-haiku")                  # which model (failover-aware)
+if ns.flag("auto_refunds", True): ...             # kill switches
+max_steps = ns.max_steps(8)                       # step cap
+
+ns.report_deploy("v13", commit="<git sha>")      # from CI, when you ship
+ns.record("failed", trace_id=..., value_usd=12)   # optional business outcome per run
+ns.serve_replays(lambda inp: run_agent(inp, dry_run=True))  # verification hook
+```
+
+Fail-open: if Night Shift is unreachable, every call returns your default.
+Traces come from your own neatlogs project; the SDK never sends prompts or outputs anywhere.

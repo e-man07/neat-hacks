@@ -39,6 +39,18 @@ CREATE TABLE IF NOT EXISTS conversations (
 );
 CREATE INDEX IF NOT EXISTS idx_conv_ts ON conversations(ts);
 
+CREATE TABLE IF NOT EXISTS events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ts REAL NOT NULL,
+    trace_id TEXT,
+    outcome TEXT NOT NULL,          -- ok | failed | escalated | negative
+    value_usd REAL DEFAULT 0,       -- money lost (positive) attributed to this run
+    release TEXT,
+    model TEXT,
+    note TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_events_trace ON events(trace_id);
+
 CREATE TABLE IF NOT EXISTS ledger (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     ts REAL NOT NULL,
@@ -124,7 +136,7 @@ CREATE TABLE IF NOT EXISTS actions (
 class OpsDB:
     """Thread-safe wrapper around one SQLite connection."""
 
-    def __init__(self, path: Path | str):
+    def __init__(self, path: Path | str, schema: str = SCHEMA):
         self.path = Path(path)
         if str(path) != ":memory:":
             self.path.parent.mkdir(parents=True, exist_ok=True)
@@ -132,7 +144,7 @@ class OpsDB:
         self._conn = sqlite3.connect(str(path), check_same_thread=False, isolation_level=None)
         self._conn.row_factory = sqlite3.Row
         self._conn.execute("PRAGMA journal_mode=WAL")
-        self._conn.executescript(SCHEMA)
+        self._conn.executescript(schema)
 
     # -- generic helpers -------------------------------------------------------------------
     def execute(self, sql: str, params: Iterable[Any] = ()) -> sqlite3.Cursor:
@@ -161,6 +173,7 @@ class OpsDB:
         with self._lock:
             for table in (
                 "conversations",
+                "events",
                 "ledger",
                 "tickets",
                 "control",
