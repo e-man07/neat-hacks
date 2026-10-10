@@ -1,0 +1,28 @@
+{
+  "cli_version": "0.11.5-nightly.202610100625.1f44a6f96",
+  "checkpoint_id": "01M4KWSGWHTGYJZ4JB83QT3TDJ",
+  "session_id": "0d2b9026-a9b3-4ad9-99da-3ce845917271",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-10T21:51:33.708398081Z",
+  "branch": "nightshift/p9-scout",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [
+    "agents/scout/releases/s2.yaml",
+    "agents/scout/scout.py"
+  ],
+  "agent": "Claude Code",
+  "model": "claude-sonnet-5-5",
+  "turn_id": "f32778ed265f",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 14,
+    "cache_creation_tokens": 18382,
+    "cache_read_tokens": 297652,
+    "output_tokens": 2060,
+    "api_call_count": 7
+  },
+  "session_metrics": {
+    "turn_count": 1
+  }
+}
