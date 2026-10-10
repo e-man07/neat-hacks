@@ -1,0 +1,27 @@
+{
+  "cli_version": "0.11.5-nightly.202610100625.1f44a6f96",
+  "checkpoint_id": "01M4KQD6V2WWFAZRERX5QP22CF",
+  "session_id": "3ee30fca-2a4f-4bff-905a-41ac55e7bfc4",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-10T20:17:27.235346194Z",
+  "branch": "nightshift/p3-incidents",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [
+    "backend/ops/llm.py"
+  ],
+  "agent": "Claude Code",
+  "model": "claude-sonnet-5-5",
+  "turn_id": "76a2b79453d9",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 10,
+    "cache_creation_tokens": 10248,
+    "cache_read_tokens": 180716,
+    "output_tokens": 1778,
+    "api_call_count": 5
+  },
+  "session_metrics": {
+    "turn_count": 1
+  }
+}
