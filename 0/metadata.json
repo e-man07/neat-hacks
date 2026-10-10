@@ -1,0 +1,59 @@
+{
+  "cli_version": "0.11.5-nightly.202610100625.1f44a6f96",
+  "checkpoint_id": "01M4KTT63ZPYZH0M81CJZNTS46",
+  "session_id": "88a90ae7-b1fc-5614-8021-5272f785237a",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-10T21:17:00.11057345Z",
+  "branch": "claude/beautiful-carson-sc2jqe",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [],
+  "agent": "Claude Code",
+  "model": "claude-sonnet-5-5",
+  "turn_id": "4cef52b2a480",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 662,
+    "cache_creation_tokens": 655296,
+    "cache_read_tokens": 141233808,
+    "output_tokens": 332092,
+    "api_call_count": 330
+  },
+  "skill_events_version": 1,
+  "skill_events": [
+    {
+      "id": "claude-skill-toolu_018KgHnjGZ62Nm91PcGriRbN",
+      "event_type": "tool_invocation",
+      "skill": {
+        "name": "anthropic-skills:built-in-browser"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "skill_tool_use",
+        "confidence": "explicit"
+      },
+      "turn_id": "42e0e60d9fe9",
+      "transcript_anchor": {
+        "unit": "line",
+        "start": 2134,
+        "end": 2135,
+        "entry_ids": [
+          "091fd63d-9209-437d-8689-a6f1549a0802"
+        ],
+        "tool_use_id": "toolu_018KgHnjGZ62Nm91PcGriRbN"
+      },
+      "native": {
+        "tool_name": "Skill",
+        "tool_use_id": "toolu_018KgHnjGZ62Nm91PcGriRbN"
+      },
+      "collapse": {
+        "target": "tool_pair",
+        "label": "Skill: anthropic-skills:built-in-browser",
+        "default_collapsed": true
+      }
+    }
+  ],
+  "session_metrics": {
+    "turn_count": 15
+  }
+}

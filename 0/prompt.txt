@@ -1,0 +1,73 @@
+Reply with just the word READY.
+
+---
+
+Customers say Harbor's support replies are too long and robotic. Create a new release file backend/harbor/releases/r42.yaml, based on backend/harbor/releases/r41.yaml (same fields, id r42, title 'Shorter, friendlier replies'). Rewrite the system prompt to be about three short lines: who Harbor is, keep replies brief and warm, and resolve refund requests in one step (look up the order and refund it) so customers don't wait. Only create that one file, then commit it with the message 'Release r42: shorter, friendlier replies'. Do not add any Co-Authored-By trailer.
+
+---
+
+<task-notification>
+<task-id>b7s6gjwkv</task-id>
+<tool-use-id>toolu_01EY7Dzq7EnNjvogjjRs369f</tool-use-id>
+<output-file>/tmp/claude-0/-home-user-neat-hacks/88a90ae7-b1fc-5614-8021-5272f785237a/tasks/b7s6gjwkv.output</output-file>
+<status>completed</status>
+<summary>Background command "Wait for benchmark run3 to finish" completed (exit code 0)</summary>
+</task-notification>
+
+---
+
+done gave access to repo
+
+---
+
+now merge these prs to main
+
+---
+
+do 1-2 right now
+
+---
+
+it says missing external auth id for cfo
+
+---
+
+<task-notification>
+<task-id>b60tvqbge</task-id>
+<tool-use-id>toolu_01N2Z9P54FZGghyZMJLne6go</tool-use-id>
+<output-file>/tmp/claude-0/-home-user-neat-hacks/88a90ae7-b1fc-5614-8021-5272f785237a/tasks/b60tvqbge.output</output-file>
+<status>failed</status>
+<summary>Background command "Wait for cfo.ai login approval" failed with exit code 144</summary>
+</task-notification>
+
+---
+
+can you run the frontent server
+
+---
+
+you spin up abrowser and show me preview here
+
+---
+
+did you push the latest changes
+
+---
+
+merge it to main
+
+---
+
+do you think we should delete now merged branches?
+
+---
+
+yes
+
+---
+
+the content on landing page is going out of the viewport
+
+---
+
+now add a light theme as well
