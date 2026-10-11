@@ -1,6 +1,6 @@
 # nightly-sdk
 
-The Python SDK for **[Nightly](https://web-emrq.vercel.app)**, the on-call engineer for your AI agents.
+The Python SDK for **[Nightly](https://nightly.whyparabola.online)**, the on-call engineer for your AI agents.
 
 AI agents rarely fail loudly. A prompt change, a model swap or a tool update ships, and the agent starts
 answering wrong, looping, refunding money it shouldn't, or failing its tools, while every request still
@@ -97,6 +97,6 @@ results. Prompts and outputs stay in your own neatlogs project unless you pass t
 
 ## Links
 
-- Website: https://web-emrq.vercel.app
-- Docs: https://web-emrq.vercel.app/docs
-- Source: https://github.com/e-man07/neat-hacks/tree/main/sdk/python
+- Website: https://nightly.whyparabola.online
+- Docs: https://nightly.whyparabola.online/docs
+- Source: https://github.com/e-man07/nightly/tree/main/sdk/python

@@ -10,7 +10,7 @@ Release s3 (commit c42532d, deployed 0.7 min before onset) introduced a `doc_roo
 ## Root cause and provenance
 - Release: `s3`
 - Commit: `c42532d175a6` Scout: add doc_root release setting and s3 release for versioned docs/v2
-- Entire checkpoint: `01M4KX3NBN835SRDCEYVFZ7JF0` ([view](https://entire.io/gh/e-man07/neat-hacks/commit/c42532d175a645d9b66bd9d8dfac900868e9a227))
+- Entire checkpoint: `01M4KX3NBN835SRDCEYVFZ7JF0` ([view](https://entire.io/gh/e-man07/nightly/commit/c42532d175a645d9b66bd9d8dfac900868e9a227))
 - Coding agent: Claude Code claude-sonnet-5-5
 - Prompt behind the change: “Scout (agents/scout/scout.py) is our Lumen docs assistant. The docs team is moving every page under a versioned folder, agents/scout/docs/v2/<slug>.md, and the move lands this week. Get Scout ready ahead of it: add a doc_root release setting (default 'docs', relative to agents/scout) and make read_doc load pages from <doc_root>/<slug>.md for the active release. Leave the search index as it is for ”
 

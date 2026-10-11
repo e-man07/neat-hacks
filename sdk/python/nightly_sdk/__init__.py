@@ -13,7 +13,7 @@ import urllib.request
 from typing import Any, Callable, Optional
 
 __all__ = ["Nightly", "NightShift", "current_trace_id"]
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 
 log = logging.getLogger("nightly_sdk")
 

@@ -4,7 +4,7 @@ Drafts only: Aman reviews, edits and posts. Each fits in one post (≤280 chars)
 as a thread. Attach the suggested screenshot. Post 1–5 today, spaced a few hours apart, then 6 with
 the demo, and the submission quote post in the window.
 
-Links: repo https://github.com/e-man07/neat-hacks · live https://web-emrq.vercel.app
+Links: repo https://github.com/e-man07/nightly · live https://nightly.whyparabola.online
 
 ## 1 — the idea  (screenshot: landing page)
 Building Nightly for #neatHack: the on-call engineer for your AI agents.
@@ -39,7 +39,7 @@ Nightly is now a real product: GitHub sign-in, a 5-minute connect wizard, a zero
 SDK, per-agent policies, and a Slack app with Approve / Undo buttons.
 
 Our second agent, Scout, connects only through the SDK and @neatlogs traces. #neatHack
-https://web-emrq.vercel.app
+https://nightly.whyparabola.online
 
 ## 6 — thread: a live incident, end to end  (screenshots per post)
 1/ A Claude Code session shipped a "get ready for the docs migration" change to Scout, our docs agent.
@@ -64,11 +64,11 @@ Nightly demo, 3 min: a coding-agent change breaks a live agent → detected in @
 through Entire to the prompt behind it → priced with @cfo_ai → rolled back → verified → one Slack
 message. [video link]
 
-Repo + evidence: https://github.com/e-man07/neat-hacks #neatHack
+Repo + evidence: https://github.com/e-man07/nightly #neatHack
 
 ## Submission quote post  (Oct 12, in the window; quote the official neatlogs submission post)
 Team: [team name]
 Project: Nightly, the on-call engineer for your AI agents
-Repo: https://github.com/e-man07/neat-hacks
-Demo: [video link] · Live: https://web-emrq.vercel.app
+Repo: https://github.com/e-man07/nightly
+Demo: [video link] · Live: https://nightly.whyparabola.online
 #neatHack
