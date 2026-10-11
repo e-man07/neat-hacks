@@ -1,24 +1,46 @@
-# Demo script — 3:00 max
+# Demo script: 3:00 max
 
-Setup (before recording):
-```bash
-cd backend && NIGHTSHIFT_LOCAL_TIME=03:07 uv run uvicorn api.server:app --port 8000   # live models
-cd web && npm run dev                                                                # http://localhost:3000
-```
-In the console: Reset demo → Start traffic (12/min). Let ~10 conversations go green. Have the
-phone (ntfy app subscribed to `NTFY_TOPIC`) on camera if possible; otherwise the on-screen phone.
+The story: a real coding-agent change breaks a live agent at night. Night Shift catches it, traces it to
+the prompt behind it, prices it, fixes what it's allowed to, proves the fix, and asks a human only for
+the irreversible part. The demo shows each tool (neatlogs, Entire, cfo.ai) at work, not just named.
+
+## Setup (10 minutes before recording)
+
+1. Browser tabs: https://web-emrq.vercel.app/app (signed in), the Scout agent page, Slack (the channel
+   connected under Paging), the neatlogs app (Scout traces), and the two cfo.ai links from `business/PLAN.md`.
+2. Scout on s2 with steady traffic, so there's a healthy baseline (about 3 min, ~25 runs):
+   ```bash
+   cd agents/scout && export NIGHTSHIFT_API_URL=https://api.34-14-135-119.sslip.io NIGHTSHIFT_AGENT_TOKEN=nsa_...
+   uv run --project ../../backend python scout.py deploy s2
+   uv run --project ../../backend python scout.py serve --rate 10      # leave running
+   ```
+3. Record in one take, and speed up the waiting in editing (detection takes ~1.5 min, the fix ~1 min).
+   On screen, show "≈ 90 s later" when you cut.
+
+## Script
 
 | Time | Screen | Say |
 |---|---|---|
-| 0:00–0:15 | Landing hero | "It's 3:07 AM. Your support agent is talking to customers. Nobody is awake. Night Shift is the on-call engineer for AI agents: it stops the bleeding by itself and only wakes you for decisions that can't be undone." |
-| 0:15–0:35 | Console, quiet | "This is Harbor, a real LLM support agent on Claude Haiku, handling refunds for a store. Every conversation is traced in **neatlogs**. Every release was written by a Claude Code session and checkpointed by **Entire**." |
-| 0:35–0:50 | Click "r46 One-step refunds" | "A developer asked their coding agent to make refunds faster — and assumed the payments service validates eligibility. It doesn't." Money counter turns red. |
-| 0:50–1:35 | Incident panel streams | "Night Shift detects wrong refunds from the ledger, then investigates like an SRE: reads the traces from neatlogs, sees the deploy, diffs the release, and follows the commit to the **Entire checkpoint** — here's the exact prompt behind the bug, and the warning the coding agent gave that nobody read." |
-| 1:35–1:55 | Impact + policy cards | "It prices the incident with our **cfo.ai** model: dollars per minute at production volume × 300 minutes until a human would wake up. Above $25 and reversible, so policy lets it act." |
-| 1:55–2:15 | Act + verify + phone | "It rolls back, replays the exact failed conversations on the fixed config — all pass — and watches live traffic recover. Then one page: handled, here's what it cost, a permanent fix is waiting for your approval." |
-| 2:15–2:35 | Benchmark page | "Six staged incidents, live models: unchecked refunds, API drift, a flaky-dependency loop it chose *not* to wake you for, a provider outage it failed over, a prompt-injection wave, a ticket flood. Before vs after numbers, all with trace ids." Mention run 1 → run 2 improvement. |
-| 2:35–2:50 | Business page | "Investigations cost about nine cents. The business plan — pricing, costs, revenue, runway — is built in cfo.ai from those measured costs." |
-| 2:50–3:00 | Landing CTA | "Autonomous where it's reversible. A human approves anything that isn't. Go to sleep — it's handled." |
+| 0:00–0:15 | Landing page | "AI agents run in production all night. When one quietly breaks, nobody's awake. Night Shift is the on-call engineer for your AI agents: it fixes what's safe to fix by itself, and only wakes you for what can't be undone." |
+| 0:15–0:35 | App → Scout agent page (green, traffic flowing) | "This is Scout, a docs assistant for a SaaS company, connected with our SDK in five minutes. Every answer is traced in **neatlogs**; Night Shift reads those traces. The SDK lets Night Shift steer the agent: release, model, kill switches." |
+| 0:35–0:50 | Terminal: `scout.py deploy s3` → agent page shows s3 | "Now a release ships. A developer asked their Claude Code agent to prepare for a docs migration. The code is checkpointed by **Entire**." |
+| 0:50–1:05 | Traces tab: tool errors appear (cut ≈ 90 s) | "Every request still returns 200, but the answers break: the new release reads docs from a folder that doesn't exist yet." |
+| 1:05–1:40 | Incident page: timeline streaming, then the provenance card | "Night Shift opens an incident and investigates like an SRE: it reads the failing traces back from neatlogs, sees the deploy, diffs it, and follows the commit to the **Entire checkpoint**. Here's the exact prompt the coding agent was given, and the warning it gave that nobody read: 'eval drops to 15/18, docs/v2 doesn't exist yet'." |
+| 1:40–1:55 | Impact cards | "It prices the damage with the unit economics we built in **cfo.ai**: about $11 a minute, $3,000+ if it waits until a human wakes up. It's reversible and the policy pre-approves it, so it acts." |
+| 1:55–2:15 | Slack message updating; replay 3/3 | "It rolls back to s2, then asks Scout to replay the failed questions on the new config: 3/3 pass. One Slack message tells me it's handled. The permanent fix is a PR waiting for my approval: that's irreversible, so it's my call." |
+| 2:15–2:30 | Click **Approve fix** in Slack → GitHub PR | "Approve, and Night Shift opens the fix PR with the postmortem and a regression test." |
+| 2:30–2:45 | Benchmark page | "We also ran six staged incidents on a refunds agent: wrong refunds, API drift, a provider outage, a prompt-injection wave. After improving Night Shift between runs, it went from 4/6 to 6/6 handled correctly, all with neatlogs trace ids." |
+| 2:45–3:00 | Business page with cfo.ai links | "Each investigation costs about nine cents. The business plan (pricing, costs, revenue, runway) is built in **cfo.ai**: break-even in month 8. Go to sleep. It's handled." |
 
-Cover for each tool (rubric): architecture (landing "three tools" section), implementation (console
-provenance card / code), runtime (live incident), reasoning (investigator steps), result (benchmark).
+## The rubric for each tool: where the demo shows it
+| | neatlogs | Entire | cfo.ai |
+|---|---|---|---|
+| Architecture | landing "how it works" | provenance card | business page |
+| Implementation | SDK snippet on /docs | commit → checkpoint → prompt | unit economics in incident pricing |
+| Runtime | traces flowing; MCP read-back in the timeline | checkpoint lookup during the investigation | $/min and $ at risk |
+| Reasoning | investigator cites trace ids | the coding agent's warning drives the diagnosis | policy gate: "worth acting on" |
+| Result | before/after traces | postmortem names prompt + checkpoint | plan: break-even M08 |
+
+## Fallback
+If the live run misbehaves, record the sandbox (https://web-emrq.vercel.app/sandbox → "r46
+One-step refunds"). It shows the same lifecycle on Harbor.

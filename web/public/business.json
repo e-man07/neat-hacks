@@ -1,6 +1,6 @@
 {
-  "status": "Draft computed locally from measured costs; cfo.ai model pending (see business/ARI_PROMPT.md)",
-  "cfo_share_url": null,
+  "status": "Built in cfo.ai from measured costs (read-only links below)",
+  "cfo_share_url": "https://app.cfo.ai/s/CsWafbQfu2U1y94W",
   "pricing": [
     {
       "tier": "Hobby",
@@ -278,5 +278,26 @@
   "runway_months": ">24",
   "breakeven_month": "M08",
   "gross_margin": 0.925,
-  "arpa": 637.65
+  "arpa": 637.65,
+  "cfo_support_url": "https://app.cfo.ai/s/fHcCAy2lG_aXs3Qt",
+  "scenarios": [
+    {
+      "name": "Main",
+      "breakeven": "M08",
+      "lowest_cash": "$98.2k",
+      "cash_m24": "$831k"
+    },
+    {
+      "name": "Slow sales (half the new customers)",
+      "breakeven": "M13",
+      "lowest_cash": "$62.4k",
+      "cash_m24": "$318k"
+    },
+    {
+      "name": "LLM prices double",
+      "breakeven": "M08",
+      "lowest_cash": "$97.7k",
+      "cash_m24": "$819k"
+    }
+  ]
 }

@@ -61,13 +61,23 @@ Aman (handle to be confirmed by Aman).
 - Web product: GitHub sign-in (Auth.js), app shell, connect-an-agent wizard, agent pages (metrics, control plane, deploys, traces, policy editor, settings), incident inbox with approve/undo, paging setup, SDK docs. The old console became `/sandbox`.
 - Deploy kit: GCP VM with Caddy and automatic HTTPS, Vercel env, Slack manifest (`docs/DEPLOY.md`).
 
+### 2026-10-11 ~04:30–06:30 IST: deployed
+- API on a GCP VM (asia-south1, e2-small) behind Caddy with automatic HTTPS: https://api.34-14-135-119.sslip.io. Web on Vercel: https://web-emrq.vercel.app. GitHub sign-in and the Slack app are configured.
+- Setup runs from a GCE startup script, because SSH isn't reachable from the build sandbox. Secrets are passed once through instance metadata and then removed from it. Caddy's apt repository returned 402, so Caddy is installed from its release binary.
+- Scout is connected to Aman's workspace through the live product. It is paused until the demo to save gateway budget (~$2.50/day).
+- cfo.ai plan links wired into the README, `business/PLAN.md` and the business page. README and demo script rewritten for the live product. Post drafts refreshed.
+
 ## Demo
-Script in `docs/DEMO_SCRIPT.md`. Run locally with `scripts/dev.sh`.
+Live: https://web-emrq.vercel.app (GitHub sign-in) · sandbox without an account: `/sandbox` · SDK docs: `/docs`.
+Script: `docs/DEMO_SCRIPT.md` (a live Scout incident through the product, with the sandbox as fallback). Local: `scripts/dev.sh`.
 
 ## Known limitations and next steps
-- Incidents are staged on purpose (bad releases and injected faults) to make the benchmark reproducible.
-- Production traffic is simulated customers; tools act on a sandbox ledger.
+- Harbor's benchmark incidents are staged on purpose (bad releases and injected faults) to be reproducible. Its customers are simulated, and its tools act on a sandbox ledger.
+- Scout answers a fixed question bank about a fictional product.
+- neatlogs search and trace read-back missed most Scout traces during the live runs (reported in `evidence/scout/`). Night Shift falls back to SDK outcome events.
+- Python SDK only.
 
 ## Submission
-- Confirmed: public repo, commits dated in the window, 3-minute demo, neatlogs + Entire + cfo.ai evidence, cfo.ai plan included, #neatHack posts, quote-post submission on X (Oct 12, 7:00–11:55 PM IST planned; final cutoff announced on Discord).
-- Outstanding: everything in `docs/PLAN.md` "Human-only steps".
+- Confirmed (neatlogs.com/hackathon, re-checked Oct 11): one track; must use neatlogs, Entire and cfo.ai, and include the cfo.ai business plan; public repo with commits dated during the event; submit by quoting the official neatlogs post with team, project, repo and demo. Planned window Oct 12, 7:00–11:55 PM IST, with the final cutoff on Discord. Judging: agent 30%, tool use 25%, demo 20%, building in public 15%, usefulness 10%.
+- Done: public repo; live product; evidence for neatlogs, Entire, cfo.ai, before/after and recovery; cfo.ai plan links.
+- Outstanding (Aman): confirm the cutoff on Discord; post the #neatHack drafts (`posts/drafts.md`); run `scripts/restore_entire_refs.sh`; neatlogs screenshots; connect Slack; record the demo; submit the quote post in the window.

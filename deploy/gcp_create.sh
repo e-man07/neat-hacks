@@ -28,4 +28,4 @@ for i in $(seq 1 50); do
 done
 gcloud compute instances get-serial-port-output "$NAME" --zone "$ZONE" 2>/dev/null | grep -E "NIGHTSHIFT_READY|startup-script.*(error|Error)" | tail -3
 # secrets now live on the VM's disk only; drop them from instance metadata
-gcloud compute instances remove-metadata "$NAME" --zone "$ZONE" --keys ns-env
+gcloud compute instances remove-metadata "$NAME" --zone "$ZONE" --keys ns-env,scout-env

@@ -148,12 +148,34 @@ export async function get<T>(path: string): Promise<T> {
   return r.json();
 }
 
+let sandboxToken: { token: string | null; exp: number } | null = null;
+
+/** The signed-in user's API token, if any (the deployed sandbox requires sign-in for actions). */
+async function optionalToken(): Promise<string | null> {
+  if (sandboxToken && sandboxToken.exp > Date.now()) return sandboxToken.token;
+  try {
+    const r = await fetch("/api/ns-token", { cache: "no-store" });
+    const j = r.ok ? await r.json() : null;
+    sandboxToken = { token: j?.token ?? null, exp: Date.now() + (j?.token ? 50 * 60_000 : 30_000) };
+  } catch {
+    sandboxToken = { token: null, exp: Date.now() + 30_000 };
+  }
+  return sandboxToken.token;
+}
+
 export async function post<T>(path: string, body?: unknown): Promise<T> {
+  const token = await optionalToken();
   const r = await fetch(`${API}${path}`, {
     method: "POST",
-    headers: { "content-type": "application/json" },
+    headers: { "content-type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
     body: body === undefined ? undefined : JSON.stringify(body),
   });
+  if (r.status === 401) {
+    if (confirm("Sign in with GitHub to drive the live sandbox (it runs real models)?")) {
+      window.location.href = `/signin?callbackUrl=${encodeURIComponent(window.location.pathname)}`;
+    }
+    throw new Error("sign in required");
+  }
   if (!r.ok) throw new Error(`${path}: ${r.status}`);
   return r.json();
 }

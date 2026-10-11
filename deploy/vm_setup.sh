@@ -67,9 +67,38 @@ $HOST {
   }
 }
 CADDY
+# Optional: run the Scout sample agent (needs scout-env metadata on first boot: NIGHTSHIFT_AGENT_TOKEN, SCOUT_RATE)
+md instance/attributes/scout-env > /tmp/scout.env
+if [ -s /tmp/scout.env ]; then
+  { cat /tmp/scout.env; echo "NIGHTSHIFT_API_URL=http://127.0.0.1:8000"; } > /opt/nightshift/scout.env
+  chown nightshift /opt/nightshift/scout.env; chmod 600 /opt/nightshift/scout.env
+fi
+rm -f /tmp/scout.env
+if [ -f /opt/nightshift/scout.env ]; then
+  cat > /etc/systemd/system/nightshift-scout.service <<UNIT
+[Unit]
+Description=Scout sample agent (Lumen docs assistant)
+After=nightshift-api.service
+[Service]
+User=nightshift
+WorkingDirectory=/opt/nightshift/agents/scout
+EnvironmentFile=/opt/nightshift/.env
+EnvironmentFile=/opt/nightshift/scout.env
+ExecStart=/bin/bash -c 'exec /opt/nightshift/backend/.venv/bin/python scout.py serve --rate \${SCOUT_RATE:-0.5}'
+Restart=always
+RestartSec=10
+[Install]
+WantedBy=multi-user.target
+UNIT
+  SCOUT=1
+fi
 systemctl daemon-reload
 systemctl enable --now nightshift-api caddy
 systemctl restart nightshift-api caddy
+# scout-enabled=false metadata pauses the sample agent (it spends LLM budget); the API stays up
+if [ "$(md instance/attributes/scout-enabled)" = "false" ]; then
+  systemctl disable --now nightshift-scout 2>/dev/null || true
+elif [ -n "${SCOUT:-}" ]; then systemctl enable nightshift-scout; systemctl restart nightshift-scout; fi
 sleep 4
 for i in $(seq 1 30); do curl -fsS "https://$HOST/api/health" >/dev/null 2>&1 && break; sleep 5; done
 curl -fsS "https://$HOST/api/health" && echo && echo "NIGHTSHIFT_READY https://$HOST"

@@ -92,8 +92,13 @@ def list_agents(ws: dict[str, Any] = Depends(workspace)) -> list[dict[str, Any]]
 def create_agent(body: AgentIn, ws: dict[str, Any] = Depends(workspace)) -> dict[str, Any]:
     if not body.name.strip():
         raise HTTPException(422, "name is required")
-    agent, token = platform().store.create_agent(ws["id"], body.name.strip(), body.description.strip(),
-                                                 repo=(body.repo or "").strip() or None)
+    repo = (body.repo or "").strip() or None
+    if repo and not repos.REPO_RE.match(repo):
+        raise HTTPException(422, "repo must look like owner/name")
+    agent, token = platform().store.create_agent(ws["id"], body.name.strip(), body.description.strip(), repo=repo)
+    if repo:
+        threading.Thread(target=_clone, args=(agent["id"], repo, platform().store.github_token(ws["owner_id"])),
+                         daemon=True).start()
     return {"agent": agent, "token": token}
 
 
