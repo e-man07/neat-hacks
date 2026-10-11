@@ -29,3 +29,5 @@ video/.venv/
 video/timeline.json
 video/amp.json
 nightly-master-1080p60.mp4
+sdk/python/dist/
+sdk/python/build/

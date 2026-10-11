@@ -32,8 +32,8 @@ def current_trace_id() -> Optional[str]:
 class Nightly:
     def __init__(self, api_url: Optional[str] = None, token: Optional[str] = None, refresh_s: float = 5.0,
                  timeout_s: float = 4.0):
-        self.api_url = (api_url or os.environ.get("NIGHTLY_API_URL") or os.environ.get("NIGHTLY_API_URL", "")).rstrip("/")
-        self.token = token or os.environ.get("NIGHTLY_AGENT_TOKEN") or os.environ.get("NIGHTLY_AGENT_TOKEN", "")
+        self.api_url = (api_url or os.environ.get("NIGHTLY_API_URL") or os.environ.get("NIGHTSHIFT_API_URL", "")).rstrip("/")
+        self.token = token or os.environ.get("NIGHTLY_AGENT_TOKEN") or os.environ.get("NIGHTSHIFT_AGENT_TOKEN", "")
         self.refresh_s = refresh_s
         self.timeout_s = timeout_s
         self._config: dict[str, Any] = {}
