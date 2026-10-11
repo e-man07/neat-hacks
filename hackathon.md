@@ -70,7 +70,14 @@ Aman (handle to be confirmed by Aman).
 ### 2026-10-11 ~16:00–17:00 IST: Nightly, and an explainer video
 - Renamed the product from Night Shift to **Nightly** in display text: web, Slack messages, postmortems, fix-PR titles, docs. The SDK is now `nightly-sdk` / `nightly_sdk.Nightly`; the old module name and the `NIGHTSHIFT_*` env vars still work. Internal code names are unchanged. Evidence files from earlier runs keep the old name.
 - New logo, favicon and character: the Nightly ghost.
-- A ~50 s motion-design explainer for the hero, modelled on the Inkbox launch video: ElevenLabs voiceover with word-timed captions, the ghost blinking and lip-syncing, UI scenes (agent runs, investigation, fix, Slack message, SDK), and music plus sound effects generated in numpy. The source is in `video/`.
+- A motion-design explainer for the hero, modelled on the Inkbox launch video: ElevenLabs voiceover with word-timed captions, the ghost blinking and lip-syncing, UI scenes (agent runs, investigation, fix, Slack message, SDK), and music plus sound effects generated in numpy. The source is in `video/`.
+
+### 2026-10-11 ~17:00–19:30 IST: PyPI, competitor review, clearer product
+- Explainer video v2 (67 s, 1080p60): real sponsor logos, master hosted on R2 and served in the hero.
+- `nightly-sdk` published on PyPI (0.1.0, then 0.1.1 with a full description). Fixed packaging found on the way: the `nightshift_sdk` shim wasn't shipped and the `NIGHTSHIFT_*` env fallback was lost in the rename.
+- Reviewed 21 other public neatHack repos and the market (agent observability vs AI SRE tools). About 9 build agents that debug or fix other agents; none combines a live production agent, $ pricing, reversible containment and a hosted product. Acted on it: `/judge` page mapping each criterion to evidence; a one-click guided "3 AM incident" in the sandbox with a live $-lost counter; incidents now show confidence, traces cited and each policy check; a Slack message preview and a comparison table on the landing page; README opening with proof numbers.
+- Built in public: first #neatHack post with the explainer video: https://x.com/WhyParabola/status/2109333155702571151
+- Slack connected to the live product.
 
 ## Demo
 Live: https://web-emrq.vercel.app (GitHub sign-in) · sandbox without an account: `/sandbox` · SDK docs: `/docs`.
@@ -85,4 +92,4 @@ Script: `docs/DEMO_SCRIPT.md` (a live Scout incident through the product, with t
 ## Submission
 - Confirmed (neatlogs.com/hackathon, re-checked Oct 11): one track; must use neatlogs, Entire and cfo.ai, and include the cfo.ai business plan; public repo with commits dated during the event; submit by quoting the official neatlogs post with team, project, repo and demo. Planned window Oct 12, 7:00–11:55 PM IST, with the final cutoff on Discord. Judging: agent 30%, tool use 25%, demo 20%, building in public 15%, usefulness 10%.
 - Done: public repo; live product; evidence for neatlogs, Entire, cfo.ai, before/after and recovery; cfo.ai plan links.
-- Outstanding (Aman): confirm the cutoff on Discord; post the #neatHack drafts (`posts/drafts.md`); run `scripts/restore_entire_refs.sh`; neatlogs screenshots; connect Slack; record the demo; submit the quote post in the window.
+- Outstanding (Aman): confirm the cutoff on Discord; post the remaining #neatHack drafts (`posts/drafts.md`); run `scripts/restore_entire_refs.sh`; neatlogs screenshots; record the demo; submit the quote post in the window.
