@@ -129,6 +129,43 @@ body {
   animation: marquee 40s linear infinite;
 }
 
+.marquee-reverse {
+  animation: marquee 48s linear infinite reverse;
+}
+
+.marquee:hover,
+.marquee-reverse:hover {
+  animation-play-state: paused;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.reveal.in {
+  opacity: 1;
+  transform: none;
+}
+
+@keyframes flow {
+  from { left: -24px; }
+  to { left: 100%; }
+}
+
+.flow { animation: flow 1.6s linear infinite; }
+.flow-reverse { animation: flow 1.6s linear infinite reverse; }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.float {
+  animation: float 6s ease-in-out infinite;
+}
+
 .subhead {
   color: var(--headline);
   font-weight: 400;
@@ -199,9 +236,14 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
   .pulse-alert,
   .slide-in,
   .marquee,
+  .marquee-reverse,
+  .float,
+  .flow,
+  .flow-reverse,
   .caret::after {
     animation: none;
   }
