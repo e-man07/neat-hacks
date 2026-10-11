@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
 import HeroVideo from "@/components/HeroVideo";
-import { GitHubMark, SlackMark } from "@/components/Marks";
+import { Brand, GitHubMark, SlackMark } from "@/components/Marks";
 import IncidentReel from "@/components/IncidentReel";
 import { Reveal, useInView, useScrollY } from "@/components/Motion";
 import Nav from "@/components/Nav";
@@ -14,12 +14,12 @@ import { useBenchmark, type BenchResult } from "@/lib/bench";
 
 const CITED = ["NEATLOGS TRACE", "ENTIRE CHECKPOINT", "CODING PROMPT", "DEPLOY LOG", "RELEASE DIFF", "CFO.AI MODEL", "POLICY v3", "REPLAY 3/3", "POSTMORTEM", "REGRESSION EVAL", "FIX PR"];
 
-const INTEGRATIONS: { name: string; icon: ReactNode; what: string }[] = [
+const INTEGRATIONS: { name: string; icon: ReactNode; what: string; logo?: ReactNode }[] = [
   { name: "Slack", icon: <SlackMark size={18} />, what: "One message per incident, updated live. Approve or undo from the channel." },
   { name: "GitHub", icon: <GitHubMark size={18} />, what: "Sign in with GitHub. Approved fixes open as revert PRs on your repo." },
-  { name: "neatlogs", icon: <Glyph>nl</Glyph>, what: "Your agent's traces. Nightly reads them back while it investigates." },
-  { name: "Entire", icon: <Glyph>En</Glyph>, what: "Checkpoints link a bad deploy to the coding-agent prompt behind it." },
-  { name: "cfo.ai", icon: <Glyph>$</Glyph>, what: "Your unit economics put a price on every minute of an incident." },
+  { name: "neatlogs", logo: <Brand name="neatlogs" h={20} />, icon: <Brand name="neatlogs" h={14} />, what: "Your agent's traces. Nightly reads them back while it investigates." },
+  { name: "Entire", logo: <Brand name="entire" h={20} />, icon: <Brand name="entire" h={14} />, what: "Checkpoints link a bad deploy to the coding-agent prompt behind it." },
+  { name: "cfo.ai", logo: <Brand name="cfo" h={22} />, icon: <Brand name="cfo" h={16} />, what: "Your unit economics put a price on every minute of an incident." },
   { name: "Python SDK", icon: <Glyph>py</Glyph>, what: "pip install nightly-sdk. Zero dependencies, fails open." },
   { name: "Phone push", icon: <Glyph>◔</Glyph>, what: "ntfy notifications for the incidents that really need you." },
   { name: "Webhooks", icon: <Glyph>{"{}"}</Glyph>, what: "Send pages to PagerDuty, Opsgenie or your own tools." },
@@ -72,9 +72,9 @@ export default function Home() {
               <span className="flex items-center gap-1.5 text-fg">
                 <GitHubMark /> GitHub
               </span>
-              <span>neatlogs</span>
-              <span>Entire</span>
-              <span>cfo.ai</span>
+              <Brand name="neatlogs" h={15} />
+              <Brand name="entire" h={15} />
+              <Brand name="cfo" h={17} />
             </div>
           </Reveal>
         </div>
@@ -174,11 +174,11 @@ export default function Home() {
             <DiagramCard label="Evidence">
               {[
                 ["neatlogs", "what happened"],
-                ["Entire", "why it happened"],
-                ["cfo.ai", "what it costs"],
+                ["entire", "why it happened"],
+                ["cfo", "what it costs"],
               ].map(([n, d]) => (
                 <div key={n} className="border-b border-line py-2 last:border-0">
-                  <div className="text-[14px] text-fg">{n}</div>
+                  <div className="py-0.5"><Brand name={n as "neatlogs" | "entire" | "cfo"} h={18} /></div>
                   <div className="font-mono text-[11.5px] text-faint">{d}</div>
                 </div>
               ))}
@@ -199,8 +199,14 @@ export default function Home() {
             <Reveal key={it.name} delay={(i % 4) * 70}>
               <div className="group h-full rounded-xl border border-line p-4 transition hover:-translate-y-0.5 hover:border-line-strong hover:shadow-soft">
                 <div className="flex items-center gap-2.5">
-                  <span className="grid h-8 w-8 place-items-center rounded-lg bg-chip text-fg">{it.icon}</span>
-                  <span className="text-[14.5px] font-medium text-fg">{it.name}</span>
+                  {it.logo ? (
+                    <span className="flex h-8 items-center">{it.logo}</span>
+                  ) : (
+                    <>
+                      <span className="grid h-8 w-8 place-items-center rounded-lg bg-chip text-fg">{it.icon}</span>
+                      <span className="text-[14.5px] font-medium text-fg">{it.name}</span>
+                    </>
+                  )}
                 </div>
                 <p className="mt-3 text-[13px] leading-relaxed text-muted">{it.what}</p>
               </div>
@@ -233,7 +239,7 @@ export default function Home() {
 
       {/* Numbered rows */}
       <section className="mx-auto max-w-[1000px] space-y-28 px-5 pt-32">
-        <Row n="01" tag="neatlogs" title="It investigates like an engineer." body="Reads the failing traces, the deploy log and the diff, and cites every trace it used.">
+        <Row n="01" tag={<Brand name="neatlogs" h={13} />} title="It investigates like an engineer." body="Reads the failing traces, the deploy log and the diff, and cites every trace it used.">
           {hero ? (
             <div className="force-dark min-w-0">
               <IncidentReel events={hero.timeline} title={`nightly — ${hero.incident_id} · ${hero.name}`} />
@@ -242,7 +248,7 @@ export default function Home() {
             <div className="grid h-[380px] place-items-center font-mono text-sm text-faint">loading…</div>
           )}
         </Row>
-        <Row n="02" tag="Entire" title="It finds the prompt behind the bug." body="Follows the bad deploy to its commit, its Entire checkpoint, and the coding-agent prompt that wrote it.">
+        <Row n="02" tag={<Brand name="entire" h={13} />} title="It finds the prompt behind the bug." body="Follows the bad deploy to its commit, its Entire checkpoint, and the coding-agent prompt that wrote it.">
           <div className="rounded-xl border border-line p-5 shadow-soft" style={{ background: "#fff" }}>
             <div className="font-mono text-[11.5px] uppercase tracking-wider text-faint">commit → checkpoint → prompt</div>
             <p className="mt-3 line-clamp-4 text-[15px] leading-relaxed text-fg">
@@ -255,7 +261,7 @@ export default function Home() {
             <div className="mt-4 rounded-lg bg-[#fff5ef] px-3 py-2 text-[13px] text-alert">⚠ The coding agent warned about this. Nobody read it.</div>
           </div>
         </Row>
-        <Row n="03" tag="cfo.ai + Slack" title="It only wakes you when it’s worth it." body="Prices every minute of the incident. Fixes what’s reversible, then sends one message.">
+        <Row n="03" tag={<><Brand name="cfo" h={14} /> + Slack</>} title="It only wakes you when it’s worth it." body="Prices every minute of the incident. Fixes what’s reversible, then sends one message.">
           <div className="flex justify-center py-2">
             <Phone
               clock="03:08"
@@ -328,7 +334,11 @@ export default function Home() {
             reverse
             items={INTEGRATIONS.map((it) => (
               <span key={it.name} className="flex items-center gap-2 px-4 text-[14px] text-muted">
-                <span className="text-fg">{it.icon}</span> {it.name}
+                {it.logo ?? (
+                  <>
+                    <span className="text-fg">{it.icon}</span> {it.name}
+                  </>
+                )}
               </span>
             ))}
           />
@@ -471,13 +481,13 @@ function Connector({ label, reverse = false }: { label: string; reverse?: boolea
   );
 }
 
-function Row({ n, tag, title, body, children }: { n: string; tag: string; title: string; body: string; children: ReactNode }) {
+function Row({ n, tag, title, body, children }: { n: string; tag: ReactNode; title: string; body: string; children: ReactNode }) {
   return (
     <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
       <Reveal>
         <div className="flex items-center gap-3">
           <span className="font-mono text-[13px] text-faint">{n}</span>
-          <span className="chip">{tag}</span>
+          <span className="chip inline-flex items-center gap-1.5">{tag}</span>
         </div>
         <h3 className="mt-4 text-[26px] font-normal tracking-tight text-fg">{title}</h3>
         <p className="mt-3 text-[15.5px] leading-relaxed text-muted">{body}</p>

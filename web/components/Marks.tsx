@@ -16,3 +16,16 @@ export function GitHubMark({ size = 14 }: { size?: number }) {
     </svg>
   );
 }
+
+const BRAND = {
+  neatlogs: { src: "/brand/logo-neatlogs.png", alt: "neatlogs", ratio: 1100 / 243 },
+  entire: { src: "/brand/logo-entire.svg", alt: "Entire", ratio: 959.94 / 236.81 },
+  cfo: { src: "/brand/logo-cfo.svg", alt: "cfo.ai", ratio: 100 / 31 },
+} as const;
+
+/** Official wordmarks of the three tools Nightly is built on. */
+export function Brand({ name, h = 18 }: { name: keyof typeof BRAND; h?: number }) {
+  const b = BRAND[name];
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img src={b.src} alt={b.alt} height={h} width={Math.round(h * b.ratio)} style={{ height: h, width: "auto", display: "inline-block" }} />;
+}
