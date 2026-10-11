@@ -108,8 +108,9 @@ uv run python -m bench.benchmark --brain live           # incident benchmark (~$
 uv run --project backend python agents/scout/scout.py eval --release s3   # Scout's offline eval
 ```
 
-Entire checkpoints are on GitHub as `_entire/*` branches (the build sandbox could only push
-branches). `scripts/restore_entire_refs.sh` moves them to `refs/entire/*`.
+Entire checkpoints live in `refs/entire/checkpoints/*` and the repo is mirrored on entire.io, so every
+commit link (e.g. [r46](https://entire.io/gh/e-man07/nightly/commit/e26a58f17ad4af5d119de989ebeaafc7055b8929))
+opens its checkpoint, session and the coding agent's prompt.
 
 ## Repo map
 
