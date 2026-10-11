@@ -1,33 +1,74 @@
 # #neatHack build-in-public drafts
 
-Drafts only — Aman reviews, edits and posts. Replace bracketed bits with real links.
+Drafts only: Aman reviews, edits and posts. Each fits in one post (≤280 chars) except where marked
+as a thread. Attach the suggested screenshot. Post 1–5 today, spaced a few hours apart, then 6 with
+the demo, and the submission quote post in the window.
 
-## 1 — the idea
-Building Night Shift for #neatHack: the on-call engineer for AI agents.
+Links: repo https://github.com/e-man07/neat-hacks · live https://web-emrq.vercel.app
 
-At 3 AM a "harmless" prompt change starts paying refunds it shouldn't. Every request still returns 200.
-Night Shift catches it, finds the change *and the coding-agent prompt behind it*, prices the damage,
-rolls back within a pre-approved policy, proves the fix, and only then pages you.
+## 1 — the idea  (screenshot: landing page)
+Building Night Shift for #neatHack: the on-call engineer for your AI agents.
 
-Stack: @neatlogs traces · Entire checkpoints · cfo.ai economics. [repo link]
+When an agent quietly breaks at 3 AM, it finds the change and the coding-agent prompt behind it,
+prices the damage, rolls back within your policy, proves the fix, and only then wakes you.
 
-## 2 — the bad releases are real
-Every bad release in our benchmark was written by a real Claude Code session with a realistic dev
-request — "make refunds one step, payments already validates them". Entire checkpointed each one.
+@neatlogs · Entire · @cfo_ai
 
-Best part: the coding agent *warned* about the risk every time. Night Shift surfaces that warning in
-the postmortem. Nobody reads it at 5 PM; Night Shift reads it at 3 AM. #neatHack [screenshot]
+## 2 — the bad releases are real  (screenshot: incident provenance card)
+Every bad release in our benchmark was written by a real Claude Code session from a realistic dev
+request, and checkpointed by Entire.
 
-## 3 — first live benchmark
-Ran 6 staged incidents on live models (Haiku agent, Sonnet investigator), all traced in neatlogs.
-Run 1: the investigator found an API-drift bug instantly (KeyError in the v2 adapter, exact commit +
-prompt) — then rated itself 0.5 confident, so policy refused to act alone. Fixed calibration.
-Run 2: [results]. Investigations cost ~$0.09 each. #neatHack [link to evidence/benchmark]
+The coding agent warned about the risk every time. Nobody reads that at 5 PM. Night Shift reads it at
+3 AM and quotes it in the postmortem. #neatHack
 
-## 4 — it chose not to wake me
-A release made the agent retry a flaky carrier API. Night Shift diagnosed it, priced it at $8 until
-morning, and deferred it with the fix attached instead of paging me. Judgment > alerts. #neatHack
+## 3 — it got better between runs  (screenshot: evidence/before-after.md table)
+6 staged incidents on live models, every run traced in @neatlogs.
 
-## 5 — demo
-Night Shift demo (3 min): [video link]. Deploy a bad release → detected → traced to the prompt →
-priced → rolled back → verified → one page on my phone. Repo + evidence: [link] #neatHack
+Run 1: 4/6. It found an API-drift bug in seconds, then rated itself 50% confident and refused to act.
+We fixed calibration, pricing and paging.
+Run 3: 6/6. ~9¢ per investigation. #neatHack
+
+## 4 — it chose not to wake me  (screenshot: a DEFERRED incident)
+A release made the agent retry a flaky API. Night Shift diagnosed it, priced it with our @cfo_ai unit
+economics at $1 until morning, and deferred it with the fix attached instead of paging me.
+
+An on-call engineer needs judgment, not just alerts. #neatHack
+
+## 5 — from demo to product  (screenshot: /app overview + Slack message)
+Night Shift is now a real product: GitHub sign-in, a 5-minute connect wizard, a zero-dependency
+SDK, per-agent policies, and a Slack app with Approve / Undo buttons.
+
+Our second agent, Scout, connects only through the SDK and @neatlogs traces. #neatHack
+https://web-emrq.vercel.app
+
+## 6 — thread: a live incident, end to end  (screenshots per post)
+1/ A Claude Code session shipped a "get ready for the docs migration" change to Scout, our docs agent.
+It even warned: "eval drops to 15/18, docs/v2 doesn't exist yet." It shipped anyway. #neatHack
+
+2/ 1.5 min later Night Shift saw tool errors in 30% of runs in @neatlogs, traced them to the commit,
+the Entire checkpoint and that warning, and priced it at $11/min.
+
+3/ The rollback is reversible and pre-approved, so it rolled back alone, then had Scout replay the
+failed questions: 3/3 pass. Resolved in under 3 min. The permanent fix waits for my approval.
+
+## 7 — what broke while building it  (honest-builder post)
+Building Night Shift for #neatHack I found that @neatlogs search returned ~25 traces for ~120 runs,
+with 0 SDK export errors. So the SDK's outcome reports now carry run details, and traces add to them
+when they land. An on-call tool can't go blind when a trace is missing.
+
+(Post this only if you're comfortable with it, and maybe share it with the neatlogs team on Discord
+first.)
+
+## 8 — demo  (with the video)
+Night Shift demo, 3 min: a coding-agent change breaks a live agent → detected in @neatlogs → traced
+through Entire to the prompt behind it → priced with @cfo_ai → rolled back → verified → one Slack
+message. [video link]
+
+Repo + evidence: https://github.com/e-man07/neat-hacks #neatHack
+
+## Submission quote post  (Oct 12, in the window; quote the official neatlogs submission post)
+Team: [team name]
+Project: Night Shift, the on-call engineer for your AI agents
+Repo: https://github.com/e-man07/neat-hacks
+Demo: [video link] · Live: https://web-emrq.vercel.app
+#neatHack

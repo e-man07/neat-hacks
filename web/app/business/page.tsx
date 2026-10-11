@@ -8,6 +8,8 @@ import { API, money } from "@/lib/api";
 type Plan = {
   status: string;
   cfo_share_url: string | null;
+  cfo_support_url?: string | null;
+  scenarios?: { name: string; breakeven: string; lowest_cash: string; cash_m24: string }[];
   pricing: { tier: string; price: string; includes: string[] }[];
   unit_costs: { item: string; value: string; source: string }[];
   forecast: { month: string; customers: number; mrr: number; costs: number; cash: number }[];
@@ -102,13 +104,32 @@ export default function BusinessPage() {
             <div className="flex flex-wrap items-center justify-between gap-2">
               <Label>24-month forecast · runway {plan.runway_months ?? "—"} months</Label>
               {plan.cfo_share_url ? (
-                <a href={plan.cfo_share_url} className="text-[12px] text-info underline underline-offset-2">
-                  open the cfo.ai model
-                </a>
+                <span className="flex gap-4">
+                  <a href={plan.cfo_share_url} className="text-[12px] text-info underline underline-offset-2">
+                    business plan in cfo.ai
+                  </a>
+                  {plan.cfo_support_url && (
+                    <a href={plan.cfo_support_url} className="text-[12px] text-info underline underline-offset-2">
+                      customer unit economics in cfo.ai
+                    </a>
+                  )}
+                </span>
               ) : (
                 <span className="font-mono text-[11px] text-amber">cfo.ai share link pending</span>
               )}
             </div>
+            {plan.scenarios && (
+              <div className="mt-4 grid gap-2 sm:grid-cols-3">
+                {plan.scenarios.map((sc) => (
+                  <div key={sc.name} className="rounded-lg border border-line p-3">
+                    <div className="text-[12px] text-white/60">{sc.name}</div>
+                    <div className="mt-1 font-mono text-[12px] text-white/85">
+                      break-even {sc.breakeven} · low {sc.lowest_cash} · M24 {sc.cash_m24}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
             <div className="mt-4 overflow-x-auto">
               <table className="w-full min-w-[640px] text-[12.5px]">
                 <thead className="font-mono text-[10.5px] uppercase text-white/40">
