@@ -7,12 +7,21 @@ import { Brand, GitHubMark, SlackMark } from "@/components/Marks";
 import IncidentReel from "@/components/IncidentReel";
 import { Reveal, useInView, useScrollY } from "@/components/Motion";
 import Nav from "@/components/Nav";
-import Phone from "@/components/Phone";
+import SlackPreview from "@/components/SlackPreview";
 import { GhostLink, Moon, PrimaryLink } from "@/components/ui";
 import { money } from "@/lib/api";
 import { useBenchmark, type BenchResult } from "@/lib/bench";
 
 const CITED = ["NEATLOGS TRACE", "ENTIRE CHECKPOINT", "CODING PROMPT", "DEPLOY LOG", "RELEASE DIFF", "CFO.AI MODEL", "POLICY v3", "REPLAY 3/3", "POSTMORTEM", "REGRESSION EVAL", "FIX PR"];
+
+const COMPARE: [string, string, string, string][] = [
+  ["Watches what your AI agent does", "✓ traces, evals, alerts", "— watches servers", "✓ traces and outcomes"],
+  ["Finds the prompt behind a bad change", "—", "—", "✓ via the Entire checkpoint"],
+  ["Puts a price on the incident", "LLM spend only", "—", "✓ $/min from your unit economics"],
+  ["Fixes it while you sleep", "—", "infrastructure only", "✓ rollback, model failover, kill switch"],
+  ["Proves the fix worked", "—", "service health", "✓ replays the failed runs"],
+  ["Asks before anything irreversible", "n/a", "varies", "✓ always, in Slack"],
+];
 
 const INTEGRATIONS: { name: string; icon: ReactNode; what: string; logo?: ReactNode }[] = [
   { name: "Slack", icon: <SlackMark size={18} />, what: "One message per incident, updated live. Approve or undo from the channel." },
@@ -263,20 +272,13 @@ export default function Home() {
         </Row>
         <Row n="03" tag={<><Brand name="cfo" h={14} /> + Slack</>} title="It only wakes you when it’s worth it." body="Prices every minute of the incident. Fixes what’s reversible, then sends one message.">
           <div className="flex justify-center py-2">
-            <Phone
-              clock="03:08"
-              notes={
-                hero
-                  ? [
-                      {
-                        title: "✅ Handled. No action needed tonight",
-                        body: `${hero.name}: rolled back ${hero.seconds_detect_to_mitigate ?? "?"}s after detection. ${hero.replay}/${hero.replay_n} failed runs now pass. ~${money(hero.projected_loss_if_waiting)} saved. A fix PR is waiting for your approval.`,
-                        time: "now",
-                        tone: "ok",
-                      },
-                    ]
-                  : []
-              }
+            <SlackPreview
+              agent={hero ? `Harbor · ${hero.name}` : "Harbor"}
+              incident={hero?.incident_id ?? "INC-1001"}
+              release={hero?.culprit ?? "r46"}
+              seconds={String(Math.round(hero?.seconds_detect_to_mitigate ?? 18))}
+              replay={hero ? `${hero.replay}/${hero.replay_n}` : "5/5"}
+              saved={hero ? money(hero.projected_loss_if_waiting) : "$22,846"}
             />
           </div>
         </Row>
@@ -315,6 +317,39 @@ export default function Home() {
             </div>
           </Reveal>
         </div>
+      </section>
+
+      {/* Compare */}
+      <section className="mx-auto max-w-[1000px] px-5 pt-32">
+        <Reveal>
+          <h2 className="subhead text-center text-[30px] sm:text-[40px]">
+            Monitoring tells you. <span className="text-muted">Nightly handles it.</span>
+          </h2>
+        </Reveal>
+        <Reveal delay={100}>
+          <div className="mt-12 overflow-x-auto rounded-2xl border border-line-strong">
+            <table className="w-full min-w-[620px] text-left text-[14px]">
+              <thead>
+                <tr className="border-b border-line text-[12.5px] text-muted">
+                  <th className="p-4 font-normal" />
+                  <th className="p-4 font-normal">Agent observability</th>
+                  <th className="p-4 font-normal">AI SRE tools</th>
+                  <th className="bg-card-2 p-4 font-medium text-fg">Nightly</th>
+                </tr>
+              </thead>
+              <tbody>
+                {COMPARE.map(([row, a, b, n]) => (
+                  <tr key={row} className="border-b border-line last:border-0">
+                    <td className="p-4 text-fg">{row}</td>
+                    <td className="p-4 text-muted">{a}</td>
+                    <td className="p-4 text-muted">{b}</td>
+                    <td className="bg-card-2 p-4 text-fg">{n}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Reveal>
       </section>
 
       {/* CTA */}

@@ -1,11 +1,31 @@
 # Nightly
 
-**The on-call engineer for your AI agents.** Built for neatHack 2026. (Called *Night Shift* during the build; older evidence files use that name.)
+**The on-call engineer for your AI agents.** Every request returned 200. Nightly checked anyway.
 
-It stops the bleeding by itself, and only wakes you for decisions that can't be undone.
+When a change makes a production AI agent fail quietly, Nightly finds the cause, prices the damage,
+applies a fix that can be undone, proves it by replaying the failed runs, and pages you once in Slack.
+Built for neatHack 2026 (called *Night Shift* during the build; older evidence files use that name).
 
-**Live:** https://web-emrq.vercel.app · sign in with GitHub · [SDK docs](https://web-emrq.vercel.app/docs) ·
-[sandbox demo, no account needed](https://web-emrq.vercel.app/sandbox)
+| **6/6** staged incidents handled correctly | **13–21 s** from detection to containment | **4/6 → 6/6** from benchmark run 1 to run 3 |
+|---|---|---|
+
+**Live:** [web-emrq.vercel.app](https://web-emrq.vercel.app) · [**for judges: every criterion and its evidence**](https://web-emrq.vercel.app/judge) ·
+[sandbox: run the 3 AM incident](https://web-emrq.vercel.app/sandbox) · [SDK docs](https://web-emrq.vercel.app/docs) ·
+`pip install nightly-sdk` ([PyPI](https://pypi.org/project/nightly-sdk/)) ·
+[explainer video](https://pub-322f2127ed23420ebefb3a5062774ae4.r2.dev/films/nightly-master-1080p60.mp4)
+
+## How it compares
+
+| | Agent observability tools | AI SRE tools | **Nightly** |
+|---|---|---|---|
+| Watches what your AI agent does | ✓ traces, evals, alerts | watches servers | ✓ traces and outcomes |
+| Finds the prompt behind a bad change | — | — | ✓ via the Entire checkpoint |
+| Prices the incident | LLM spend only | — | ✓ $/min from cfo.ai unit economics |
+| Fixes it while you sleep | — | infrastructure only | ✓ rollback, model failover, kill switch, step cap |
+| Proves the fix worked | — | service health | ✓ replays the failed runs, undoes the fix if they fail |
+| Asks before anything irreversible | n/a | varies | ✓ always, in Slack |
+
+## The story
 
 At 3 AM, a "harmless" change to a production AI agent starts failing. Maybe it pays refunds it
 shouldn't, or reads docs from a folder that doesn't exist yet. Every request still returns HTTP 200.
