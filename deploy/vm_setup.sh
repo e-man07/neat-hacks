@@ -95,7 +95,10 @@ fi
 systemctl daemon-reload
 systemctl enable --now nightshift-api caddy
 systemctl restart nightshift-api caddy
-if [ -n "${SCOUT:-}" ]; then systemctl enable nightshift-scout; systemctl restart nightshift-scout; fi
+# scout-enabled=false metadata pauses the sample agent (it spends LLM budget); the API stays up
+if [ "$(md instance/attributes/scout-enabled)" = "false" ]; then
+  systemctl disable --now nightshift-scout 2>/dev/null || true
+elif [ -n "${SCOUT:-}" ]; then systemctl enable nightshift-scout; systemctl restart nightshift-scout; fi
 sleep 4
 for i in $(seq 1 30); do curl -fsS "https://$HOST/api/health" >/dev/null 2>&1 && break; sleep 5; done
 curl -fsS "https://$HOST/api/health" && echo && echo "NIGHTSHIFT_READY https://$HOST"
