@@ -13,7 +13,7 @@ import urllib.request
 from typing import Any, Callable, Optional
 
 __all__ = ["Nightly", "NightShift", "current_trace_id"]
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 log = logging.getLogger("nightly_sdk")
 
@@ -98,8 +98,8 @@ class Nightly:
                **run: Any) -> bool:
         """outcome: ok | failed | escalated | negative. value_usd: money lost on this run, if any.
 
-        Optional run details (input, output, steps, tool_errors, tokens, latency_ms, cost_usd) let Night
-        Shift count the run even when its trace is late or never exported."""
+        Optional run details (input, output, steps, tool_errors, tokens, latency_ms, cost_usd) let Nightly
+        count the run even when its trace is late or never exported."""
         allowed = {"input", "output", "steps", "tool_errors", "tokens", "latency_ms", "cost_usd"}
         body = {"outcome": outcome, "trace_id": trace_id or current_trace_id(), "value_usd": value_usd,
                 "release": release, "model": model, "note": note}
@@ -154,5 +154,5 @@ class Nightly:
         self._stop.set()
 
 
-# The product was called Nightly during development; keep the old name importable.
+# The product was called Night Shift during development; keep the old name importable.
 NightShift = Nightly

@@ -1,15 +1,21 @@
 [project]
 name = "nightly-sdk"
-version = "0.1.0"
-description = "Connect an LLM agent to Nightly: the on-call engineer for AI agents"
+version = "0.1.1"
+description = "Let Nightly, the on-call engineer for AI agents, roll back, fail over and verify fixes for your LLM agent. Zero dependencies, fails open."
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = []
-keywords = ["llm", "agents", "on-call", "observability", "incident-response"]
+keywords = ["llm", "ai-agents", "on-call", "incident-response", "observability", "rollback", "kill-switch", "neatlogs"]
 classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
   "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
   "Operating System :: OS Independent",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: System :: Monitoring",
   "Topic :: Software Development :: Libraries",
+  "Typing :: Typed",
 ]
 
 [project.urls]
@@ -23,3 +29,6 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 packages = ["nightly_sdk", "nightshift_sdk"]
+
+[tool.setuptools.package-data]
+nightly_sdk = ["py.typed"]
