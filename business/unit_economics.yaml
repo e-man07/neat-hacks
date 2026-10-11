@@ -1,7 +1,7 @@
 # Harbor Goods unit economics used by Nightly to price incidents.
 # Source of truth: the cfo.ai model (see business/README.md). This file mirrors its inputs;
 # `scripts/cfo_sync.py` refreshes it once the cfo.ai MCP login is approved.
-source: "cfo.ai model 'Harbor Goods — support economics' (mirror; pending sync)"
+source: "cfo.ai unit economics (app.cfo.ai/s/fHcCAy2lG_aXs3Qt), inputs mirrored in business/unit_economics.yaml"
 currency: USD
 
 # Customer-facing support volume (production, not the demo sample)

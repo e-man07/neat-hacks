@@ -40,7 +40,13 @@ git config --system --add safe.directory /opt/nightshift  # the checkout is owne
 if [ ! -d /opt/nightshift/.git ]; then git clone -q --branch "$BRANCH" "$REPO" /opt/nightshift; fi
 git -C /opt/nightshift remote set-url origin "$REPO"
 git -C /opt/nightshift fetch -q origin "$BRANCH" && git -C /opt/nightshift reset -q --hard "origin/$BRANCH"
-git -C /opt/nightshift fetch -q origin '+refs/heads/_entire/*:refs/entire/*' || true
+# Entire: checkpoint refs + CLI, so investigations can read the coding-agent prompt behind a commit
+git -C /opt/nightshift fetch -q origin '+refs/entire/*:refs/entire/*' || true
+if ! command -v entire >/dev/null; then
+  (export HOME=/root; curl -fsSL https://entire.io/install.sh | bash) >/dev/null 2>&1 \
+    && install -m 755 /root/.local/bin/entire /usr/local/bin/entire || echo "entire CLI install failed"
+fi
+echo "ENTIRE_CHECK cli=$(command -v entire || echo none) refs=$(git -C /opt/nightshift for-each-ref refs/entire | wc -l)"
 if [ -s /tmp/api.env ]; then install -m 600 -o nightshift /tmp/api.env /opt/nightshift/.env; fi
 rm -f /tmp/api.env
 # ns-env-patch metadata: non-secret KEY=VALUE lines that replace those keys in the kept .env (e.g. a new web domain)
