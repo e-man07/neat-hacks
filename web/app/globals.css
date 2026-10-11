@@ -1,6 +1,32 @@
 @import "tailwindcss";
 
-:root,
+:root {
+  /* Light only. Tailwind's white/black are used as foreground/background across the app, so they
+     are swapped here; screens (terminal windows, the phone) opt back into dark with `.force-dark`. */
+  --color-white: #111111;
+  --color-black: #ffffff;
+  --sky: 17, 17, 17;
+  --headline: #111111;
+  --code-bg: #f4f3ee;
+  --chip: #f0efe9;
+  --bg: #ffffff;
+  --panel: #ffffff;
+  --card: #ffffff;
+  --card-2: #f7f6f2;
+  --line: rgba(17, 17, 17, 0.09);
+  --line-strong: rgba(17, 17, 17, 0.16);
+  --fg: #111111;
+  --fg-2: #2a2a2a;
+  --muted: #666666;
+  --faint: #9a9a9a;
+  --alert: #e0502b;
+  --amber: #b06a00;
+  --ok: #18804a;
+  --info: #2f5bd3;
+  --violet: #6d4fe0;
+  color-scheme: light;
+}
+
 .force-dark {
   --color-white: #ffffff;
   --color-black: #000000;
@@ -22,35 +48,6 @@
   --ok: #4ade80;
   --info: #7aa2ff;
   --violet: #b69cff;
-}
-
-/* Light theme: Tailwind's white/black are used as foreground/background, so swapping them
-   inverts the UI. Terminal windows and the phone keep `.force-dark`, like real devices. */
-:root[data-theme="light"] {
-  --color-white: #0b0b0c;
-  --color-black: #ffffff;
-  --sky: 24, 24, 32;
-  --headline: #0b0b0c;
-  --code-bg: rgba(0, 0, 0, 0.05);
-  --bg: #f5f4f0;
-  --panel: #ffffff;
-  --card: #ffffff;
-  --card-2: #f0efea;
-  --line: rgba(0, 0, 0, 0.09);
-  --line-strong: rgba(0, 0, 0, 0.18);
-  --fg: #0b0b0c;
-  --fg-2: #2b2b30;
-  --muted: rgba(0, 0, 0, 0.58);
-  --faint: rgba(0, 0, 0, 0.42);
-  --alert: #dc4a26;
-  --amber: #a86a12;
-  --ok: #15803d;
-  --info: #2f5bd3;
-  --violet: #6d4fe0;
-  color-scheme: light;
-}
-
-.force-dark {
   color: var(--fg-2);
   color-scheme: dark;
 }
@@ -71,6 +68,7 @@
   --color-ok: var(--ok);
   --color-info: var(--info);
   --color-violet: var(--violet);
+  --color-chip: var(--chip);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -79,7 +77,6 @@ html,
 body {
   background: var(--bg);
   color: var(--fg-2);
-  transition: background-color 0.2s ease;
 }
 
 body {
@@ -88,22 +85,55 @@ body {
 }
 
 ::selection {
-  background: rgba(255, 106, 61, 0.35);
+  background: #111;
   color: #fff;
 }
 
 .headline {
   color: var(--headline);
   font-weight: 400;
-  letter-spacing: -0.05em;
-  line-height: 1.02;
+  letter-spacing: -0.03em;
+  line-height: 1.04;
+}
+
+/* mono eyebrow, e.g. "Backed by …" */
+.eyebrow {
+  font-family: var(--font-geist-mono);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 6px;
+  background: var(--chip);
+  padding: 3px 9px;
+  font-family: var(--font-geist-mono);
+  font-size: 12.5px;
+  color: var(--fg-2);
+}
+
+.shadow-soft {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 30px rgba(0, 0, 0, 0.06);
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.marquee {
+  animation: marquee 40s linear infinite;
 }
 
 .subhead {
   color: var(--headline);
   font-weight: 400;
   letter-spacing: -0.025em;
-  line-height: 1.15;
+  line-height: 1.12;
 }
 
 .subhead .dim {
@@ -114,7 +144,7 @@ body {
   background: linear-gradient(180deg, #161618 0%, #0e0e10 100%);
   border: 1px solid var(--line-strong);
   border-radius: 12px;
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.16), 0 2px 6px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .window-bar {
@@ -136,8 +166,8 @@ body {
 }
 
 .dotgrid {
-  background-image: radial-gradient(rgba(var(--sky), 0.14) 1px, transparent 1px);
-  background-size: 6px 6px;
+  background-image: radial-gradient(rgba(var(--sky), 0.16) 1px, transparent 1px);
+  background-size: 7px 7px;
 }
 
 @keyframes pulse-ring {
@@ -171,6 +201,7 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .pulse-alert,
   .slide-in,
+  .marquee,
   .caret::after {
     animation: none;
   }

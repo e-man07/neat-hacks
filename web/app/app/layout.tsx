@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { auth, githubEnabled, signOut } from "@/auth";
 import AppNav from "@/components/app/AppNav";
-import ThemeToggle from "@/components/ThemeToggle";
 import { Moon } from "@/components/ui";
 
 export const metadata: Metadata = { title: "Night Shift" };
@@ -14,8 +13,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <div className="flex min-h-screen bg-bg text-fg">
       <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r border-line bg-panel px-3 py-4 md:flex">
-        <Link href="/app" className="flex items-center gap-2 px-2 text-[15px] font-semibold tracking-tight text-white">
-          <Moon /> night shift
+        <Link href="/app" className="flex items-center gap-2 px-2 text-[14px] font-medium tracking-tight text-fg">
+          <span className="grid h-7 w-7 place-items-center rounded-md bg-chip">
+            <Moon size={15} />
+          </span>
+          Night Shift
         </Link>
         <AppNav />
         <div className="mt-auto space-y-2 border-t border-line pt-3">
@@ -27,9 +29,6 @@ export default async function AppLayout({ children }: { children: React.ReactNod
               <span className="grid h-6 w-6 place-items-center rounded-full bg-white/10 text-[11px]">{login[0]?.toUpperCase()}</span>
             )}
             <span className="truncate text-sm text-fg-2">{login}</span>
-            <span className="ml-auto">
-              <ThemeToggle />
-            </span>
           </div>
           {githubEnabled ? (
             <form
@@ -50,7 +49,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <div className="min-w-0 flex-1">
         <div className="flex items-center justify-between border-b border-line px-4 py-3 md:hidden">
           <Link href="/app" className="flex items-center gap-2 text-sm font-semibold text-white">
-            <Moon /> night shift
+            <Moon /> Night Shift
           </Link>
           <AppNav mobile />
         </div>

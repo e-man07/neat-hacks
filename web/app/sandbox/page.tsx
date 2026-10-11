@@ -5,7 +5,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Controls from "@/components/console/Controls";
 import IncidentPanel from "@/components/console/IncidentPanel";
 import TrafficFeed from "@/components/console/TrafficFeed";
-import ThemeToggle from "@/components/ThemeToggle";
 import NightSky from "@/components/NightSky";
 import Phone, { type PhoneNote } from "@/components/Phone";
 import { Counter, Label, Moon, Pill, Sparkline } from "@/components/ui";
@@ -96,7 +95,7 @@ export default function ConsolePage() {
       {/* Top bar */}
       <header className="flex flex-wrap items-center gap-x-6 gap-y-2 border-b border-line px-4 py-3 sm:px-6">
         <Link href="/" className="flex items-center gap-2 text-[15px] font-semibold text-white">
-          <Moon /> night shift
+          <Moon /> Night Shift
         </Link>
         <span className="font-mono text-[12px] text-white/40">console</span>
         <div className="flex items-baseline gap-2">
@@ -125,7 +124,6 @@ export default function ConsolePage() {
             </span>
           )}
           <span className={connected ? "text-ok" : "text-alert"}>{connected ? "● stream" : "○ offline"}</span>
-          <ThemeToggle />
         </div>
       </header>
 

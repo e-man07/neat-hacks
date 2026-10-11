@@ -19,7 +19,7 @@ export default async function SignIn({ searchParams }: { searchParams: Promise<{
       <NightSky />
       <div className="relative z-10 w-full max-w-sm rounded-xl border border-line bg-card p-8 text-center">
         <Link href="/" className="inline-flex items-center gap-2 text-[15px] font-semibold text-white">
-          <Moon /> night shift
+          <Moon /> Night Shift
         </Link>
         <h1 className="mt-6 text-xl font-semibold text-white">Sign in</h1>
         <p className="mt-2 text-sm text-muted">

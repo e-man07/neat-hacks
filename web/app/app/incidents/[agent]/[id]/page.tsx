@@ -32,7 +32,7 @@ export default function AppIncident({ params }: { params: Promise<{ agent: strin
       {error && <p className="text-sm text-alert">Couldn’t load the incident: {error}</p>}
       {inc && (
         <div className="grid gap-6 xl:grid-cols-2">
-          <Card className="force-dark h-[760px] overflow-hidden">
+          <Card className="h-[760px] overflow-hidden">
             <IncidentPanel
               inc={inc}
               onChange={reload}
