@@ -115,8 +115,9 @@ const CRITERIA: Criterion[] = [
     weight: "15%",
     items: [
       {
-        claim: "Commit history starts with the plan only; the build log records each phase with timestamps.",
+        claim: "Posted on X with #neatHack as we built. Commit history starts with the plan only; the build log records each phase with timestamps.",
         links: [
+          ["#neatHack post on X", "https://x.com/WhyParabola/status/2109333155702571151"],
           ["Build log", `${GH}/hackathon.md`],
           ["Commits", "https://github.com/e-man07/neat-hacks/commits/main"],
         ],

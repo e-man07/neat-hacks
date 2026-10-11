@@ -50,7 +50,7 @@ approval in Slack.*
 | **Used neatlogs** | Every agent run and every investigation is traced. Nightly reads traces back over the neatlogs MCP during investigations, and creates a neatlogs detection after an attack. [`evidence/neatlogs.md`](evidence/neatlogs.md) |
 | **Used Entire** | Every bad release was written by a separate Claude Code session with an Entire checkpoint. Nightly resolves commit → checkpoint → prompt → the coding agent's own warning, plus entire-graph change lists. [`evidence/entire.md`](evidence/entire.md) |
 | **Used cfo.ai** | [Business plan in cfo.ai](https://app.cfo.ai/s/CsWafbQfu2U1y94W) (pricing, costs, revenue, runway: break-even M08, runway > 24 months) and [customer unit economics in cfo.ai](https://app.cfo.ai/s/fHcCAy2lG_aXs3Qt), which Nightly uses to price every incident. [`business/PLAN.md`](business/PLAN.md) |
-| **Built in public** | #neatHack posts, drafted in [`posts/`](posts) |
+| **Built in public** | [#neatHack post with the explainer video](https://x.com/WhyParabola/status/2109333155702571151); more drafted in [`posts/`](posts) |
 | **Code written during the hackathon** | Commit history (first commit is the plan only), build log in [`hackathon.md`](hackathon.md) |
 
 ## The product
