@@ -3,7 +3,9 @@
 import { useRef, useState } from "react";
 
 /** Full-quality master hosted outside the repo (e.g. an R2 bucket); falls back to the copy in /public. */
-const REMOTE = process.env.NEXT_PUBLIC_HERO_VIDEO_URL;
+const REMOTE =
+  process.env.NEXT_PUBLIC_HERO_VIDEO_URL ||
+  "https://pub-322f2127ed23420ebefb3a5062774ae4.r2.dev/films/nightly-master-1080p60.mp4";
 
 /** The Nightly explainer: plays muted on loop; one click restarts it with sound. */
 export default function HeroVideo() {
