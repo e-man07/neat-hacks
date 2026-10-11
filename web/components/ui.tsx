@@ -15,7 +15,8 @@ export function PrimaryLink({ href, children }: { href: string; children: ReactN
   return (
     <Link
       href={href}
-      className="inline-flex items-center gap-2 rounded-md bg-white px-4 py-2.5 text-sm font-medium text-black transition hover:bg-white/90"
+      className="inline-flex items-center gap-2 rounded-lg bg-[#111] px-4 py-2.5 text-sm font-medium transition hover:bg-[#2a2a2a]"
+      style={{ color: "#fff" }}
     >
       {children} <Arrow />
     </Link>
@@ -26,7 +27,7 @@ export function GhostLink({ href, children }: { href: string; children: ReactNod
   return (
     <Link
       href={href}
-      className="inline-flex items-center gap-2 rounded-md border border-white/80 bg-white/[0.06] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-white/10"
+      className="inline-flex items-center gap-2 rounded-lg border border-line-strong bg-[var(--panel)] px-4 py-2.5 text-sm font-medium text-fg shadow-[0_1px_2px_rgba(0,0,0,0.05)] transition hover:bg-card-2"
     >
       {children}
     </Link>
