@@ -9,8 +9,8 @@ export const metadata: Metadata = {
   description: "Every neatHack judging criterion, mapped to the evidence that backs it.",
 };
 
-const GH = "https://github.com/e-man07/neat-hacks/blob/main";
-const TREE = "https://github.com/e-man07/neat-hacks/tree/main";
+const GH = "https://github.com/e-man07/nightly/blob/main";
+const TREE = "https://github.com/e-man07/nightly/tree/main";
 
 type Item = { claim: ReactNode; links: [string, string][] };
 type Criterion = { name: ReactNode; weight: string; items: Item[] };
@@ -83,7 +83,7 @@ const CRITERIA: Criterion[] = [
         claim: "Entire: every bad release was written by a separate Claude Code session with its own checkpoint. Nightly resolves commit → checkpoint → prompt → the coding agent’s own warning.",
         links: [
           ["Entire evidence", `${GH}/evidence/entire.md`],
-          ["r46 checkpoint on entire.io", "https://entire.io/gh/e-man07/neat-hacks/commit/e26a58f17ad4af5d119de989ebeaafc7055b8929"],
+          ["r46 checkpoint on entire.io", "https://entire.io/gh/e-man07/nightly/commit/e26a58f17ad4af5d119de989ebeaafc7055b8929"],
         ],
       },
       {
@@ -119,7 +119,7 @@ const CRITERIA: Criterion[] = [
         links: [
           ["#neatHack post on X", "https://x.com/WhyParabola/status/2109333155702571151"],
           ["Build log", `${GH}/hackathon.md`],
-          ["Commits", "https://github.com/e-man07/neat-hacks/commits/main"],
+          ["Commits", "https://github.com/e-man07/nightly/commits/main"],
         ],
       },
     ],

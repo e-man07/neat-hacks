@@ -386,7 +386,7 @@ export default function Home() {
             <Link href="/docs" className="hover:text-fg">Docs</Link>
             <Link href="/benchmark" className="hover:text-fg">Benchmark</Link>
             <Link href="/business" className="hover:text-fg">Business</Link>
-            <a href="https://github.com/e-man07/neat-hacks" className="hover:text-fg">GitHub</a>
+            <a href="https://github.com/e-man07/nightly" className="hover:text-fg">GitHub</a>
           </span>
         </footer>
       </section>

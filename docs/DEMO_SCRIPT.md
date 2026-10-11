@@ -6,7 +6,7 @@ the irreversible part. The demo shows each tool (neatlogs, Entire, cfo.ai) at wo
 
 ## Setup (10 minutes before recording)
 
-1. Browser tabs: https://web-emrq.vercel.app/app (signed in), the Scout agent page, Slack (the channel
+1. Browser tabs: https://nightly.whyparabola.online/app (signed in), the Scout agent page, Slack (the channel
    connected under Paging), the neatlogs app (Scout traces), and the two cfo.ai links from `business/PLAN.md`.
 2. Scout on s2 with steady traffic, so there's a healthy baseline (about 3 min, ~25 runs):
    ```bash
@@ -42,5 +42,5 @@ the irreversible part. The demo shows each tool (neatlogs, Entire, cfo.ai) at wo
 | Result | before/after traces | postmortem names prompt + checkpoint | plan: break-even M08 |
 
 ## Fallback
-If the live run misbehaves, record the sandbox (https://web-emrq.vercel.app/sandbox → "r46
+If the live run misbehaves, record the sandbox (https://nightly.whyparabola.online/sandbox → "r46
 One-step refunds"). It shows the same lifecycle on Harbor.

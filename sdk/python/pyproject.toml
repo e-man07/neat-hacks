@@ -1,6 +1,6 @@
 [project]
 name = "nightly-sdk"
-version = "0.1.1"
+version = "0.1.2"
 description = "Let Nightly, the on-call engineer for AI agents, roll back, fail over and verify fixes for your LLM agent. Zero dependencies, fails open."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -19,9 +19,9 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://web-emrq.vercel.app"
-Documentation = "https://web-emrq.vercel.app/docs"
-Source = "https://github.com/e-man07/neat-hacks/tree/main/sdk/python"
+Homepage = "https://nightly.whyparabola.online"
+Documentation = "https://nightly.whyparabola.online/docs"
+Source = "https://github.com/e-man07/nightly/tree/main/sdk/python"
 
 [build-system]
 requires = ["setuptools>=68"]

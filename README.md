@@ -9,8 +9,8 @@ Built for neatHack 2026 (called *Night Shift* during the build; older evidence f
 | **6/6** staged incidents handled correctly | **13–21 s** from detection to containment | **4/6 → 6/6** from benchmark run 1 to run 3 |
 |---|---|---|
 
-**Live:** [web-emrq.vercel.app](https://web-emrq.vercel.app) · [**for judges: every criterion and its evidence**](https://web-emrq.vercel.app/judge) ·
-[sandbox: run the 3 AM incident](https://web-emrq.vercel.app/sandbox) · [SDK docs](https://web-emrq.vercel.app/docs) ·
+**Live:** [nightly.whyparabola.online](https://nightly.whyparabola.online) · [**for judges: every criterion and its evidence**](https://nightly.whyparabola.online/judge) ·
+[sandbox: run the 3 AM incident](https://nightly.whyparabola.online/sandbox) · [SDK docs](https://nightly.whyparabola.online/docs) ·
 `pip install nightly-sdk` ([PyPI](https://pypi.org/project/nightly-sdk/)) ·
 [explainer video](https://pub-322f2127ed23420ebefb3a5062774ae4.r2.dev/films/nightly-master-1080p60.mp4)
 

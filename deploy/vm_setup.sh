@@ -8,7 +8,7 @@ IP=${1:-$(md instance/network-interfaces/0/access-configs/0/external-ip)}
 # env: /tmp/api.env (scp) or the ns-env metadata attribute (startup script); kept on disk after first boot
 [ -f /tmp/api.env ] || md instance/attributes/ns-env > /tmp/api.env
 HOST="api.${IP//./-}.sslip.io"
-REPO=${REPO:-https://github.com/e-man07/neat-hacks.git}
+REPO=${REPO:-https://github.com/e-man07/nightly.git}
 BRANCH=${BRANCH:-main}
 
 apt-get update -qq
@@ -37,10 +37,21 @@ id nightshift >/dev/null 2>&1 || useradd -m -s /bin/bash nightshift
 sudo -u nightshift bash -c 'command -v ~/.local/bin/uv >/dev/null || curl -LsSf https://astral.sh/uv/install.sh | sh'
 
 if [ ! -d /opt/nightshift/.git ]; then git clone -q --branch "$BRANCH" "$REPO" /opt/nightshift; fi
+git -C /opt/nightshift remote set-url origin "$REPO"
 git -C /opt/nightshift fetch -q origin "$BRANCH" && git -C /opt/nightshift reset -q --hard "origin/$BRANCH"
 git -C /opt/nightshift fetch -q origin '+refs/heads/_entire/*:refs/entire/*' || true
 if [ -s /tmp/api.env ]; then install -m 600 -o nightshift /tmp/api.env /opt/nightshift/.env; fi
 rm -f /tmp/api.env
+# ns-env-patch metadata: non-secret KEY=VALUE lines that replace those keys in the kept .env (e.g. a new web domain)
+PATCH=$(md instance/attributes/ns-env-patch)
+if [ -n "$PATCH" ]; then
+  while IFS= read -r line; do
+    k=${line%%=*}
+    [[ "$k" =~ ^[A-Z_][A-Z0-9_]*$ ]] || continue
+    sed -i "/^$k=/d" /opt/nightshift/.env
+    printf '%s\n' "$line" >> /opt/nightshift/.env
+  done <<< "$PATCH"
+fi
 grep -q '^PUBLIC_API_URL=' /opt/nightshift/.env || echo "PUBLIC_API_URL=https://$HOST" >> /opt/nightshift/.env
 chown -R nightshift /opt/nightshift
 sudo -u nightshift bash -c 'cd /opt/nightshift/backend && ~/.local/bin/uv sync -q'

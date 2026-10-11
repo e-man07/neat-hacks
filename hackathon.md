@@ -62,7 +62,7 @@ Aman (handle to be confirmed by Aman).
 - Deploy kit: GCP VM with Caddy and automatic HTTPS, Vercel env, Slack manifest (`docs/DEPLOY.md`).
 
 ### 2026-10-11 ~04:30–06:30 IST: deployed
-- API on a GCP VM (asia-south1, e2-small) behind Caddy with automatic HTTPS: https://api.34-14-135-119.sslip.io. Web on Vercel: https://web-emrq.vercel.app. GitHub sign-in and the Slack app are configured.
+- API on a GCP VM (asia-south1, e2-small) behind Caddy with automatic HTTPS: https://api.34-14-135-119.sslip.io. Web on Vercel: https://nightly.whyparabola.online. GitHub sign-in and the Slack app are configured.
 - Setup runs from a GCE startup script, because SSH isn't reachable from the build sandbox. Secrets are passed once through instance metadata and then removed from it. Caddy's apt repository returned 402, so Caddy is installed from its release binary.
 - Scout is connected to Aman's workspace through the live product. It is paused until the demo to save gateway budget (~$2.50/day).
 - cfo.ai plan links wired into the README, `business/PLAN.md` and the business page. README and demo script rewritten for the live product. Post drafts refreshed.
@@ -78,9 +78,10 @@ Aman (handle to be confirmed by Aman).
 - Reviewed 21 other public neatHack repos and the market (agent observability vs AI SRE tools). About 9 build agents that debug or fix other agents; none combines a live production agent, $ pricing, reversible containment and a hosted product. Acted on it: `/judge` page mapping each criterion to evidence; a one-click guided "3 AM incident" in the sandbox with a live $-lost counter; incidents now show confidence, traces cited and each policy check; a Slack message preview and a comparison table on the landing page; README opening with proof numbers.
 - Built in public: first #neatHack post with the explainer video: https://x.com/WhyParabola/status/2109333155702571151
 - Slack connected to the live product.
+- Moved the site to https://nightly.whyparabola.online and renamed the repo to `e-man07/nightly`; the API allows the new origin and Slack links point to it.
 
 ## Demo
-Live: https://web-emrq.vercel.app (GitHub sign-in) · sandbox without an account: `/sandbox` · SDK docs: `/docs`.
+Live: https://nightly.whyparabola.online (GitHub sign-in) · sandbox without an account: `/sandbox` · SDK docs: `/docs`.
 Script: `docs/DEMO_SCRIPT.md` (a live Scout incident through the product, with the sandbox as fallback). Local: `scripts/dev.sh`.
 
 ## Known limitations and next steps
