@@ -2,7 +2,7 @@ import PageShell from "@/components/PageShell";
 import { Code } from "@/components/app/bits";
 import { Card, Label, PrimaryLink } from "@/components/ui";
 
-export const metadata = { title: "Docs — Night Shift" };
+export const metadata = { title: "Docs — Nightly" };
 
 const H = ({ id, children }: { id: string; children: React.ReactNode }) => (
   <h2 id={id} className="mt-12 mb-3 scroll-mt-20 text-[20px] font-semibold text-white">
@@ -23,7 +23,7 @@ export default function Docs() {
               ["trace", "2. Trace with neatlogs"],
               ["control", "3. Read the control plane"],
               ["report", "4. Report outcomes and deploys"],
-              ["replay", "5. Let Night Shift verify fixes"],
+              ["replay", "5. Let Nightly verify fixes"],
               ["policy", "6. Set the policy"],
               ["paging", "7. Paging"],
               ["example", "Full example"],
@@ -37,7 +37,7 @@ export default function Docs() {
         <div className="min-w-0 max-w-[760px]">
           <H id="how">How it works</H>
           <P>
-            Night Shift watches your agent through two channels: its <b>neatlogs traces</b> and the <b>outcome events</b> your agent
+            Nightly watches your agent through two channels: its <b>neatlogs traces</b> and the <b>outcome events</b> your agent
             reports. When a window of runs goes bad (failures, tool errors, escalations, runaway loops, cost spikes), it investigates.
             It reads the traces, the deploy log, the diff, and the Entire checkpoint with the coding-agent prompt behind the change. Then
             it prices the damage with your unit economics and decides under your policy.
@@ -62,15 +62,15 @@ export default function Docs() {
           </Card>
 
           <H id="install">1. Install</H>
-          <Code>{`pip install nightshift-sdk neatlogs
+          <Code>{`pip install nightly-sdk neatlogs
 
-export NIGHTSHIFT_API_URL=https://api.your-nightshift-host
-export NIGHTSHIFT_AGENT_TOKEN=nsa_...      # from "Connect an agent"
+export NIGHTLY_API_URL=https://api.your-nightshift-host
+export NIGHTLY_AGENT_TOKEN=nsa_...      # from "Connect an agent"
 export NEATLOGS_API_KEY=...                # your neatlogs project key`}</Code>
-          <P>The SDK has zero dependencies and fails open. If Night Shift is unreachable, your agent keeps its last known config or its defaults.</P>
+          <P>The SDK has zero dependencies and fails open. If Nightly is unreachable, your agent keeps its last known config or its defaults.</P>
 
           <H id="trace">2. Trace with neatlogs</H>
-          <P>Wrap one run of your agent in a root span. Night Shift polls your project for traces with that root span name.</P>
+          <P>Wrap one run of your agent in a root span. Nightly polls your project for traces with that root span name.</P>
           <Code>{`import neatlogs
 from openai import OpenAI
 
@@ -81,9 +81,9 @@ with neatlogs.trace("support_conversation", kind="WORKFLOW"):
     ...  # your agent loop; raise inside a tool span to mark it errored`}</Code>
 
           <H id="control">3. Read the control plane</H>
-          <P>These are the levers Night Shift pulls during an incident. Read them at the start of each run (they&apos;re cached for 5 s).</P>
-          <Code>{`from nightshift_sdk import NightShift
-ns = NightShift()
+          <P>These are the levers Nightly pulls during an incident. Read them at the start of each run (they&apos;re cached for 5 s).</P>
+          <Code>{`from nightly_sdk import Nightly
+ns = Nightly()
 
 release   = ns.release("v1")              # rollback target
 model     = ns.model("claude-haiku")      # model failover
@@ -99,12 +99,12 @@ refunds   = ns.flag("refunds_enabled", True)   # kill switch for a tool`}</Code>
           input=message, output=reply, steps=n_steps, tool_errors=n_tool_errors,
           tokens=usage.total_tokens, latency_ms=elapsed_ms, note="refund above policy")
 
-# in CI, after a deploy (the commit lets Night Shift find the Entire checkpoint)
+# in CI, after a deploy (the commit lets Nightly find the Entire checkpoint)
 ns.report_deploy("v2", commit=os.environ["GIT_SHA"])`}</Code>
 
-          <H id="replay">5. Let Night Shift verify fixes</H>
+          <H id="replay">5. Let Nightly verify fixes</H>
           <P>
-            After it acts, Night Shift sends the failing inputs back to your agent to re-run on the new config. Run the handler without
+            After it acts, Nightly sends the failing inputs back to your agent to re-run on the new config. Run the handler without
             side effects (no refunds, no emails) and say whether it passed.
           </P>
           <Code>{`def replay(message: str) -> dict:
@@ -114,7 +114,7 @@ ns.report_deploy("v2", commit=os.environ["GIT_SHA"])`}</Code>
 ns.serve_replays(replay)     # background thread`}</Code>
 
           <H id="policy">6. Set the policy</H>
-          <P>Each agent has a versioned YAML policy. Night Shift acts alone only on actions listed under auto, and every one of them must be reversible.</P>
+          <P>Each agent has a versioned YAML policy. Nightly acts alone only on actions listed under auto, and every one of them must be reversible.</P>
           <Code>{`gates:
   min_confidence: 0.6          # diagnosis confidence needed to act alone
   min_projected_loss_usd: 25   # below this, it waits for morning
@@ -128,14 +128,14 @@ needs_approval: [deploy_code_fix, refund_customers, contact_customers, delete_da
 
           <H id="paging">7. Paging</H>
           <P>
-            Add Night Shift to Slack and it posts one message per incident with <b>Approve fix</b> and <b>Undo</b> buttons, updated as it works.
+            Add Nightly to Slack and it posts one message per incident with <b>Approve fix</b> and <b>Undo</b> buttons, updated as it works.
             Approving a code fix opens a revert PR on your repo with the postmortem and a regression eval. ntfy (phone push) and a generic
             webhook are there too.
           </P>
 
           <H id="example">Full example</H>
           <P>
-            Scout, a docs assistant in the repo (<code>agents/scout/scout.py</code>), is wired exactly this way. Night Shift caught its bad
+            Scout, a docs assistant in the repo (<code>agents/scout/scout.py</code>), is wired exactly this way. Nightly caught its bad
             release, rolled it back and verified the fix in under three minutes. See <code>evidence/scout/</code>.
           </P>
           <div className="mt-8">

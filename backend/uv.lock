@@ -796,6 +796,11 @@ openai = [
 ]
 
 [[package]]
+name = "nightly-sdk"
+version = "0.2.0"
+source = { editable = "../sdk/python" }
+
+[[package]]
 name = "nightshift"
 version = "0.1.0"
 source = { virtual = "." }
@@ -804,7 +809,7 @@ dependencies = [
     { name = "fastapi" },
     { name = "httpx" },
     { name = "neatlogs", extra = ["openai"] },
-    { name = "nightshift-sdk" },
+    { name = "nightly-sdk" },
     { name = "openai" },
     { name = "pydantic" },
     { name = "pyjwt" },
@@ -824,7 +829,7 @@ requires-dist = [
     { name = "fastapi", specifier = ">=0.115" },
     { name = "httpx", specifier = ">=0.27" },
     { name = "neatlogs", extras = ["openai"], specifier = ">=1.4.26" },
-    { name = "nightshift-sdk", editable = "../sdk/python" },
+    { name = "nightly-sdk", editable = "../sdk/python" },
     { name = "openai", specifier = ">=1.50" },
     { name = "pydantic", specifier = ">=2.7" },
     { name = "pyjwt", specifier = ">=2.8" },
@@ -835,11 +840,6 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [{ name = "pytest", specifier = ">=8.0" }]
-
-[[package]]
-name = "nightshift-sdk"
-version = "0.1.0"
-source = { editable = "../sdk/python" }
 
 [[package]]
 name = "openai"

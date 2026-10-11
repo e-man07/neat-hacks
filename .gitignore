@@ -17,3 +17,14 @@ backend/harbor/evals/regressions/INC-*
 deploy/api.env
 deploy/web.env
 deploy/slack-manifest.filled.yml
+nightly_sdk.egg-info/
+nightshift_sdk.egg-info/
+video/frames/
+video/vo/
+video/*.npy
+video/*.wav
+video/*.mp4
+video/*.jpg
+video/.venv/
+video/timeline.json
+video/amp.json

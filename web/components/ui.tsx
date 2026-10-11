@@ -145,10 +145,10 @@ export function WindowFrame({ title, children, className = "" }: { title: string
   );
 }
 
+/** The Nightly ghost: logo and character. */
 export function Moon({ size = 18 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden>
-      <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z" fill="currentColor" />
-    </svg>
-  );
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img src="/nightly.png" width={Math.round(size * 1.1)} height={size} alt="" aria-hidden style={{ objectFit: "contain" }} />;
 }
+
+export const Logo = Moon;

@@ -20,7 +20,7 @@ export default function IncidentPage({ params }: { params: Promise<{ id: string 
             <IncidentPanel inc={inc} onChange={reload} />
           </Card>
           <Card className="h-[760px] overflow-y-auto p-6">
-            <Label>postmortem (written by Night Shift)</Label>
+            <Label>postmortem (written by Nightly)</Label>
             <div className="prose-ns mt-4">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>{inc.postmortem}</ReactMarkdown>
             </div>

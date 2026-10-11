@@ -4,7 +4,7 @@ import { auth, githubEnabled, signOut } from "@/auth";
 import AppNav from "@/components/app/AppNav";
 import { Moon } from "@/components/ui";
 
-export const metadata: Metadata = { title: "Night Shift" };
+export const metadata: Metadata = { title: "Nightly" };
 export const dynamic = "force-dynamic";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -14,10 +14,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <div className="flex min-h-screen bg-bg text-fg">
       <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r border-line bg-panel px-3 py-4 md:flex">
         <Link href="/app" className="flex items-center gap-2 px-2 text-[14px] font-medium tracking-tight text-fg">
-          <span className="grid h-7 w-7 place-items-center rounded-md bg-chip">
-            <Moon size={15} />
-          </span>
-          Night Shift
+          <Moon size={30} />
+          Nightly
         </Link>
         <AppNav />
         <div className="mt-auto space-y-2 border-t border-line pt-3">
@@ -49,7 +47,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <div className="min-w-0 flex-1">
         <div className="flex items-center justify-between border-b border-line px-4 py-3 md:hidden">
           <Link href="/app" className="flex items-center gap-2 text-sm font-semibold text-white">
-            <Moon /> Night Shift
+            <Moon /> Nightly
           </Link>
           <AppNav mobile />
         </div>

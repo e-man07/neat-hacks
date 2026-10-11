@@ -33,7 +33,7 @@ export default function IntegrationsPage() {
     <>
       <PageHead
         title="Paging"
-        sub="Where Night Shift reaches you. It pages only when something needs a human; everything else lands in the morning report."
+        sub="Where Nightly reaches you. It pages only when something needs a human; everything else lands in the morning report."
         actions={
           <Button
             onClick={() =>
@@ -57,7 +57,7 @@ export default function IntegrationsPage() {
             {c.slack ? <Pill color="var(--ok)">connected</Pill> : <Pill>off</Pill>}
           </div>
           <p className="text-sm text-muted">
-            One message per incident, updated as Night Shift works, with <b>Approve fix</b> and <b>Undo</b> buttons right in the channel.
+            One message per incident, updated as Nightly works, with <b>Approve fix</b> and <b>Undo</b> buttons right in the channel.
           </p>
           {c.slack ? (
             <>

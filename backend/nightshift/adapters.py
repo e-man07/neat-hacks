@@ -1,7 +1,7 @@
-"""Agent adapters: how Night Shift sees and steers one agent.
+"""Agent adapters: how Nightly sees and steers one agent.
 
 `HarborAdapter` is the built-in sandbox agent (business ledger, local replays).
-`SdkAdapter` is any customer agent that uses the Night Shift SDK: its traces come from the
+`SdkAdapter` is any customer agent that uses the Nightly SDK: its traces come from the
 customer's neatlogs project, its control plane is read by the SDK, deploys are reported by the
 SDK, and verification replays run inside the customer's agent via SDK replay jobs.
 """

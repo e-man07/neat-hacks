@@ -29,10 +29,8 @@ export default function Nav() {
         style={scrolled ? { background: "rgba(255,255,255,0.92)" } : undefined}
       >
         <Link href="/" className="flex items-center gap-2 text-[14px] font-medium tracking-tight text-fg">
-          <span className="grid h-7 w-7 place-items-center rounded-md bg-chip">
-            <Moon size={15} />
-          </span>
-          Night Shift
+          <Moon size={30} />
+          Nightly
         </Link>
         <nav className="hidden items-center gap-7 text-[14px] text-fg md:flex">
           {LINKS.map((l) => (

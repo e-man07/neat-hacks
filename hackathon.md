@@ -67,6 +67,11 @@ Aman (handle to be confirmed by Aman).
 - Scout is connected to Aman's workspace through the live product. It is paused until the demo to save gateway budget (~$2.50/day).
 - cfo.ai plan links wired into the README, `business/PLAN.md` and the business page. README and demo script rewritten for the live product. Post drafts refreshed.
 
+### 2026-10-11 ~16:00–17:00 IST: Nightly, and an explainer video
+- Renamed the product from Night Shift to **Nightly** in display text: web, Slack messages, postmortems, fix-PR titles, docs. The SDK is now `nightly-sdk` / `nightly_sdk.Nightly`; the old module name and the `NIGHTSHIFT_*` env vars still work. Internal code names are unchanged. Evidence files from earlier runs keep the old name.
+- New logo, favicon and character: the Nightly ghost.
+- A ~50 s motion-design explainer for the hero, modelled on the Inkbox launch video: ElevenLabs voiceover with word-timed captions, the ghost blinking and lip-syncing, UI scenes (agent runs, investigation, fix, Slack message, SDK), and music plus sound effects generated in numpy. The source is in `video/`.
+
 ## Demo
 Live: https://web-emrq.vercel.app (GitHub sign-in) · sandbox without an account: `/sandbox` · SDK docs: `/docs`.
 Script: `docs/DEMO_SCRIPT.md` (a live Scout incident through the product, with the sandbox as fallback). Local: `scripts/dev.sh`.

@@ -1,6 +1,6 @@
 """neatlogs tracing helpers.
 
-One `neatlogs.init()` per process. Harbor and Night Shift each open their own WORKFLOW root with a
+One `neatlogs.init()` per process. Harbor and Nightly each open their own WORKFLOW root with a
 per-root workflow name, as the neatlogs "multiple workflows in one codebase" guide describes.
 When no neatlogs key is configured, spans are still created locally but nothing is exported.
 """

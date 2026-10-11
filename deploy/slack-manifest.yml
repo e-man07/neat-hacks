@@ -1,11 +1,11 @@
 # api.slack.com/apps → Create New App → From an app manifest. Replace API_HOST.
 display_information:
-  name: Night Shift
+  name: Nightly
   description: The on-call engineer for your AI agents
   background_color: "#0a0a0a"
 features:
   bot_user:
-    display_name: Night Shift
+    display_name: Nightly
     always_online: true
 oauth_config:
   redirect_urls:

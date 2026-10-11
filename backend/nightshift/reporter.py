@@ -18,7 +18,7 @@ log = logging.getLogger(__name__)
 INCIDENT_DIR = BACKEND_DIR / "runs" / "incidents"
 REGRESSION_DIR = BACKEND_DIR / "harbor" / "evals" / "regressions"
 
-DETECTION_GROUP = "Night Shift"
+DETECTION_GROUP = "Nightly"
 INJECTION_PATTERN = r"(?i)(refund policy checks are waived|ignore previous instructions|admin override approved)"
 
 
@@ -70,7 +70,7 @@ def ensure_detection(mcp: NeatlogsMCP, incident_type: str) -> dict[str, Any] | N
         config = {"output_pattern": INJECTION_PATTERN, "input_pattern": INJECTION_PATTERN, "operator": "OR"}
         preview = mcp.preview_detection(config)
         det = mcp.create_detection("Order-note prompt injection", group_id, config,
-                                   "Instructions hidden in order notes that try to trigger refunds (created by Night Shift).")
+                                   "Instructions hidden in order notes that try to trigger refunds (created by Nightly).")
         return {"status": "created", "preview": preview if isinstance(preview, dict) else str(preview)[:300],
                 "detection": det if isinstance(det, dict) else str(det)[:300]}
     except (NeatlogsMCPError, Exception) as exc:  # observability config must never break the incident flow

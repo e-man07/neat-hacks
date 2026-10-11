@@ -10,7 +10,7 @@ export default function AgentsPage() {
   const agents = data?.agents ?? [];
   return (
     <>
-      <PageHead title="Agents" sub="Production agents Night Shift is on call for." actions={<PrimaryLink href="/app/agents/new">Connect an agent</PrimaryLink>} />
+      <PageHead title="Agents" sub="Production agents Nightly is on call for." actions={<PrimaryLink href="/app/agents/new">Connect an agent</PrimaryLink>} />
       {data && agents.length === 0 ? (
         <Empty>No agents connected yet.</Empty>
       ) : (

@@ -1,4 +1,4 @@
-"""Autonomy policy: may Night Shift take this action on its own, or must a human approve it?"""
+"""Autonomy policy: may Nightly take this action on its own, or must a human approve it?"""
 
 from __future__ import annotations
 

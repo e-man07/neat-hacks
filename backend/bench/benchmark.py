@@ -1,7 +1,7 @@
 """Incident benchmark: five staged incidents, end to end, with evidence.
 
 For each incident: fresh ops store → deploy the known-good release → baseline traffic →
-trigger (bad release / injected fault / attack wave) → traffic until Night Shift opens an incident
+trigger (bad release / injected fault / attack wave) → traffic until Nightly opens an incident
 → investigation, pricing, policy, containment, replay verification → post-action traffic → live
 recovery check. Results go to evidence/benchmark/<run-id>/.
 
@@ -176,10 +176,10 @@ def run_incident(spec: IncidentSpec, brain: str, out_dir: Path, seed: int = 21) 
 
 def summary_md(results: list[dict[str, Any]], run_id: str, brain: str) -> str:
     ok = lambda b: "✅" if b else "❌"  # noqa: E731
-    lines = [f"# Night Shift incident benchmark — run `{run_id}` ({brain})", "",
+    lines = [f"# Nightly incident benchmark — run `{run_id}` ({brain})", "",
              "Incidents are staged on purpose (bad releases written by real coding-agent sessions, injected faults, attack traffic).",
              "Money figures use production volume from `business/unit_economics.yaml`; on-call clock pinned to 03:07 local.", "",
-             "| # | Incident | Detected after | Diagnosis | Culprit | Action | Replay | Live recovered | Loss/conv during → after | Projected loss if waiting | Night Shift LLM cost |",
+             "| # | Incident | Detected after | Diagnosis | Culprit | Action | Replay | Live recovered | Loss/conv during → after | Projected loss if waiting | Nightly LLM cost |",
              "|---|---|---|---|---|---|---|---|---|---|---|"]
     for r in results:
         lines.append(
@@ -198,7 +198,7 @@ def summary_md(results: list[dict[str, Any]], run_id: str, brain: str) -> str:
             lines.append(f"| {w} | {a['n']} | {a['correct_rate']:.0%} | ${a['loss_per_conv']} | ${a['cost_per_conv']} "
                          f"| {a['failed_rate']:.0%} | {a['wrong_refund_rate']:.0%} | {a['avg_steps']} |")
         lines += ["", f"- Culprit checkpoint: `{r['checkpoint']}` · prompt: “{r['coding_prompt'][:200]}”",
-                  f"- Night Shift trace (neatlogs): `{r['nightshift_trace_id']}` · evidence traces: "
+                  f"- Nightly trace (neatlogs): `{r['nightshift_trace_id']}` · evidence traces: "
                   + ", ".join(f"`{t}`" for t in r["evidence_trace_ids"][:4]),
                   f"- Detect → mitigate: {r['seconds_detect_to_mitigate']}s · diagnosis by {r['diagnosis_method']} "
                   f"({r['diagnosis_model']}), confidence {r['confidence']}", ""]

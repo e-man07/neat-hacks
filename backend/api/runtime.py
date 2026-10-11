@@ -1,4 +1,4 @@
-"""The live runtime behind the console: one ops store, Harbor traffic, Night Shift's loop, and an
+"""The live runtime behind the console: one ops store, Harbor traffic, Nightly's loop, and an
 event bus that fans out to Server-Sent-Events clients."""
 
 from __future__ import annotations
@@ -90,8 +90,8 @@ class Runtime:
             try:
                 self.nightshift.tick()
             except Exception as exc:  # pragma: no cover - keep the on-call loop alive
-                log.exception("night shift tick failed: %s", exc)
-                self.bus.publish({"type": "error", "message": f"night shift tick failed: {exc}"})
+                log.exception("nightly tick failed: %s", exc)
+                self.bus.publish({"type": "error", "message": f"nightly tick failed: {exc}"})
 
     def _on_conversation(self, r: ConversationResult) -> None:
         self.bus.publish({"type": "conversation", "conversation": {

@@ -1,13 +1,13 @@
-# nightshift-sdk
+# nightly-sdk
 
-Three calls connect an agent to Night Shift. Night Shift can then roll back a release, fail over a
+Three calls connect an agent to Nightly. Nightly can then roll back a release, fail over a
 model or switch off a capability for you — within the policy you set — and verify the fix by
 replaying failed inputs through your own agent.
 
 ```python
-from nightshift_sdk import NightShift
+from nightly_sdk import Nightly
 
-ns = NightShift()   # reads NIGHTSHIFT_API_URL and NIGHTSHIFT_AGENT_TOKEN
+ns = Nightly()   # reads NIGHTLY_API_URL and NIGHTLY_AGENT_TOKEN
 
 prompt = load_prompt(ns.release("v12"))          # which release to run
 model = ns.model("claude-haiku")                  # which model (failover-aware)
@@ -19,5 +19,5 @@ ns.record("failed", trace_id=..., value_usd=12)   # optional business outcome pe
 ns.serve_replays(lambda inp: run_agent(inp, dry_run=True))  # verification hook
 ```
 
-Fail-open: if Night Shift is unreachable, every call returns your default.
+Fail-open: if Nightly is unreachable, every call returns your default.
 Traces come from your own neatlogs project; the SDK never sends prompts or outputs anywhere.

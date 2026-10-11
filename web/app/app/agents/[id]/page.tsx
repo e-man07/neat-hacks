@@ -87,7 +87,7 @@ function OverviewTab({ id, s, onChange }: { id: string; s: State; onChange: () =
       )}
       {s.agent.status !== "live" && (
         <Empty>
-          This agent hasn&apos;t called Night Shift yet. Set <code>NIGHTSHIFT_AGENT_TOKEN</code> and start it. See the{" "}
+          This agent hasn&apos;t called Nightly yet. Set <code>NIGHTLY_AGENT_TOKEN</code> and start it. See the{" "}
           <Link href="/docs" className="underline">
             SDK quickstart
           </Link>
@@ -126,7 +126,7 @@ function OverviewTab({ id, s, onChange }: { id: string; s: State; onChange: () =
         </Card>
         <Card className="p-4">
           <Label>live control plane</Label>
-          <p className="mt-1 text-xs text-faint">What your agent reads through the SDK. Night Shift changes these during incidents.</p>
+          <p className="mt-1 text-xs text-faint">What your agent reads through the SDK. Nightly changes these during incidents.</p>
           <dl className="mt-3 space-y-2 text-sm">
             <Row k="release" v={s.control.active_release} />
             <Row k="model" v={s.control.force_model ? `${s.control.force_model} (failover)` : s.control.default_model} />
@@ -152,7 +152,7 @@ function OverviewTab({ id, s, onChange }: { id: string; s: State; onChange: () =
               <span className="font-mono text-fg">{d.release}</span>
               <span className="font-mono text-[11px] text-faint">{d.commit_sha ? d.commit_sha.slice(0, 8) : ""}</span>
               <span className="ml-auto text-xs text-muted">
-                {d.actor === "nightshift" ? <span className="text-info">Night Shift</span> : d.actor} · {ago(d.ts)}
+                {d.actor === "nightshift" ? <span className="text-info">Nightly</span> : d.actor} · {ago(d.ts)}
               </span>
               {d.release !== s.control.active_release && (
                 <Button onClick={() => confirm(`Deploy ${d.release}?`) && setControl("active_release", d.release)}>Deploy</Button>
@@ -244,7 +244,7 @@ function PolicyTab({ id }: { id: string }) {
             onClick={async () => {
               try {
                 const r = await api<{ version: number }>(`/agents/${id}/policy`, { method: "PUT", json: { yaml: text } });
-                setMsg({ ok: true, text: `Saved as v${r.version}. Night Shift uses it from the next tick.` });
+                setMsg({ ok: true, text: `Saved as v${r.version}. Nightly uses it from the next tick.` });
                 reload();
               } catch (e) {
                 setMsg({ ok: false, text: (e as Error).message });

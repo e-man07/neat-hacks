@@ -1,6 +1,6 @@
 """On-call clock.
 
-Night Shift reasons about "how long until a human would respond", which depends on the local hour.
+Nightly reasons about "how long until a human would respond", which depends on the local hour.
 For the demo, NIGHTSHIFT_LOCAL_TIME (e.g. "03:07") pins the on-call clock to a simulated local
 time that then advances in real time. The console labels it as simulated.
 """

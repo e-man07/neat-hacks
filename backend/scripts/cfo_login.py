@@ -27,7 +27,7 @@ TOKEN_FILE = Path(__file__).resolve().parents[2] / ".cfo_token.json"
 
 def register() -> str:
     r = httpx.post(f"{AUTH}/oauth2/register", json={
-        "client_name": "Night Shift",
+        "client_name": "Nightly",
         "grant_types": ["urn:ietf:params:oauth:grant-type:device_code", "refresh_token", "authorization_code"],
         "token_endpoint_auth_method": "none",
         "redirect_uris": ["http://localhost:8765/callback"],
@@ -42,7 +42,7 @@ def login() -> dict:
     d = httpx.post(f"{AUTH}/oauth2/device_authorization", data={
         "client_id": client_id, "scope": "openid profile email offline_access", "resource": MCP,
     }, timeout=20).json()
-    print("\n  Approve Night Shift's access to cfo.ai:")
+    print("\n  Approve Nightly's access to cfo.ai:")
     print(f"  {d['verification_uri_complete']}")
     print(f"  code: {d['user_code']}   (expires in {d['expires_in'] // 60} min)\n", flush=True)
     deadline = time.time() + d["expires_in"]

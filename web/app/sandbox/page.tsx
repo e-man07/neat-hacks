@@ -95,7 +95,7 @@ export default function ConsolePage() {
       {/* Top bar */}
       <header className="flex flex-wrap items-center gap-x-6 gap-y-2 border-b border-line px-4 py-3 sm:px-6">
         <Link href="/" className="flex items-center gap-2 text-[15px] font-semibold text-white">
-          <Moon /> Night Shift
+          <Moon /> Nightly
         </Link>
         <span className="font-mono text-[12px] text-white/40">console</span>
         <div className="flex items-baseline gap-2">
@@ -129,7 +129,7 @@ export default function ConsolePage() {
 
       {stateErr && (
         <div className="border-b border-alert/30 bg-alert/10 px-6 py-2 text-[12.5px] text-alert">
-          Can’t reach the Night Shift API at {API}. Start it with <code className="font-mono">uv run uvicorn api.server:app</code> in /backend.
+          Can’t reach the Nightly API at {API}. Start it with <code className="font-mono">uv run uvicorn api.server:app</code> in /backend.
         </div>
       )}
 

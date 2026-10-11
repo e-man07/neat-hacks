@@ -1,4 +1,4 @@
-"""Night Shift API.
+"""Nightly API.
 
     uv run uvicorn api.server:app --port 8000
 
@@ -36,7 +36,7 @@ async def lifespan(_: FastAPI):
     p.stop()
 
 
-app = FastAPI(title="Night Shift", lifespan=lifespan)
+app = FastAPI(title="Nightly", lifespan=lifespan)
 origins = [o.strip() for o in os.environ.get("CORS_ORIGINS", "*").split(",") if o.strip()]
 app.add_middleware(CORSMiddleware, allow_origins=origins, allow_methods=["*"], allow_headers=["*"],
                    allow_credentials=False)

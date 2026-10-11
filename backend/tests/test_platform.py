@@ -57,9 +57,9 @@ def test_agent_onboarding_and_sdk_control_plane(client):
     # a human flips a kill switch; the SDK sees it
     r = client.put(f"/api/app/agents/{agent['id']}/control", json={"key": "flag:tools_enabled", "value": "false"})
     assert r.status_code == 200
-    from nightshift_sdk import NightShift
+    from nightly_sdk import Nightly
 
-    ns = NightShift(api_url="http://testserver", token=token)
+    ns = Nightly(api_url="http://testserver", token=token)
     ns._request = lambda method, path, body=None: client.request(method, path, headers=sdk, json=body).json()
     assert ns.flag("tools_enabled", True) is False
     assert ns.release("default") == "s1"

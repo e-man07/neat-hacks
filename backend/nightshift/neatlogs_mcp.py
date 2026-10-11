@@ -1,7 +1,7 @@
 """Minimal client for the neatlogs MCP server (Streamable HTTP, project API key as bearer).
 
 The Public REST API needs a service-account token; the MCP server accepts the project key, so
-Night Shift reads traces and manages detections through it.
+Nightly reads traces and manages detections through it.
 """
 
 from __future__ import annotations
