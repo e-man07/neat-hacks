@@ -1,285 +1,226 @@
-"""Music + sound effects for the Nightly explainer, synthesised in numpy, mixed under the voiceover."""
+"""Nightly explainer soundtrack: playful marimba track + soft UI sound effects, mixed under the voice."""
 import json
 import wave
 
 import numpy as np
+from scipy.signal import lfilter
 
-SR = 44100
+SR = 48000
 tl = json.load(open("timeline.json"))
 S = {s["id"]: s for s in tl["scenes"]}
 L = [l["start"] for l in tl["lines"]]
 TOTAL = tl["total"]
 N = int(TOTAL * SR) + SR
-rng = np.random.default_rng(7)
+rng = np.random.default_rng(11)
 
 
-def t_(d):
-    return np.arange(int(d * SR)) / SR
-
-
-def env_adsr(n, a=0.01, d=0.1, s=0.6, r=0.2):
-    a_, d_, r_ = int(a * SR), int(d * SR), int(r * SR)
-    s_ = max(0, n - a_ - d_ - r_)
-    return np.concatenate([np.linspace(0, 1, a_, False), np.linspace(1, s, d_, False), np.full(s_, s), np.linspace(s, 0, r_)])[:n]
-
-
-def lowpass(x, cutoff):
-    a = np.exp(-2 * np.pi * cutoff / SR)
-    y = np.empty_like(x)
-    acc = 0.0
-    for i in range(len(x)):  # small buffers only
-        acc = (1 - a) * x[i] + a * acc
-        y[i] = acc
-    return y
-
-
-def lp_fast(x, cutoff):
-    from scipy.signal import lfilter
-    a = np.exp(-2 * np.pi * cutoff / SR)
+def lp(x, fc):
+    a = np.exp(-2 * np.pi * fc / SR)
     return lfilter([1 - a], [1, -a], x)
 
 
-def place(buf, sig, at, gain=1.0):
+def hp(x, fc):
+    return x - lp(x, fc)
+
+
+def put(buf, sig, at, g=1.0):
     s = int(at * SR)
-    if s >= len(buf) or s + len(sig) <= 0:
+    if s >= len(buf):
         return
     e = min(len(buf), s + len(sig))
-    buf[max(s, 0):e] += gain * sig[max(0, -s):e - s]
+    if s < 0:
+        sig = sig[-s:]; s = 0
+    buf[s:e] += g * sig[: e - s]
 
 
-def note(m):
+def hz(m):
     return 440 * 2 ** ((m - 69) / 12)
 
 
-# ---------------------------------------------------------------- music
-BPM = 84
-BEAT = 60 / BPM
-BAR = 4 * BEAT
-CHORDS = [  # midi notes: Fmaj7, Em7, Dm9, Cmaj7(add9)
-    [53, 57, 60, 64], [52, 55, 59, 62], [50, 53, 57, 60, 64], [48, 52, 55, 59, 62],
-]
-music = np.zeros(N, np.float32)
-drums = np.zeros(N, np.float32)
-arp = np.zeros(N, np.float32)
-bass = np.zeros(N, np.float32)
+def tt(d):
+    return np.arange(int(d * SR)) / SR
 
-nob0, nob1 = S["nobody"]["vstart"], S["dig"]["vstart"] + 0.2
+
+# ------------------------------------------------------------------ instruments
+def marimba(m, d=0.9, bright=1.0):
+    t = tt(d); f = hz(m)
+    s = np.sin(2 * np.pi * f * t) * np.exp(-t * 6) + 0.35 * bright * np.sin(2 * np.pi * 3.93 * f * t) * np.exp(-t * 22) + 0.12 * np.sin(2 * np.pi * 9.2 * f * t) * np.exp(-t * 60)
+    return s * np.minimum(1, t * 900)
+
+
+def musicbox(m, d=1.4):
+    t = tt(d); f = hz(m)
+    s = (np.sin(2 * np.pi * f * t) + 0.45 * np.sin(2 * np.pi * 2 * f * t) * np.exp(-t * 3) + 0.2 * np.sin(2 * np.pi * 5.4 * f * t) * np.exp(-t * 9)) * np.exp(-t * 3.2)
+    return s * np.minimum(1, t * 1500)
+
+
+def pad(ms, d):
+    t = tt(d); s = np.zeros_like(t)
+    for m in ms:
+        f = hz(m)
+        for det in (-.15, 0, .13):
+            s += np.sin(2 * np.pi * f * (1 + det / 100) * t + rng.random() * 6)
+    s = lp(s / (len(ms) * 3), 1400)
+    a = int(.6 * SR); r = int(.8 * SR); env = np.ones_like(t)
+    env[:a] = np.linspace(0, 1, a); env[-r:] = np.linspace(1, 0, r)
+    return s * env
+
+
+def pluck_bass(m, d=0.7):
+    t = tt(d); f = hz(m)
+    return (np.sin(2 * np.pi * f * t) + 0.2 * np.sin(2 * np.pi * 2 * f * t)) * np.exp(-t * 4) * np.minimum(1, t * 400)
+
+
+def shaker(d=0.07):
+    t = tt(d); s = hp(rng.standard_normal(len(t)), 5000) * np.exp(-t * 70)
+    return s
+
+
+def kick():
+    t = tt(.3); f = 50 + 90 * np.exp(-t * 35)
+    return np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * 11)
+
+
+# ------------------------------------------------------------------ music
+BPM = 100; B = 60 / BPM; BAR = 4 * B
+PROG = [[60, 64, 67, 71], [57, 60, 64, 67], [53, 57, 60, 64], [55, 59, 62, 65]]  # Cmaj7 Am7 Fmaj7 G7
+MEL = [[76, 74, 72, 74, 76, 79, 76, 74], [72, 71, 69, 71, 72, 76, 72, 69], [69, 72, 76, 74, 72, 69, 72, 74], [71, 74, 79, 77, 74, 71, 74, 76]]
+music = np.zeros(N); perc = np.zeros(N)
+nob0, nob1 = S["nobody"]["vstart"], L[11] + 0.2
 end0 = S["end"]["vstart"]
-
-
-def intensity(t):
-    if t < BAR * 0.5:
-        return 0.0
-    if nob0 <= t < nob1:
-        return 0.0
-    return 1.0
-
-
-nbars = int(TOTAL / BAR) + 2
-for b in range(nbars):
+for b in range(int(TOTAL / BAR) + 2):
     t0 = b * BAR
-    ch = CHORDS[b % 4]
-    # pad
-    n = int(BAR * 1.15 * SR)
-    tt = np.arange(n) / SR
-    pad = np.zeros(n)
-    for m in ch:
-        f = note(m + 12)
-        for det in (-0.12, 0.0, 0.11):
-            pad += np.sin(2 * np.pi * f * (1 + det / 100) * tt + rng.random() * 6) * 0.5
-            pad += 0.18 * np.sin(2 * np.pi * 2 * f * (1 + det / 100) * tt)
-    pad *= env_adsr(n, a=0.9, d=0.4, s=0.8, r=0.6) / (len(ch) * 3)
-    tense = nob0 <= t0 < nob1
-    place(music, (pad * (0.55 if tense else 1.0)).astype(np.float32), t0, 0.5)
-    # bass
-    if intensity(t0) > 0:
-        for bt in (0, 2.5):
-            nb = int(BEAT * 1.4 * SR)
-            tb = np.arange(nb) / SR
-            f = note(ch[0] - 12)
-            sig = (np.sin(2 * np.pi * f * tb) + 0.25 * np.sin(2 * np.pi * 2 * f * tb)) * np.exp(-tb * 2.2)
-            place(bass, sig.astype(np.float32), t0 + bt * BEAT, 0.42)
-    # arpeggio: plucked bell 8ths
-    if intensity(t0) > 0 or t0 < BAR:
-        pattern = [0, 2, 1, 3, 2, 1, 3, 2]
-        for i, pi in enumerate(pattern):
-            m = ch[pi % len(ch)] + 24
-            na = int(0.9 * SR)
-            ta = np.arange(na) / SR
-            f = note(m)
-            sig = (np.sin(2 * np.pi * f * ta) * 0.7 + np.sin(2 * np.pi * 2.01 * f * ta) * 0.18 + np.sin(2 * np.pi * 3.98 * f * ta) * 0.06) * np.exp(-ta * 5.5)
-            sig *= np.minimum(1, ta * 400)
-            vel = 0.55 + 0.25 * (i % 2 == 0)
-            place(arp, sig.astype(np.float32), t0 + i * BEAT / 2, 0.16 * vel)
-    # drums
-    if intensity(t0) > 0:
-        for bt in range(4):
-            tb = t0 + bt * BEAT
-            if bt in (0, 2):  # soft kick
-                nk = int(0.35 * SR)
-                tk = np.arange(nk) / SR
-                f = 45 + 70 * np.exp(-tk * 30)
-                k = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-tk * 9)
-                place(drums, k.astype(np.float32), tb, 0.55)
-            else:  # brush snare
-                ns = int(0.22 * SR)
-                ts = np.arange(ns) / SR
-                s = rng.standard_normal(ns) * np.exp(-ts * 18)
-                s = s - np.convolve(s, np.ones(8) / 8, "same")
-                place(drums, s.astype(np.float32), tb, 0.10)
-            for h in (0, 0.5):  # hats
-                nh = int(0.05 * SR)
-                th = np.arange(nh) / SR
-                hsig = rng.standard_normal(nh) * np.exp(-th * 90)
-                hsig = hsig - np.convolve(hsig, np.ones(4) / 4, "same")
-                place(drums, hsig.astype(np.float32), tb + h * BEAT, 0.05 if h else 0.035)
-
-# tension drone during "nobody"
-nd = int((nob1 - nob0 + 0.6) * SR)
-td = np.arange(nd) / SR
-drone = (np.sin(2 * np.pi * 55 * td) + 0.5 * np.sin(2 * np.pi * 82.4 * td) + 0.3 * np.sin(2 * np.pi * 110.5 * td)) * np.minimum(1, td / 0.4) * np.minimum(1, (td[::-1]) / 0.5)
-place(music, drone.astype(np.float32), nob0, 0.12)
-
-# delay on arp
-d = int(BEAT * 0.75 * SR)
-arp_d = arp.copy()
-arp_d[d:] += 0.35 * arp[:-d]
-arp_d[2 * d:] += 0.15 * arp[:-2 * d]
-
-mus = music + arp_d + bass + drums
-# fade in / out
-fi = np.minimum(1, np.arange(N) / (SR * 1.2))
-fo = np.clip((TOTAL + 0.3 - np.arange(N) / SR) / 2.2, 0, 1)
-mus *= fi * fo
-
-# ---------------------------------------------------------------- sfx
-sfx = np.zeros(N, np.float32)
-
-
-def pop(at, g=0.35, f0=320, f1=980):
-    n = int(0.09 * SR); tt = np.arange(n) / SR
-    f = f0 + (f1 - f0) * (tt / tt[-1]) ** 0.6
-    s = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-tt * 38)
-    place(sfx, s.astype(np.float32), at, g)
-
-
-def whoosh(at, g=0.22, d=0.42):
-    n = int(d * SR); tt = np.arange(n) / SR
-    s = rng.standard_normal(n)
-    s = lp_fast(s, 1800) - lp_fast(s, 300)
-    s *= np.sin(np.pi * tt / d) ** 2
-    place(sfx, (s / (np.abs(s).max() + 1e-9)).astype(np.float32), at, g)
-
-
-def tick(at, g=0.12, f=2100):
-    n = int(0.04 * SR); tt = np.arange(n) / SR
-    place(sfx, (np.sin(2 * np.pi * f * tt) * np.exp(-tt * 120)).astype(np.float32), at, g)
-
-
-def err(at, g=0.12):
-    for k, f in enumerate((196, 165)):
-        n = int(0.09 * SR); tt = np.arange(n) / SR
-        s = np.sign(np.sin(2 * np.pi * f * tt)) * 0.5 + np.sin(2 * np.pi * f * tt) * 0.5
-        s = lp_fast(s, 1200) * np.exp(-tt * 22)
-        place(sfx, s.astype(np.float32), at + k * 0.1, g)
-
-
-def ding(at, g=0.25, f=1318.5):
-    n = int(1.2 * SR); tt = np.arange(n) / SR
-    s = (np.sin(2 * np.pi * f * tt) + 0.4 * np.sin(2 * np.pi * 2 * f * tt) + 0.15 * np.sin(2 * np.pi * 3.01 * f * tt)) * np.exp(-tt * 4.5)
-    place(sfx, s.astype(np.float32), at, g)
-
-
-def notify(at, g=0.3):
-    for k, f in enumerate((987.8, 1318.5)):
-        n = int(0.32 * SR); tt = np.arange(n) / SR
-        s = (np.sin(2 * np.pi * f * tt) + 0.3 * np.sin(2 * np.pi * 2 * f * tt)) * np.exp(-tt * 10) * np.minimum(1, tt * 300)
-        place(sfx, s.astype(np.float32), at + k * 0.12, g)
-
-
-def typing(at, dur, g=0.05):
-    t = at
-    while t < at + dur:
-        n = int(0.012 * SR)
-        s = rng.standard_normal(n) * np.exp(-np.arange(n) / SR * 400)
-        place(sfx, s.astype(np.float32), t, g * (0.7 + 0.6 * rng.random()))
-        t += 0.045 + rng.random() * 0.05
-
-
-def swell(at, d=1.6, g=0.18):
-    n = int(d * SR); tt = np.arange(n) / SR
-    s = rng.standard_normal(n); s = lp_fast(s, 500)
-    s *= (tt / d) ** 2 * np.minimum(1, (d - tt) * 8)
-    place(sfx, (s / (np.abs(s).max() + 1e-9)).astype(np.float32), at, g)
-
-
-def chime(at, g=0.22):
-    for k, m in enumerate((77, 81, 84, 88)):
-        ding(at + k * 0.12, g * (1 - k * 0.12), note(m))
-
-
-pop(S["hi"]["vstart"] + 0.1, 0.45, 220, 760)
-pop(L[1] - 0.1); whoosh(L[2] - 0.15)
-for i in range(8):
-    pop(S["watch"]["vstart"] + 0.4 + i * 0.18, 0.18, 400 + i * 40, 1100 + i * 40)
-    tick(L[4] + i * 0.12, 0.08, 2400)
-whoosh(S["runs"]["vstart"], 0.25)
-runs0, fix0 = S["runs"]["vstart"], S["fix"]["vstart"]
-i = 0
-while True:
-    at = runs0 + 0.3 + i * 0.55
-    if at >= S["nobody"]["vstart"]:
+    if t0 > TOTAL + 1:
         break
-    bad = at >= L[7] - 0.9 and i % 4 != 0
-    (err(at, 0.07) if bad else tick(at, 0.06))
-    i += 1
-whoosh(L[6] - 0.05, 0.16)
-swell(S["nobody"]["vstart"] - 0.6)
-whoosh(S["dig"]["vstart"], 0.2)
-for st in (L[10] + 0.1, L[10] + 1.0, L[10] + 1.9, L[11] + 0.5):
-    typing(st, 0.85)
-    tick(st + 0.9, 0.09, 1600)
-ding(L[12] + 0.2, 0.22)
+    ch = PROG[b % 4]
+    sleepy = nob0 - .2 <= t0 < nob1
+    put(music, pad([m + 12 for m in ch[:3]] + [ch[0] - 12 + 24], BAR * 1.2), t0, .9 if not sleepy else .7)
+    if sleepy:
+        for i, m in enumerate(MEL[b % 4][::2]):
+            put(music, musicbox(m + 12), t0 + i * B, .22)
+        continue
+    intro = t0 < BAR
+    # marimba arpeggio 8ths
+    for i in range(8):
+        m = ch[[0, 2, 1, 3, 2, 1, 3, 2][i]] + 12
+        put(music, marimba(m, .7, .8), t0 + i * B / 2, .16 if i % 2 == 0 else .11)
+    # melody (sparser) after intro
+    if not intro and t0 < end0 + 2:
+        for i, m in enumerate(MEL[b % 4]):
+            if i % 2 == 0 or (b % 2 == 1):
+                put(music, marimba(m, .9, 1.0), t0 + i * B / 2 + .01, .10)
+    if not intro:
+        put(music, pluck_bass(ch[0] - 24), t0, .5); put(music, pluck_bass(ch[0] - 24), t0 + 2.5 * B, .35)
+        put(perc, kick(), t0, .35); put(perc, kick(), t0 + 2 * B, .22)
+        for i in range(8):
+            put(perc, shaker(), t0 + i * B / 2 + (0.012 if i % 2 else 0), .05 if i % 2 else .035)
+# ending: resolve on C with a music-box flourish
+for i, m in enumerate([72, 76, 79, 84]):
+    put(music, musicbox(m, 2.5), end0 + 1.2 + i * .18, .25)
+put(music, pad([60, 64, 67, 72], 3.5), end0 + 1.0, .8)
+mus = music + perc
+fade = np.clip((TOTAL + .2 - np.arange(N) / SR) / 2.0, 0, 1) * np.minimum(1, np.arange(N) / (SR * .6))
+mus *= fade
+
+# ------------------------------------------------------------------ sound effects
+sfx = np.zeros(N)
+
+
+def pop(at, g=.25, f0=500, f1=1000, d=.06):
+    t = tt(d); f = f0 + (f1 - f0) * (t / d) ** .5
+    put(sfx, np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * 45) * np.minimum(1, t * 3000), at, g)
+
+
+def bubble(at, g=.22):  # chat bubble: two quick tones
+    pop(at, g, 620, 900, .05); pop(at + .045, g * .8, 900, 1250, .05)
+
+
+def plink(at, m, g=.2):
+    put(sfx, marimba(m, .6, 1.2), at, g)
+
+
+def tap(at, g=.18):  # soft card/paper tap
+    t = tt(.08)
+    s = lp(rng.standard_normal(len(t)), 1800) * np.exp(-t * 60) + .6 * np.sin(2 * np.pi * 140 * t) * np.exp(-t * 40)
+    put(sfx, s, at, g)
+
+
+def bonk(at, g=.25):
+    t = tt(.22); f = 320 * np.exp(-t * 4)
+    put(sfx, np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * 14) * np.minimum(1, t * 2000), at, g)
+
+
+def chime(at, notes, g=.18, gap=.07):
+    for i, m in enumerate(notes):
+        put(sfx, musicbox(m, 1.6), at + i * gap, g)
+
+
+def knock(at, g=.3):  # notification
+    chime(at, [83, 88], g, .11)
+
+
+def click(at, g=.25):
+    t = tt(.03); put(sfx, hp(rng.standard_normal(len(t)), 2000) * np.exp(-t * 200), at, g)
+
+
+def typing(at, d, g=.035):
+    t = at
+    while t < at + d:
+        click(t, g * (.7 + .6 * rng.random())); t += .05 + rng.random() * .05
+
+
+PENTA = [72, 74, 76, 79, 81, 84, 86, 88]
+pop(S["hi"]["vstart"] + .1, .35, 300, 900, .09); chime(S["hi"]["vstart"] + .45, [79, 84], .12)
+pop(L[1] - .1, .18)          # chip
+tap(L[2] - .1, .12); tap(L[3] - .1, .12)
+pop(L[4] - .3, .18)
+for i in range(8):
+    plink(L[5] + i * .16, PENTA[i], .16)
+    pop(L[5] + 2.0 + i * .08, .1, 1200, 1700, .04)
+tap(S["runs"]["vstart"] + .1, .2)
+bubble(S["runs"]["vstart"] + .5); bubble(S["runs"]["vstart"] + 1.4)
+chime(L[7] - .1, [84, 88], .14)
+tap(L[8] + 1.2, .16); bubble(L[9] - .3); bubble(L[9] + .5); bonk(L[9] + .5, .2); bonk(L[9] + 1.3, .22); bonk(L[9] + 1.45, .16)
+pop(S["nobody"]["vstart"] + .1, .14)
+chime(L[11] + .4, [79, 83, 86, 91], .12, .05)
+tap(S["dig"]["vstart"] + .1, .2)
+for i, st in enumerate([L[13] + .1, L[13] + 1.3, L[14] + .2, L[15] + .3]):
+    typing(st, .7); plink(st + .6, [76, 79, 81, 84][i], .2)
+plink(L[16] + .6, 79, .2)
 for k in range(3):
-    tick(L[13] + 0.5 + k * 0.5, 0.1, 1900 + k * 200)
-ding(L[13] + 1.6, 0.2, 1568)
-notify(S["slack"]["vstart"] + 0.35)
-for k in range(4):
-    pop(S["slack"]["vstart"] + 0.35 + k * 0.4, 0.08, 500, 900)
-tick(L[15] + 0.1, 0.12, 1200)
-whoosh(S["tagline"]["vstart"] + 0.15, 0.2)
-pop(L[17] - 0.1, 0.3, 300, 1200)
-whoosh(S["sdk"]["vstart"], 0.2)
-typing(S["sdk"]["vstart"] + 0.3, 0.5)
-typing(S["sdk"]["vstart"] + 0.9, 0.5)
-for d_ in (1.3, 1.8, 2.3, 2.8):
-    tick(S["sdk"]["vstart"] + 0.3 + d_, 0.09, 1800)
-chime(end0 + 0.3)
+    pop(L[17] + .5 + k * .5, .12, 900 + k * 150, 1300 + k * 150, .05)
+plink(L[18] - .1 + .4, 84, .16)
+chime(L[18] - .1, [76, 79, 84, 88], .18, .06)
+knock(S["slack"]["vstart"] + .35)
+for k in range(3):
+    pop(S["slack"]["vstart"] + .8 + k * .5, .08, 700, 950, .04)
+click(L[20] + 1.1, .35); chime(L[20] + 1.2, [84, 91], .12)
+pop(S["tagline"]["vstart"] + .2, .14); pop(L[22] - .1, .14, 600, 1100)
+tap(S["sdk"]["vstart"] + .1, .15)
+typing(S["sdk"]["vstart"] + .4, .7); typing(S["sdk"]["vstart"] + 1.3, .8)
+for k, d in enumerate((1.9, 2.2, 2.5)):
+    plink(S["sdk"]["vstart"] + .4 + d, [79, 81, 84][k], .13)
+pop(S["end"]["vstart"] + .3, .25, 300, 900, .09)
 
-# ---------------------------------------------------------------- mix
-vo = np.load("vo.npy")[:N]
-vo = np.pad(vo, (0, max(0, N - len(vo))))
-# ducking envelope from voice
-frame = 1024
-venv = np.repeat([np.sqrt(np.mean(vo[i:i + frame] ** 2)) for i in range(0, N, frame)], frame)[:N]
-duck_target = np.where(venv > 0.01, 0.55, 1.0)
-duck = lp_fast(duck_target.astype(np.float64), 3.0)
-
-mus_l = mus * duck * 0.2
-mix = vo * 1.0 + mus_l + sfx * 0.9
-mix = np.tanh(mix * 1.1) / np.tanh(1.1)  # gentle limiter
-peak = np.abs(mix).max()
-mix = mix / peak * 0.92
-# stereo: small widening of music via delay
-right = mix.copy()
-left = mix.copy()
-st = (mus_l / peak * 0.92) * 0.08
-dly = int(0.012 * SR)
-left[dly:] += st[:-dly]
-right[:-dly] += st[dly:]
-out = np.stack([left, right], 1)
-out = np.clip(out, -1, 1)
+# ------------------------------------------------------------------ mix
+vo48 = np.load("vo.npy")
+# vo.npy is 44.1 kHz: resample to 48 kHz
+x_old = np.arange(len(vo48)) / 44100
+x_new = np.arange(int(len(vo48) * SR / 44100)) / SR
+vo = np.interp(x_new, x_old, vo48)
+vo = np.pad(vo, (0, max(0, N - len(vo))))[:N]
+frame = 960
+env = np.repeat([np.sqrt(np.mean(vo[i:i + frame] ** 2)) for i in range(0, N, frame)], frame)[:N]
+duck = lp(np.where(env > .01, .5, 1.0), 4.0)
+mix = vo * 1.0 + mus * .14 * duck + sfx * .7
+mix = np.tanh(mix * 1.2) / np.tanh(1.2)
+mix = mix / np.abs(mix).max() * .9
+music_only = mus * .14 * duck / np.abs(mix).max()
+dl = int(.011 * SR)
+left, right = mix.copy(), mix.copy()
+left[dl:] += .1 * music_only[:-dl]; right[:-dl] += .1 * music_only[dl:]
+out = np.clip(np.stack([left, right], 1), -1, 1)
 with wave.open("mix.wav", "wb") as w:
     w.setnchannels(2); w.setsampwidth(2); w.setframerate(SR)
     w.writeframes((out * 32767).astype(np.int16).tobytes())
-print("mix.wav", out.shape[0] / SR, "s")
+print("mix", out.shape[0] / SR)

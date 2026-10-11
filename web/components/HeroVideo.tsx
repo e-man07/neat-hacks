@@ -2,6 +2,9 @@
 
 import { useRef, useState } from "react";
 
+/** Full-quality master hosted outside the repo (e.g. an R2 bucket); falls back to the copy in /public. */
+const REMOTE = process.env.NEXT_PUBLIC_HERO_VIDEO_URL;
+
 /** The Nightly explainer: plays muted on loop; one click restarts it with sound. */
 export default function HeroVideo() {
   const ref = useRef<HTMLVideoElement>(null);
@@ -31,6 +34,7 @@ export default function HeroVideo() {
         preload="metadata"
         aria-label="Nightly explainer: a ghost that watches your AI agents at night"
       >
+        {REMOTE && <source src={REMOTE} type="video/mp4" />}
         <source src="/video/nightly.webm" type="video/webm" />
         <source src="/video/nightly.mp4" type="video/mp4" />
       </video>
