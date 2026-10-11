@@ -36,7 +36,7 @@ fi
 id nightshift >/dev/null 2>&1 || useradd -m -s /bin/bash nightshift
 sudo -u nightshift bash -c 'command -v ~/.local/bin/uv >/dev/null || curl -LsSf https://astral.sh/uv/install.sh | sh'
 
-git config --global --add safe.directory /opt/nightshift  # the checkout is owned by the nightshift user
+git config --system --add safe.directory /opt/nightshift  # the checkout is owned by the nightshift user
 if [ ! -d /opt/nightshift/.git ]; then git clone -q --branch "$BRANCH" "$REPO" /opt/nightshift; fi
 git -C /opt/nightshift remote set-url origin "$REPO"
 git -C /opt/nightshift fetch -q origin "$BRANCH" && git -C /opt/nightshift reset -q --hard "origin/$BRANCH"
