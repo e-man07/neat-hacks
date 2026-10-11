@@ -1,0 +1,168 @@
+import type { Metadata } from "next";
+import type { ReactNode } from "react";
+import PageShell from "@/components/PageShell";
+import { Brand } from "@/components/Marks";
+import { Card, Label } from "@/components/ui";
+
+export const metadata: Metadata = {
+  title: "For judges · Nightly",
+  description: "Every neatHack judging criterion, mapped to the evidence that backs it.",
+};
+
+const GH = "https://github.com/e-man07/neat-hacks/blob/main";
+const TREE = "https://github.com/e-man07/neat-hacks/tree/main";
+
+type Item = { claim: ReactNode; links: [string, string][] };
+type Criterion = { name: ReactNode; weight: string; items: Item[] };
+
+const CRITERIA: Criterion[] = [
+  {
+    name: "The agent completes a substantial task",
+    weight: "30%",
+    items: [
+      {
+        claim: "The whole incident lifecycle, on its own: detect → investigate → price → decide → contain → verify → report.",
+        links: [
+          ["Try it live (sandbox)", "/sandbox"],
+          ["How it works", "/#how"],
+        ],
+      },
+      {
+        claim: "Benchmark of six staged incidents: 6/6 handled correctly; five contained 13–21 s after detection and verified by replay.",
+        links: [
+          ["Benchmark results", "/benchmark"],
+          ["Run logs", `${TREE}/evidence/benchmark`],
+        ],
+      },
+      {
+        claim: "Live on a second agent (Scout) connected only through the SDK and neatlogs: detected ~1.5 min after deploy, rolled back, 3/3 replays passed, resolved in under 3 min.",
+        links: [["Scout incidents", `${TREE}/evidence/scout`]],
+      },
+    ],
+  },
+  {
+    name: "It improved, with before/after numbers",
+    weight: "in 30%",
+    items: [
+      {
+        claim: "Run 1 → run 3: 4/6 → 6/6 incidents handled correctly, after fixing confidence calibration and impact pricing based on what run 1 showed.",
+        links: [["Before / after", `${GH}/evidence/before-after.md`]],
+      },
+    ],
+  },
+  {
+    name: "It recovers from failures",
+    weight: "in 30%",
+    items: [
+      {
+        claim: "If a fix fails verification, Nightly undoes it by itself and escalates. Covered by a test.",
+        links: [
+          ["runner.py", `${GH}/backend/nightshift/runner.py`],
+          ["The test", `${GH}/backend/tests/test_nightshift.py#L111`],
+        ],
+      },
+      {
+        claim: "It kept working when neatlogs dropped most of Scout’s traces: runs are now also counted from SDK events.",
+        links: [["What we learned", `${GH}/evidence/scout/README.md#what-we-learned-and-changed`]],
+      },
+    ],
+  },
+  {
+    name: (
+      <span className="inline-flex flex-wrap items-center gap-2">
+        Uses <Brand name="neatlogs" h={18} /> <Brand name="entire" h={18} /> <Brand name="cfo" h={20} />
+      </span>
+    ),
+    weight: "25%",
+    items: [
+      {
+        claim: "neatlogs: every agent run and every investigation is traced; Nightly reads traces back over the neatlogs MCP and creates a detection after an attack.",
+        links: [["neatlogs evidence", `${GH}/evidence/neatlogs.md`]],
+      },
+      {
+        claim: "Entire: every bad release was written by a separate Claude Code session with its own checkpoint. Nightly resolves commit → checkpoint → prompt → the coding agent’s own warning.",
+        links: [
+          ["Entire evidence", `${GH}/evidence/entire.md`],
+          ["r46 checkpoint on entire.io", "https://entire.io/gh/e-man07/neat-hacks/commit/e26a58f17ad4af5d119de989ebeaafc7055b8929"],
+        ],
+      },
+      {
+        claim: "cfo.ai: the business plan (break-even M08, runway > 24 months) and the customer unit economics Nightly uses to price every incident.",
+        links: [
+          ["Business plan in cfo.ai", "https://app.cfo.ai/s/CsWafbQfu2U1y94W"],
+          ["Unit economics in cfo.ai", "https://app.cfo.ai/s/fHcCAy2lG_aXs3Qt"],
+          ["The business", "/business"],
+        ],
+      },
+    ],
+  },
+  {
+    name: "A real product, not a script",
+    weight: "usefulness",
+    items: [
+      {
+        claim: "GitHub sign-in, a 5-step “Connect an agent” wizard, agent pages, an incident inbox, a Slack app with Approve and Undo, and an SDK on PyPI.",
+        links: [
+          ["Open the app", "/app"],
+          ["SDK docs", "/docs"],
+          ["nightly-sdk on PyPI", "https://pypi.org/project/nightly-sdk/"],
+        ],
+      },
+    ],
+  },
+  {
+    name: "Built during the hackathon, in public",
+    weight: "15%",
+    items: [
+      {
+        claim: "Commit history starts with the plan only; the build log records each phase with timestamps.",
+        links: [
+          ["Build log", `${GH}/hackathon.md`],
+          ["Commits", "https://github.com/e-man07/neat-hacks/commits/main"],
+        ],
+      },
+    ],
+  },
+];
+
+export default function JudgePage() {
+  return (
+    <PageShell title="For judges" sub="Each criterion, and where to check it.">
+      <p className="max-w-[720px] text-[15px] leading-relaxed text-muted">
+        Nightly is the on-call engineer for AI agents. When a change makes an agent fail quietly, it finds the cause, prices
+        the damage, applies a fix that can be undone, proves it by replaying the failed runs, and pages a human once.
+        Benchmark incidents are staged on purpose so they are reproducible; the Scout incidents ran live through the product.
+      </p>
+      <div className="mt-10 space-y-4">
+        {CRITERIA.map((c, i) => (
+          <Card key={i} className="p-6">
+            <div className="flex flex-wrap items-baseline gap-3">
+              <h2 className="text-[19px] font-medium tracking-tight text-fg">{c.name}</h2>
+              <Label>{c.weight}</Label>
+            </div>
+            <div className="mt-4 space-y-4">
+              {c.items.map((it, j) => (
+                <div key={j} className="border-t border-line pt-4 first:border-0 first:pt-0">
+                  <p className="text-[14.5px] leading-relaxed text-fg-2">{it.claim}</p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {it.links.map(([label, href]) => (
+                      <a
+                        key={href}
+                        href={href}
+                        target={href.startsWith("http") ? "_blank" : undefined}
+                        rel="noreferrer"
+                        className="rounded-full border border-line px-3 py-1 text-[12.5px] text-fg transition hover:border-line-strong hover:bg-chip"
+                      >
+                        {label} {href.startsWith("http") ? "↗" : "→"}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        ))}
+      </div>
+    </PageShell>
+  );
+}

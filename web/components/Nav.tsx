@@ -9,6 +9,7 @@ const LINKS = [
   { href: "/sandbox", label: "Sandbox" },
   { href: "/benchmark", label: "Benchmark" },
   { href: "/business", label: "Business" },
+  { href: "/judge", label: "For judges" },
 ];
 
 /** Floating pill nav: flat at the top of the page, lifts into a card once you scroll. */

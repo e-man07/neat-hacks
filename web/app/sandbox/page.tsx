@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Controls from "@/components/console/Controls";
+import Guide from "@/components/console/Guide";
 import IncidentPanel from "@/components/console/IncidentPanel";
 import TrafficFeed from "@/components/console/TrafficFeed";
 import NightSky from "@/components/NightSky";
@@ -132,6 +133,15 @@ export default function ConsolePage() {
           Can’t reach the Nightly API at {API}. Start it with <code className="font-mono">uv run uvicorn api.server:app</code> in /backend.
         </div>
       )}
+
+      <Guide
+        state={state}
+        inc={inc}
+        onChange={() => {
+          reloadState();
+          reloadIncidents();
+        }}
+      />
 
       <div className="grid min-h-0 flex-1 gap-px bg-line lg:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)_340px]">
         {/* Left: money + feed */}

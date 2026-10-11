@@ -62,6 +62,7 @@ export default function IncidentPanel({
   const thoughts = inc.events.filter((e) => e.kind === "step" && e.title.startsWith("think"));
   const proposals = inc.actions.filter((a) => a.status === "proposed");
   const replay = inc.verification?.replay;
+  const decision = inc.events.find((e) => e.kind === "decide")?.detail as { mode: string; reasons: string[] } | undefined;
 
   return (
     <div className="flex h-full min-h-0 flex-col">
@@ -137,6 +138,31 @@ export default function IncidentPanel({
             </div>
           </div>
         )}
+
+        {/* Why it acted (or didn't) */}
+        {decision?.reasons?.length ? (
+          <div className="mt-3 rounded-lg border border-line p-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <Label>why Nightly {decision.mode === "auto" ? "acted on its own" : decision.mode === "defer" ? "waited for the morning" : "asked a human"}</Label>
+              {d && (
+                <span className="ml-auto font-mono text-[11px] text-white/50">
+                  confidence <span className="text-white">{Math.round(d.confidence * 100)}%</span> · {(d.evidence_trace_ids ?? []).length} traces cited
+                </span>
+              )}
+            </div>
+            <ul className="mt-2 space-y-1 text-[12.5px]">
+              {decision.reasons.map((r, i) => {
+                const last = i === decision.reasons.length - 1 && decision.mode !== "auto";
+                return (
+                  <li key={i} className="flex gap-2">
+                    <span className={last ? "text-amber" : "text-ok"}>{last ? "!" : "✓"}</span>
+                    <span className="text-white/75">{r}</span>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        ) : null}
 
         {/* Proposals */}
         {proposals.length > 0 && (
