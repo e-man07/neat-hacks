@@ -105,7 +105,7 @@
   <div id="end" class="abs" style="left:0; right:0; top:610px; text-align:center; display:none">
     <div class="word">Nightly</div>
     <div class="tag">The on-call engineer for your AI agents.</div>
-    <div class="row"><span class="url">web-emrq.vercel.app</span><span class="pill">Built with neatlogs · Entire · cfo.ai</span></div>
+    <div class="row"><span class="pill" style="gap:30px; padding:16px 34px"><span>Built with</span><img src="logo-neatlogs.png" style="height:34px"/><img src="logo-entire.svg" style="height:34px"/><img src="logo-cfo.svg" style="height:38px"/></span></div>
   </div>
   <div id="caption" class="abs"></div>
 </div>
@@ -270,10 +270,10 @@ function agentCard(t, id) {
   return `${head}<div class="feed">${feed}</div>`;
 }
 const FIELDS = [
-  { lbl: "What broke", src: "neatlogs", val: "12 answers: doc not found", icon: "trace", bg: "#d9e6ff", fg: "#2f5bd3" },
+  { lbl: "What broke", src: '<img src="logo-neatlogs.png" style="height:17px; vertical-align:-2px"/>', val: "12 answers: doc not found", icon: "trace", bg: "#d9e6ff", fg: "#2f5bd3" },
   { lbl: "The change", src: "git", val: "release s3 · c42532d", icon: "git", bg: "#e7e4ef", fg: "#3a3550" },
-  { lbl: "The prompt", src: "Entire", val: "“get ready for the docs migr…", icon: "spark", bg: "#e9dcff", fg: "#7046d6" },
-  { lbl: "The cost", src: "cfo.ai", val: "$11.25 / minute", icon: "dollar", bg: "#f8cfc9", fg: "#b9392c" },
+  { lbl: "The prompt", src: '<img src="logo-entire.svg" style="height:18px; vertical-align:-3px"/>', val: "“get ready for the docs migr…", icon: "spark", bg: "#e9dcff", fg: "#7046d6" },
+  { lbl: "The cost", src: '<img src="logo-cfo.svg" style="height:20px; vertical-align:-5px"/>', val: "$11.25 / minute", icon: "dollar", bg: "#f8cfc9", fg: "#b9392c" },
 ];
 const FIX = [
   { lbl: "Rolled back", val: "s3 → s2, automatically", icon: "undo", bg: "#cdeed9", fg: "#1f8f55" },
@@ -288,7 +288,7 @@ function incidentCard(t, id) {
     const starts = [L(13) + .1, L(13) + 1.3, L(14) + .2, L(15) + .3];
     FIELDS.forEach((f, i) => {
       const k = P(t, starts[i], .9), n = Math.floor(f.val.length * eout(k)), on = k > 0;
-      rows.push(`<div class="field ${on ? "on" : ""}"><div class="grow"><div class="lbl">${f.lbl}<span class="src">· ${f.src}</span></div><div class="val">${f.val.slice(0, n)}</div></div>${on ? `<div style="transform:scale(${back(P(t, starts[i] + .55, .4)) || .001})">${tile(f.icon, f.bg, f.fg, true)}</div>` : '<div class="empty"></div>'}</div>`);
+      rows.push(`<div class="field ${on ? "on" : ""}"><div class="grow"><div class="lbl">${f.lbl}<span class="src">${f.src.startsWith("<") ? "" : "· "}${f.src}</span></div><div class="val">${f.val.slice(0, n)}</div></div>${on ? `<div style="transform:scale(${back(P(t, starts[i] + .55, .4)) || .001})">${tile(f.icon, f.bg, f.fg, true)}</div>` : '<div class="empty"></div>'}</div>`);
     });
   } else {
     const starts = [L(16) + .2, L(17) + .1, L(18) - .1];
