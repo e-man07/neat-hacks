@@ -5,16 +5,16 @@ import numpy as np
 
 KEY = [l.split("=", 1)[1].strip() for l in open("../.env") if l.startswith("ELEVENLABS_API_KEY=")][0]
 VOICE = "cgSgspJ2msm6clMCkdW9"  # premade voice closest in pitch to the reference
-SR, FPS = 44100, 30
-PAD_AFTER = {"hi": .35, "fact": .5, "watch": .7, "runs": .9, "deploy": .7, "nobody": .6, "dig": .9, "fix": .8,
-             "slack": 1.0, "tagline": .8, "sdk": 1.3, "end": 2.4}
+SR, FPS = 44100, 60
+PAD_AFTER = {"hi": .45, "fact": .45, "watch": .6, "runs": .5, "deploy": .55, "nobody": .5, "dig": .6, "fix": .55,
+             "slack": .7, "tagline": .6, "sdk": .9, "end": 2.6}
 os.makedirs("vo", exist_ok=True)
 lines = json.load(open("script.json"))
 for i, l in enumerate(lines):
     if os.path.exists(f"vo/{i:02d}.json"):
         continue
     body = {"text": l["text"], "model_id": "eleven_multilingual_v2",
-            "voice_settings": {"stability": .42, "similarity_boost": .8, "style": .4, "use_speaker_boost": True},
+            "voice_settings": {"stability": .32, "similarity_boost": .8, "style": .6, "use_speaker_boost": True},
             "previous_text": lines[i - 1]["text"] if i else None, "next_text": lines[i + 1]["text"] if i + 1 < len(lines) else None}
     req = urllib.request.Request(f"https://api.elevenlabs.io/v1/text-to-speech/{VOICE}/with-timestamps?output_format=mp3_44100_128",
                                  data=json.dumps(body).encode(), headers={"xi-api-key": KEY, "Content-Type": "application/json"})
@@ -23,7 +23,7 @@ for i, l in enumerate(lines):
     json.dump(d["alignment"], open(f"vo/{i:02d}.json", "w"))
 
 # timeline
-t, out, prev = .8, [], None
+t, out, prev = .9, [], None
 for i, l in enumerate(lines):
     al = json.load(open(f"vo/{i:02d}.json"))
     if prev and prev != l["scene"]:
