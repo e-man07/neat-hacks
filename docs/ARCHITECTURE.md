@@ -1,4 +1,4 @@
-# Night Shift — Architecture
+# Nightly — Architecture
 
 > The on-call engineer for your AI agents.
 > It stops the bleeding by itself. It only waits for you on decisions that can't be undone.
@@ -10,7 +10,7 @@ does not see: a prompt edit that skips a policy check, a tool whose upstream API
 retry loop that burns tokens, a model provider outage, a wave of prompt-injection attempts. Every
 request still returns HTTP 200. Someone notices hours later, usually from the refund ledger.
 
-Night Shift watches a production agent, detects the incident from business signals and traces,
+Nightly watches a production agent, detects the incident from business signals and traces,
 finds the change (and the coding-agent prompt) that caused it, prices the damage, takes the
 reversible containment action that its pre-approved policy allows, proves the fix by replaying the
 failed conversations, and pages a human only for decisions that can't be undone.
@@ -81,7 +81,7 @@ Attack traffic (prompt injection) can be mixed in on demand.
 ### 3.3 Telemetry
 - **neatlogs SDK** traces every conversation (`workflow=harbor-support`, tags `release:<id>`,
   `model:<id>`), every LLM call (auto-instrumented OpenAI client) and every tool call
-  (`@neatlogs.span(kind="TOOL")`). Night Shift's own investigation is traced too
+  (`@neatlogs.span(kind="TOOL")`). Nightly's own investigation is traced too
   (`workflow=nightshift`).
 - **Ops store** (`ops.db`): one row per conversation (release, model, tokens, cost, outcome, loss,
   trace id) — the company's own business metrics, i.e. what a real team has in its warehouse.
@@ -89,7 +89,7 @@ Attack traffic (prompt injection) can be mixed in on demand.
   key as bearer): `search_traces`, `get_trace_context`, `list_detections`, `create_detection`.
   Spike S2 showed the Public REST API needs a service-account token; the MCP accepts the project key.
 
-### 3.4 Night Shift (`backend/nightshift/`)
+### 3.4 Nightly (`backend/nightshift/`)
 | Module | Responsibility |
 |---|---|
 | `detector.py` | Sliding window over the ops store; compares error rate, wrong-action rate, cost/conversation, tool-error rate, escalation rate with the baseline; opens an incident with the triggering signals. |
@@ -114,7 +114,7 @@ Approved by a human ahead of time, version-controlled and Entire-checkpointed.
   an `undo`; at most one auto action per 10 minutes per incident; auto-undo if the verify step fails.
 
 ### 3.6 API (`backend/api/`)
-FastAPI process that runs Harbor, the traffic simulator and Night Shift as asyncio tasks and exposes:
+FastAPI process that runs Harbor, the traffic simulator and Nightly as asyncio tasks and exposes:
 `GET /api/state`, `/api/conversations`, `/api/incidents`, `/api/incidents/{id}`, `/api/benchmark`,
 `/api/economics`; `POST /api/demo/deploy`, `/api/demo/fault`, `/api/demo/reset`,
 `/api/proposals/{id}/approve`; `GET /api/stream` (Server-Sent Events).
@@ -128,9 +128,9 @@ phone-page mock, demo controls), `/incidents/[id]` postmortem, `/benchmark`, `/b
 
 | Tool | Role | Concrete calls |
 |---|---|---|
-| **neatlogs** | Evidence and alarm | SDK traces for Harbor and Night Shift; MCP `search_traces` / `get_trace_context` to pull failing conversations during investigation; `create_detection` to leave a permanent detection for the incident signature (e.g. injection pattern); before/after numbers from traces. |
-| **Entire** | The "why" of every change | Every release is committed by a coding-agent session and gets an `Entire-Checkpoint` trailer. Night Shift resolves culprit commit → checkpoint → the prompt and reasoning behind it. The repo's own development is checkpointed too. |
-| **cfo.ai** | The price of an incident | The business model (AOV, refund rate, churn LTV, human ticket cost, LLM cost per conversation, pricing for Night Shift itself) lives in cfo.ai and is mirrored into `business/unit_economics.yaml`, which Night Shift uses to price incidents and decide whether waiting for a human is affordable. The plan (pricing, costs, revenue, runway) is exported to `business/`. |
+| **neatlogs** | Evidence and alarm | SDK traces for Harbor and Nightly; MCP `search_traces` / `get_trace_context` to pull failing conversations during investigation; `create_detection` to leave a permanent detection for the incident signature (e.g. injection pattern); before/after numbers from traces. |
+| **Entire** | The "why" of every change | Every release is committed by a coding-agent session and gets an `Entire-Checkpoint` trailer. Nightly resolves culprit commit → checkpoint → the prompt and reasoning behind it. The repo's own development is checkpointed too. |
+| **cfo.ai** | The price of an incident | The business model (AOV, refund rate, churn LTV, human ticket cost, LLM cost per conversation, pricing for Nightly itself) lives in cfo.ai and is mirrored into `business/unit_economics.yaml`, which Nightly uses to price incidents and decide whether waiting for a human is affordable. The plan (pricing, costs, revenue, runway) is exported to `business/`. |
 
 ## 5. Incident catalogue (benchmark)
 
@@ -143,7 +143,7 @@ phone-page mock, demo controls), `/incidents/[id]` postmortem, `/benchmark`, `/b
 | I5 | Prompt-injection wave | Attack traffic asks for unauthorised refunds | Disable auto-refunds (human queue) + neatlogs detection |
 
 Metrics per run: time to detect, diagnosis correct, culprit correct, action taken, time to
-mitigate, replay pass rate, loss during incident, projected loss avoided, LLM cost of Night Shift.
+mitigate, replay pass rate, loss during incident, projected loss avoided, LLM cost of Nightly.
 
 ## 6. Data model (SQLite `ops.db`)
 - `conversations(id, ts, release, model, brain, scenario_id, outcome, loss_usd, cost_usd, tokens, steps, error, trace_id, transcript_json)`

@@ -47,7 +47,7 @@ sudo -u nightshift bash -c 'cd /opt/nightshift/backend && ~/.local/bin/uv sync -
 
 cat > /etc/systemd/system/nightshift-api.service <<UNIT
 [Unit]
-Description=Night Shift API
+Description=Nightly API
 After=network-online.target
 [Service]
 User=nightshift
@@ -67,10 +67,10 @@ $HOST {
   }
 }
 CADDY
-# Optional: run the Scout sample agent (needs scout-env metadata on first boot: NIGHTSHIFT_AGENT_TOKEN, SCOUT_RATE)
+# Optional: run the Scout sample agent (needs scout-env metadata on first boot: NIGHTLY_AGENT_TOKEN, SCOUT_RATE)
 md instance/attributes/scout-env > /tmp/scout.env
 if [ -s /tmp/scout.env ]; then
-  { cat /tmp/scout.env; echo "NIGHTSHIFT_API_URL=http://127.0.0.1:8000"; } > /opt/nightshift/scout.env
+  { cat /tmp/scout.env; echo "NIGHTLY_API_URL=http://127.0.0.1:8000"; } > /opt/nightshift/scout.env
   chown nightshift /opt/nightshift/scout.env; chmod 600 /opt/nightshift/scout.env
 fi
 rm -f /tmp/scout.env

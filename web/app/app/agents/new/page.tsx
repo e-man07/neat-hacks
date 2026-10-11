@@ -58,7 +58,7 @@ export default function NewAgent() {
 
   return (
     <>
-      <PageHead title="Connect an agent" sub="About five minutes. Night Shift watches your traces and steers your agent through the SDK; your code stays yours." />
+      <PageHead title="Connect an agent" sub="About five minutes. Nightly watches your traces and steers your agent through the SDK; your code stays yours." />
       <ol className="mb-6 flex flex-wrap gap-2">
         {STEPS.map((s, i) => (
           <li
@@ -80,7 +80,7 @@ export default function NewAgent() {
             <Field label="Agent name">
               <input className={inputCls} value={name} onChange={(e) => setName(e.target.value)} placeholder="Support agent" autoFocus />
             </Field>
-            <Field label="What does it do?" hint="Night Shift's investigator reads this for context.">
+            <Field label="What does it do?" hint="Nightly's investigator reads this for context.">
               <input
                 className={inputCls}
                 value={description}
@@ -115,22 +115,22 @@ export default function NewAgent() {
               </div>
             </div>
             <p className="text-sm text-muted">
-              Install the SDK and read your release, model and kill switches from Night Shift. Everything fails open: if Night Shift
+              Install the SDK and read your release, model and kill switches from Nightly. Everything fails open: if Nightly
               is unreachable your agent keeps its defaults.
             </p>
-            <Code>{`pip install nightshift-sdk neatlogs
+            <Code>{`pip install nightly-sdk neatlogs
 
-export NIGHTSHIFT_API_URL=${API}
-export NIGHTSHIFT_AGENT_TOKEN=${token}`}</Code>
+export NIGHTLY_API_URL=${API}
+export NIGHTLY_AGENT_TOKEN=${token}`}</Code>
             <Code>{`import neatlogs
-from nightshift_sdk import NightShift
+from nightly_sdk import Nightly
 
 neatlogs.init(api_key=NEATLOGS_KEY, workflow_name="${slugify(agent.name)}")
-ns = NightShift()
+ns = Nightly()
 
 def handle(message):
     with neatlogs.trace("${slugify(agent.name).replaceAll("-", "_")}_run", kind="WORKFLOW"):
-        cfg = load_release(ns.release("v1"))       # Night Shift can roll this back
+        cfg = load_release(ns.release("v1"))       # Nightly can roll this back
         model = ns.model(cfg.model)                 # ...or fail over the model
         steps = ns.max_steps(cfg.max_steps)         # ...or cap runaway loops
         if not ns.flag("refunds_enabled", True):    # ...or flip a kill switch
@@ -140,7 +140,7 @@ def handle(message):
               input=message, output=result.text, steps=result.steps, tool_errors=result.tool_errors)
     return result
 
-ns.serve_replays(lambda message: {"ok": handle_dry_run(message).ok})   # how Night Shift verifies a fix
+ns.serve_replays(lambda message: {"ok": handle_dry_run(message).ok})   # how Nightly verifies a fix
 # in CI, after each deploy:  ns.report_deploy("v2", commit=GIT_SHA)`}</Code>
             <Button tone="primary" onClick={() => setStep(2)}>
               Next: connect neatlogs
@@ -151,7 +151,7 @@ ns.serve_replays(lambda message: {"ok": handle_dry_run(message).ok})   # how Nig
         {step === 2 && agent && (
           <div className="max-w-xl space-y-4">
             <p className="text-sm text-muted">
-              Night Shift reads your agent&apos;s traces from neatlogs. Use the project API key from neatlogs → Settings → API keys. It&apos;s
+              Nightly reads your agent&apos;s traces from neatlogs. Use the project API key from neatlogs → Settings → API keys. It&apos;s
               encrypted at rest.
             </p>
             <Field label="neatlogs project API key">
@@ -177,7 +177,7 @@ ns.serve_replays(lambda message: {"ok": handle_dry_run(message).ok})   # how Nig
                   ✓ Connected to <b>{verify.project.project_name ?? "your project"}</b>
                   {verify.latest_trace.trace_id ? ", and found traces." : ". No traces yet; send one and they'll show up."}
                 </div>
-                <Field label="Root span name" hint="The name of the span that wraps one run of your agent. Night Shift polls traces with this root.">
+                <Field label="Root span name" hint="The name of the span that wraps one run of your agent. Nightly polls traces with this root.">
                   <input className={inputCls} value={rootSpan} onChange={(e) => setRootSpan(e.target.value)} placeholder="support_conversation" />
                 </Field>
                 <Field label="Workflow name (optional)">
@@ -203,7 +203,7 @@ ns.serve_replays(lambda message: {"ok": handle_dry_run(message).ok})   # how Nig
         {step === 3 && agent && (
           <div className="max-w-xl space-y-4">
             <p className="text-sm text-muted">
-              Night Shift prices every incident so it knows when acting alone beats waiting for you. Rough numbers are fine; you can
+              Nightly prices every incident so it knows when acting alone beats waiting for you. Rough numbers are fine; you can
               sync them from your cfo.ai model later.
             </p>
             <div className="grid grid-cols-2 gap-3">
@@ -220,7 +220,7 @@ ns.serve_replays(lambda message: {"ok": handle_dry_run(message).ok})   # how Nig
                 <input className={inputCls} type="number" value={nightMinutes} onChange={(e) => setNightMinutes(+e.target.value)} />
               </Field>
             </div>
-            <Field label="GitHub repo (optional)" hint="owner/name. Lets Night Shift trace a release to its commit and Entire checkpoint, and open fix PRs after you approve.">
+            <Field label="GitHub repo (optional)" hint="owner/name. Lets Nightly trace a release to its commit and Entire checkpoint, and open fix PRs after you approve.">
               <input className={inputCls} value={repo} onChange={(e) => setRepo(e.target.value)} placeholder="acme/support-agent" />
             </Field>
             <Button
@@ -255,7 +255,7 @@ ns.serve_replays(lambda message: {"ok": handle_dry_run(message).ok})   # how Nig
               <>
                 <Pill color="var(--ok)">live</Pill>
                 <p className="text-sm text-fg-2">
-                  {agent.name} just checked in. Night Shift is on call. It will auto-contain incidents within the default policy
+                  {agent.name} just checked in. Nightly is on call. It will auto-contain incidents within the default policy
                   (rollback, model failover, kill switches, step caps) and page you for anything irreversible.
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -273,7 +273,7 @@ ns.serve_replays(lambda message: {"ok": handle_dry_run(message).ok})   # how Nig
                   waiting for the first SDK call
                 </Pill>
                 <p className="text-sm text-muted">
-                  Start your agent with the environment variables from step 2. This page updates when it calls Night Shift.
+                  Start your agent with the environment variables from step 2. This page updates when it calls Nightly.
                 </p>
                 <Link href={`/app/agents/${agent.id}`} className="text-sm underline">
                   Skip, open the agent page

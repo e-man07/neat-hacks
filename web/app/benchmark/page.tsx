@@ -42,7 +42,7 @@ export default function BenchmarkPage() {
     <PageShell title="Incident benchmark" sub="Six staged incidents. Live models. Every number has a trace behind it.">
       <p className="max-w-[760px] text-[14px] leading-relaxed text-white/60">
         Each incident runs end to end: baseline traffic on the known-good release, a trigger (a bad release written by a real
-        Claude Code session, an injected provider fault, or attack traffic), then Night Shift detects, investigates, prices,
+        Claude Code session, an injected provider fault, or attack traffic), then Nightly detects, investigates, prices,
         decides under policy, contains, replays the failed conversations and watches live recovery. Incidents are staged on
         purpose so they are reproducible.
       </p>
@@ -103,7 +103,7 @@ export default function BenchmarkPage() {
             )}
             <div className="mt-3 space-y-0.5 font-mono text-[10.5px] text-white/35">
               <div>checkpoint {r.checkpoint ?? "—"} · diagnosis {r.diagnosis_method} ({r.diagnosis_model ?? "rules"}) · confidence {r.confidence}</div>
-              <div>night shift trace {r.nightshift_trace_id ?? "—"}</div>
+              <div>nightly trace {r.nightshift_trace_id ?? "—"}</div>
               <div>evidence traces {r.evidence_trace_ids.slice(0, 3).join(", ") || "—"}</div>
             </div>
           </Card>

@@ -1,7 +1,7 @@
-"""SQLite ops store shared by Harbor and Night Shift.
+"""SQLite ops store shared by Harbor and Nightly.
 
 Holds the company's business data (orders ledger, conversations), the deploy log, the control
-plane, and Night Shift's incident state. Every write is committed immediately so a crashed
+plane, and Nightly's incident state. Every write is committed immediately so a crashed
 process resumes from the last persisted step.
 """
 

@@ -51,7 +51,7 @@ export default function IncidentPanel({
       <div className="grid h-full place-items-center p-8 text-center">
         <div>
           <div className="text-[15px] text-white/80">All quiet.</div>
-          <div className="mt-1 text-[13px] text-white/40">Night Shift is watching every conversation. Ship a bad release to wake it up.</div>
+          <div className="mt-1 text-[13px] text-white/40">Nightly is watching every conversation. Ship a bad release to wake it up.</div>
         </div>
       </div>
     );
@@ -170,7 +170,7 @@ export default function IncidentPanel({
             .map((a) => (
               <div key={a.id} className="mt-3 flex items-center gap-3 rounded-lg border border-line p-3">
                 <div className="min-w-0 flex-1 text-[12.5px] text-white/75">
-                  Night Shift applied <span className="font-mono">{a.kind.replaceAll("_", " ")}</span> on its own. It can be undone in one step.
+                  Nightly applied <span className="font-mono">{a.kind.replaceAll("_", " ")}</span> on its own. It can be undone in one step.
                 </div>
                 <Button tone="danger" onClick={() => onUndo(a.id).then(onChange)}>
                   Undo

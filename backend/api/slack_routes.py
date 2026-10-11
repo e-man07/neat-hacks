@@ -62,7 +62,7 @@ async def actions(request: Request) -> JSONResponse:
     store = platform().store
     agent = store.agent(value.get("a", ""))
     if not ws_id or not agent or agent["workspace_id"] != ws_id:
-        return JSONResponse({"response_type": "ephemeral", "text": "This incident isn't in your Night Shift workspace."})
+        return JSONResponse({"response_type": "ephemeral", "text": "This incident isn't in your Nightly workspace."})
     who = (payload.get("user") or {}).get("username") or (payload.get("user") or {}).get("name") or "slack user"
     owner = store.owner_of(ws_id) or ""
 

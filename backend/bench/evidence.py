@@ -22,14 +22,14 @@ def neatlogs_md(run: str) -> str:
     lines = ["# neatlogs evidence", "",
              f"Project: **{who.get('project_name')}** (`{who.get('project_id')}`, tier {who.get('tier')}). "
              "Trace ids below can be searched in the neatlogs app.", "",
-             "## How Night Shift uses neatlogs", "",
+             "## How Nightly uses neatlogs", "",
              "- **SDK tracing** (`ops/tracing.py`, `ops/llm.py`): every Harbor conversation is a WORKFLOW trace "
-             "(`harbor-support`) with auto-instrumented LLM spans and a TOOL span per tool call; every Night Shift "
+             "(`harbor-support`) with auto-instrumented LLM spans and a TOOL span per tool call; every Nightly "
              "incident is a WORKFLOW trace (`nightshift`) containing the investigator's AGENT span, its TOOL spans and the "
              "verification replays.",
              "- **Read-back over MCP** (`nightshift/neatlogs_mcp.py`): the investigator calls `search_traces` and "
              "`get_trace_context` during an investigation and cites trace ids in its diagnosis and postmortem.",
-             "- **Detections** (`nightshift/reporter.py`): after a prompt-injection incident Night Shift creates a regex "
+             "- **Detections** (`nightshift/reporter.py`): after a prompt-injection incident Nightly creates a regex "
              "detection for the attack signature so future traces are flagged.", ""]
     for wf in ("harbor-support", "nightshift"):
         try:
@@ -45,7 +45,7 @@ def neatlogs_md(run: str) -> str:
     except NeatlogsMCPError as exc:
         lines.append(f"- detections: {exc}")
     lines += ["", f"## Traces from benchmark run `{run}`", "",
-              "| Incident | Night Shift investigation trace | Evidence traces cited | Before (baseline) | During | After |",
+              "| Incident | Nightly investigation trace | Evidence traces cited | Before (baseline) | During | After |",
               "|---|---|---|---|---|---|"]
     for r in results:
         lines.append(f"| {r['incident']} {r['name']} | `{r['nightshift_trace_id']}` | "
@@ -75,7 +75,7 @@ def entire_md() -> str:
              "1. **Development**: this repo's commits carry `Entire-Checkpoint:` trailers linking each change to the "
              "coding-agent session that produced it.",
              "2. **Runtime provenance**: every Harbor release after r41 was written by a *separate* Claude Code session "
-             "(`claude -p` with a realistic developer request). When a release causes an incident, Night Shift follows "
+             "(`claude -p` with a realistic developer request). When a release causes an incident, Nightly follows "
              "release → commit → checkpoint → the developer's prompt and the coding agent's final note, plus the "
              "entire-graph semantic change list (`nightshift/provenance.py`).", "",
              "## Releases and the sessions behind them", "",

@@ -94,7 +94,7 @@ export default function Controls({ state, releases, onChange }: { state: State |
       </div>
 
       <div>
-        <Label>night shift</Label>
+        <Label>nightly</Label>
         <div className="mt-2 flex flex-wrap gap-2">
           <Button
             tone={state?.nightshift_enabled ? "ok" : "danger"}

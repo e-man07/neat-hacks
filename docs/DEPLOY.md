@@ -1,4 +1,4 @@
-# Deploying Night Shift
+# Deploying Nightly
 
 The API runs on a small GCP VM behind Caddy, with automatic HTTPS on an sslip.io name. The web app
 runs on Vercel.
@@ -36,7 +36,7 @@ re-run step 2. In the app, go to **Paging → Add to Slack**.
 ## 6. Connect an agent
 In the app, go to **Connect an agent**, or run Scout against the deployment:
 ```bash
-export NIGHTSHIFT_API_URL=https://api.<ip>.sslip.io NIGHTSHIFT_AGENT_TOKEN=nsa_...
+export NIGHTLY_API_URL=https://api.<ip>.sslip.io NIGHTLY_AGENT_TOKEN=nsa_...
 uv run --project backend python agents/scout/scout.py deploy s2
 uv run --project backend python agents/scout/scout.py serve --rate 6
 ```

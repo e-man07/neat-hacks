@@ -1,7 +1,7 @@
 [project]
-name = "nightshift-sdk"
-version = "0.1.0"
-description = "Connect an LLM agent to Night Shift: the on-call engineer for AI agents"
+name = "nightly-sdk"
+version = "0.2.0"
+description = "Connect an LLM agent to Nightly: the on-call engineer for AI agents"
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = []
@@ -11,4 +11,4 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["nightshift_sdk"]
+packages = ["nightly_sdk", "nightly_sdk"]

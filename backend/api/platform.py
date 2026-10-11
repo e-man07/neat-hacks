@@ -1,4 +1,4 @@
-"""The multi-tenant runtime: every connected agent gets its own ops store, Night Shift instance and
+"""The multi-tenant runtime: every connected agent gets its own ops store, Nightly instance and
 neatlogs poller; the Harbor sandbox runs alongside as a shared demo agent."""
 
 from __future__ import annotations
@@ -120,8 +120,8 @@ class Platform:
                 extra[f"nightshift/regressions/{reg.name}"] = reg.read_text()
             try:
                 pr = github_fix.open_revert_pr(token, agent["repo"], params["revert_commit"], row["incident_id"],
-                                               f"Night Shift fix for {row['incident_id']}: revert {params['revert_commit'][:8]}",
-                                               body + "\n\n_Opened by Night Shift after approval by " + actor + "._",
+                                               f"Nightly fix for {row['incident_id']}: revert {params['revert_commit'][:8]}",
+                                               body + "\n\n_Opened by Nightly after approval by " + actor + "._",
                                                extra)
             except github_fix.GitHubError as exc:
                 return {"error": str(exc)}

@@ -25,10 +25,10 @@ export default function OverviewPage() {
     <>
       <PageHead
         title="Overview"
-        sub="Every agent Night Shift is on call for, and what it handled while you weren't looking."
+        sub="Every agent Nightly is on call for, and what it handled while you weren't looking."
         actions={<PrimaryLink href="/app/agents/new">Connect an agent</PrimaryLink>}
       />
-      {error && <p className="mb-4 text-sm text-alert">Couldn’t reach the Night Shift API: {error}</p>}
+      {error && <p className="mb-4 text-sm text-alert">Couldn’t reach the Nightly API: {error}</p>}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Stat label="agents on call" value={agents.length} />
         <Stat label="runs watched · 24h" value={runs.toLocaleString()} />

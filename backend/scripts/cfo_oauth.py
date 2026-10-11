@@ -29,7 +29,7 @@ TOKEN_FILE = ROOT / ".cfo_token.json"
 
 def start() -> None:
     reg = httpx.post(f"{AUTH}/oauth2/register", json={
-        "client_name": "Night Shift", "grant_types": ["authorization_code", "refresh_token"],
+        "client_name": "Nightly", "grant_types": ["authorization_code", "refresh_token"],
         "token_endpoint_auth_method": "none", "redirect_uris": [REDIRECT], "response_types": ["code"],
     }, timeout=20)
     reg.raise_for_status()

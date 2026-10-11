@@ -360,13 +360,13 @@ def test_page(ws: dict[str, Any] = Depends(workspace), user: security.Principal 
     from product.paging import make_pager
 
     store = platform().store
-    fake_agent = {"id": "test", "name": "Night Shift", "workspace_id": ws["id"]}
+    fake_agent = {"id": "test", "name": "Nightly", "workspace_id": ws["id"]}
     pager = make_pager(store, ws["id"], fake_agent)
 
     class _Probe:
         db = store.agent_db("__test__")
 
-    return pager(_Probe(), "TEST", notifier.Page(title="🌙 Night Shift test page",
+    return pager(_Probe(), "TEST", notifier.Page(title="🌙 Nightly test page",
                                                  body=f"Paging works. Sent by {user.login}.", priority="low"))
 
 

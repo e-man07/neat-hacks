@@ -1,7 +1,7 @@
 [project]
 name = "nightshift"
 version = "0.1.0"
-description = "Night Shift: the on-call engineer for AI agents"
+description = "Nightly: the on-call engineer for AI agents"
 requires-python = ">=3.11,<3.14"
 dependencies = [
   "fastapi>=0.115",
@@ -14,7 +14,7 @@ dependencies = [
   "python-dotenv>=1.0",
   "pyjwt>=2.8",
   "cryptography>=42",
-  "nightshift-sdk",
+  "nightly-sdk",
 ]
 
 [dependency-groups]
@@ -25,4 +25,4 @@ testpaths = ["tests"]
 pythonpath = ["."]
 
 [tool.uv.sources]
-nightshift-sdk = { path = "../sdk/python", editable = true }
+nightly-sdk = { path = "../sdk/python", editable = true }

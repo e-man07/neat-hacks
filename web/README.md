@@ -1,4 +1,4 @@
-# Night Shift console
+# Nightly console
 
 Next.js app: landing, live console, incidents, benchmark and business pages.
 

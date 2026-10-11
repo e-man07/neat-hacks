@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Create the Night Shift API VM on GCP and install everything on it.
+# Create the Nightly API VM on GCP and install everything on it.
 #   ./deploy/gcp_create.sh <gcp-project-id> [zone]
 # To update an existing VM: gcloud compute ssh nightshift-api -- sudo google_metadata_script_runner startup
 # Needs: gcloud (logged in), and deploy/api.env (copy deploy/api.env.example and fill it in).

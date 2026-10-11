@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
-import HeroDemo, { GitHubMark, SlackMark } from "@/components/HeroDemo";
+import HeroVideo from "@/components/HeroVideo";
+import { GitHubMark, SlackMark } from "@/components/Marks";
 import IncidentReel from "@/components/IncidentReel";
 import { Reveal, useInView, useScrollY } from "@/components/Motion";
 import Nav from "@/components/Nav";
@@ -16,10 +17,10 @@ const CITED = ["NEATLOGS TRACE", "ENTIRE CHECKPOINT", "CODING PROMPT", "DEPLOY L
 const INTEGRATIONS: { name: string; icon: ReactNode; what: string }[] = [
   { name: "Slack", icon: <SlackMark size={18} />, what: "One message per incident, updated live. Approve or undo from the channel." },
   { name: "GitHub", icon: <GitHubMark size={18} />, what: "Sign in with GitHub. Approved fixes open as revert PRs on your repo." },
-  { name: "neatlogs", icon: <Glyph>nl</Glyph>, what: "Your agent's traces. Night Shift reads them back while it investigates." },
+  { name: "neatlogs", icon: <Glyph>nl</Glyph>, what: "Your agent's traces. Nightly reads them back while it investigates." },
   { name: "Entire", icon: <Glyph>En</Glyph>, what: "Checkpoints link a bad deploy to the coding-agent prompt behind it." },
   { name: "cfo.ai", icon: <Glyph>$</Glyph>, what: "Your unit economics put a price on every minute of an incident." },
-  { name: "Python SDK", icon: <Glyph>py</Glyph>, what: "pip install nightshift-sdk. Zero dependencies, fails open." },
+  { name: "Python SDK", icon: <Glyph>py</Glyph>, what: "pip install nightly-sdk. Zero dependencies, fails open." },
   { name: "Phone push", icon: <Glyph>◔</Glyph>, what: "ntfy notifications for the incidents that really need you." },
   { name: "Webhooks", icon: <Glyph>{"{}"}</Glyph>, what: "Send pages to PagerDuty, Opsgenie or your own tools." },
 ];
@@ -51,16 +52,12 @@ export default function Home() {
             </span>
           </Reveal>
           <Reveal delay={80}>
-            <h1 className="headline mt-6 text-[38px] sm:text-[58px]">
-              Your AI agents break at 3 AM.
-              <br />
-              <span className="text-muted">Night Shift fixes them.</span>
-            </h1>
+            <h1 className="headline mt-6 text-[40px] sm:text-[60px]">The on-call engineer for your AI agents</h1>
           </Reveal>
           <Reveal delay={160}>
-            <p className="mx-auto mt-5 max-w-[600px] text-[16px] leading-relaxed text-muted sm:text-[17.5px]">
-              It watches every run of your agents, rolls back the bad release on its own, proves the fix, and asks you in Slack only for the
-              changes that can’t be undone.
+            <p className="mx-auto mt-5 max-w-[620px] text-[16px] leading-relaxed text-muted sm:text-[17.5px]">
+              Nightly watches every run of your agents. When one breaks at 3 AM, it rolls back the bad release, proves the fix, and asks
+              you in Slack only for what can’t be undone.
             </p>
           </Reveal>
           <Reveal delay={240}>
@@ -83,7 +80,7 @@ export default function Home() {
         </div>
         <Reveal delay={320} className="relative z-10 mx-auto mt-14 max-w-[980px] px-4">
           <div style={{ transform: `translateY(${Math.min(y * -0.06, 0)}px)` }}>
-            <HeroDemo />
+            <HeroVideo />
           </div>
         </Reveal>
       </section>
@@ -101,13 +98,13 @@ export default function Home() {
       <section className="mx-auto max-w-[1000px] px-5 pt-28">
         <Reveal>
           <h2 className="subhead mx-auto max-w-[820px] text-center text-[32px] sm:text-[44px]">
-            The same bad release, <span className="text-muted">with and without</span> Night Shift
+            The same bad release, <span className="text-muted">with and without</span> Nightly
           </h2>
         </Reveal>
         <div className="mt-12 grid gap-5 md:grid-cols-2">
           <Reveal>
             <div className="h-full rounded-2xl border border-line-strong p-6">
-              <div className="font-mono text-[13px] text-muted">Without Night Shift</div>
+              <div className="font-mono text-[13px] text-muted">Without Nightly</div>
               <div className="mt-6 space-y-3">
                 <LogLine t="03:07">Bad release goes live. Every request still returns 200.</LogLine>
                 <LogLine t="03:07–08:12" tone="alert">
@@ -128,7 +125,7 @@ export default function Home() {
       <section id="how" className="mx-auto max-w-[1000px] scroll-mt-24 px-5 pt-32">
         <Reveal>
           <h2 className="subhead mx-auto max-w-[680px] text-center text-[28px] sm:text-[36px]">
-            One SDK in your agent. <span className="text-muted">Night Shift does the rest.</span>
+            One SDK in your agent. <span className="text-muted">Nightly does the rest.</span>
           </h2>
         </Reveal>
         <div className="relative mt-14 grid items-center gap-6 lg:grid-cols-[180px_auto_1fr_auto_220px]">
@@ -150,7 +147,7 @@ export default function Home() {
                 <span className="grid h-6 w-6 place-items-center rounded bg-white/15">
                   <Moon size={13} />
                 </span>
-                Night Shift
+                Nightly
               </div>
               <div className="mt-2 font-mono text-[12.5px]" style={{ color: "rgba(255,255,255,0.6)" }}>
                 detect · trace · price · fix
@@ -239,7 +236,7 @@ export default function Home() {
         <Row n="01" tag="neatlogs" title="It investigates like an engineer." body="Reads the failing traces, the deploy log and the diff, and cites every trace it used.">
           {hero ? (
             <div className="force-dark min-w-0">
-              <IncidentReel events={hero.timeline} title={`night-shift — ${hero.incident_id} · ${hero.name}`} />
+              <IncidentReel events={hero.timeline} title={`nightly — ${hero.incident_id} · ${hero.name}`} />
             </div>
           ) : (
             <div className="grid h-[380px] place-items-center font-mono text-sm text-faint">loading…</div>
@@ -319,7 +316,7 @@ export default function Home() {
         <Reveal>
           <div className="dotgrid rounded-2xl border border-line px-6 py-20 text-center">
             <h2 className="subhead text-[32px] sm:text-[44px]">Go to sleep. It’s handled.</h2>
-            <p className="mx-auto mt-3 max-w-[440px] text-muted">Connect an agent in five minutes and add Night Shift to Slack.</p>
+            <p className="mx-auto mt-3 max-w-[440px] text-muted">Connect an agent in five minutes and add Nightly to Slack.</p>
             <div className="mt-8 flex justify-center gap-3">
               <PrimaryLink href="/app">Get started</PrimaryLink>
               <GhostLink href="/docs">Read the docs</GhostLink>
@@ -338,7 +335,7 @@ export default function Home() {
         </div>
         <footer className="mt-10 flex flex-wrap items-center justify-between gap-3 text-[13px] text-muted">
           <span className="flex items-center gap-2">
-            <Moon size={14} /> Night Shift · neatHack 2026
+            <Moon size={14} /> Nightly · neatHack 2026
           </span>
           <span className="flex gap-5">
             <Link href="/docs" className="hover:text-fg">Docs</Link>
@@ -378,7 +375,7 @@ function WithCard({ hero, run }: { hero?: BenchResult; run?: string | null }) {
     <div ref={ref} className="h-full rounded-2xl border border-[#111] p-6">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="rounded-md bg-[#111] px-2 py-1 font-mono text-[13px]" style={{ color: "#fff" }}>
-          With Night Shift
+          With Nightly
         </span>
         <span className="font-mono text-[12px] text-muted">● recorded · {run ?? "benchmark"}</span>
       </div>

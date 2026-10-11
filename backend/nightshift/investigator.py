@@ -28,7 +28,7 @@ INCIDENT_TYPES = ["prompt_regression", "tool_schema_drift", "cost_runaway", "pro
                   "prompt_injection", "unknown"]
 ACTIONS = ["rollback_release", "failover_model", "disable_flag", "cap_steps", "none"]
 
-SYSTEM_PROMPT = """You are Night Shift, the on-call engineer for {agent}.
+SYSTEM_PROMPT = """You are Nightly, the on-call engineer for {agent}.
 An anomaly has opened an incident. Find the root cause from evidence, then choose ONE containment action.
 
 Work like a senior SRE:
@@ -323,7 +323,7 @@ class Investigation:
             caveats.append(f"blamed release {args['culprit_release']} served none of the failing runs ({', '.join(sorted(served))})")
         if caveats:
             args["confidence"] = min(float(args.get("confidence") or 0.5), 0.4)
-            args["root_cause"] = (args.get("root_cause") or "") + " [Night Shift check: " + "; ".join(caveats) + ".]"
+            args["root_cause"] = (args.get("root_cause") or "") + " [Nightly check: " + "; ".join(caveats) + ".]"
         d = Diagnosis(
             incident_type=args.get("incident_type") if args.get("incident_type") in INCIDENT_TYPES else "unknown",
             title=args.get("title") or "Incident",

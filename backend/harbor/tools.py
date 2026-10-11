@@ -113,7 +113,7 @@ def run_tool(ctx: ToolContext, name: str, raw_args: str | dict[str, Any]) -> dic
         try:
             result = _do(ctx, name, args)
             ok = True
-        except Exception as exc:  # tool failures are data for the model and for Night Shift
+        except Exception as exc:  # tool failures are data for the model and for Nightly
             ctx.tool_errors += 1
             result = {"error": f"{type(exc).__name__}: {exc}"}
             ok = False

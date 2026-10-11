@@ -1,8 +1,8 @@
-# Night Shift — business plan (draft)
+# Nightly — business plan (draft)
 
 _Built in **cfo.ai** from the costs we measured in live runs. Read-only links:_
-- **Night Shift business plan** (pricing, costs, revenue, runway): https://app.cfo.ai/s/CsWafbQfu2U1y94W
-- **Customer unit economics** (what an incident costs a support team; Night Shift prices every incident with it): https://app.cfo.ai/s/fHcCAy2lG_aXs3Qt
+- **Nightly business plan** (pricing, costs, revenue, runway): https://app.cfo.ai/s/CsWafbQfu2U1y94W
+- **Customer unit economics** (what an incident costs a support team; Nightly prices every incident with it): https://app.cfo.ai/s/fHcCAy2lG_aXs3Qt
 
 | Scenario (in cfo.ai) | Break-even | Lowest cash | Cash at M24 |
 |---|---|---|---|
@@ -11,7 +11,7 @@ _Built in **cfo.ai** from the costs we measured in live runs. Read-only links:_
 | LLM prices double | M08 | $97.7k | $819k |
 
 The workspace also has a "Night incident" scenario: $22.5k lost when a bad release runs for 300 minutes
-until someone wakes up. That's the number Night Shift exists to cut. The links open the Main scenario.
+until someone wakes up. That's the number Nightly exists to cut. The links open the Main scenario.
 The tables below are the same model computed locally (`business/model.py`), so it can be reproduced.
 
 ## Pricing

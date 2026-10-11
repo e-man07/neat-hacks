@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import GitHub from "next-auth/providers/github";
 
-/** Server-side base URL of the Night Shift API (can differ from the public one). */
+/** Server-side base URL of the Nightly API (can differ from the public one). */
 export const API_INTERNAL = process.env.NS_API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 /** Without a GitHub OAuth app the web app runs in local dev mode against a dev-mode API. */
@@ -34,13 +34,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }),
         cache: "no-store",
       }).catch((e) => {
-        console.error(`night shift API unreachable at ${API_INTERNAL}:`, e);
+        console.error(`nightly API unreachable at ${API_INTERNAL}:`, e);
         return null;
       });
       if (res?.ok) return true;
       // Say why, instead of the generic AccessDenied page.
       const reason = !res ? "ApiUnreachable" : res.status === 401 ? "InternalSecretMismatch" : `ApiError${res.status}`;
-      console.error(`night shift sign-in failed: ${reason} (${API_INTERNAL})`);
+      console.error(`nightly sign-in failed: ${reason} (${API_INTERNAL})`);
       return `/signin?error=${reason}`;
     },
     async jwt({ token, profile }) {

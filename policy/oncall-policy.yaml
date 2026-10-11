@@ -1,5 +1,5 @@
-# Night Shift autonomy policy.
-# Approved in advance by a human. Night Shift may take an action on its own only if it is listed
+# Nightly autonomy policy.
+# Approved in advance by a human. Nightly may take an action on its own only if it is listed
 # under `auto`, every gate passes, and the action can be undone in one step.
 version: 1
 approved_by: Aman

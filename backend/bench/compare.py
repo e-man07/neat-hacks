@@ -1,4 +1,4 @@
-"""Compare two benchmark runs (Night Shift before vs after a change) and snapshot the latest run
+"""Compare two benchmark runs (Nightly before vs after a change) and snapshot the latest run
 for the static web build.
 
     uv run python -m bench.compare run1-live run3-live
@@ -42,8 +42,8 @@ def load(run: str) -> list[dict]:
 def main(before: str, after: str) -> None:
     a, b = load(before), load(after)
     by_a = {r["incident"]: r for r in a}
-    lines = [f"# Night Shift improved: `{before}` → `{after}`", "",
-             "Same six staged incidents, same live models. Between the runs we changed Night Shift itself, "
+    lines = [f"# Nightly improved: `{before}` → `{after}`", "",
+             "Same six staged incidents, same live models. Between the runs we changed Nightly itself, "
              "based on what run 1 showed (see the build log):", "",
              "- investigator: explicit confidence calibration; a diagnosis without a confidence is rejected and re-submitted",
              "- low-impact incidents are deferred to the morning instead of paging someone",
@@ -67,7 +67,7 @@ def main(before: str, after: str) -> None:
               "runs: between them we lowered Harbor's production volume in the unit economics (night 420 → 90 "
               "conversations/hour) to match a mid-size store.", "",
               "Harbor's own before/during/after numbers for each incident (the production agent improving once "
-              f"Night Shift acts) are in [`{after}/SUMMARY.md`]({after}/SUMMARY.md)."]
+              f"Nightly acts) are in [`{after}/SUMMARY.md`]({after}/SUMMARY.md)."]
     (REPO_DIR / "evidence" / "before-after.md").write_text("\n".join(lines) + "\n")
     shutil.copy(ROOT / after / "results.json", REPO_DIR / "web" / "public" / "benchmark.json")
     snap = json.loads((REPO_DIR / "web" / "public" / "benchmark.json").read_text())

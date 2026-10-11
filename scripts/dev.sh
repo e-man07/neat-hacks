@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run the Night Shift API and console together.
+# Run the Nightly API and console together.
 #   scripts/dev.sh          live models (needs .env)
 #   scripts/dev.sh sim      offline, deterministic brain
 set -euo pipefail

@@ -29,12 +29,12 @@ export default function BusinessPage() {
   const ue = econ?.unit_economics as Record<string, unknown> | undefined;
 
   return (
-    <PageShell title="The business" sub="What an incident costs, and what Night Shift costs.">
+    <PageShell title="The business" sub="What an incident costs, and what Nightly costs.">
       <div className="grid gap-4 md:grid-cols-2">
         <Card className="p-6">
           <Label>pricing an incident (Harbor Goods model)</Label>
           <p className="mt-3 text-[14px] leading-relaxed text-white/65">
-            Night Shift decides whether to act alone by comparing the loss rate at production volume with how long a human
+            Nightly decides whether to act alone by comparing the loss rate at production volume with how long a human
             would take to respond. These inputs live in the cfo.ai model and are mirrored into{" "}
             <code className="font-mono text-[12px] text-white">business/unit_economics.yaml</code>.
           </p>
@@ -60,7 +60,7 @@ export default function BusinessPage() {
         </Card>
 
         <Card className="p-6">
-          <Label>night shift pricing</Label>
+          <Label>nightly pricing</Label>
           <div className="mt-4 space-y-3">
             {(plan?.pricing ?? []).map((p) => (
               <div key={p.tier} className="rounded-lg border border-line p-3">

@@ -5,7 +5,7 @@ import NightSky from "@/components/NightSky";
 import { Moon } from "@/components/ui";
 
 const ERRORS: Record<string, string> = {
-  ApiUnreachable: "GitHub sign-in worked, but this site can't reach the Night Shift API. Check NS_API_URL and redeploy.",
+  ApiUnreachable: "GitHub sign-in worked, but this site can't reach the Nightly API. Check NS_API_URL and redeploy.",
   InternalSecretMismatch: "GitHub sign-in worked, but the API rejected this site. NS_INTERNAL_SECRET must match the API's.",
   AccessDenied: "Sign-in was refused.",
 };
@@ -19,11 +19,11 @@ export default async function SignIn({ searchParams }: { searchParams: Promise<{
       <NightSky />
       <div className="relative z-10 w-full max-w-sm rounded-xl border border-line bg-card p-8 text-center">
         <Link href="/" className="inline-flex items-center gap-2 text-[15px] font-semibold text-white">
-          <Moon /> Night Shift
+          <Moon /> Nightly
         </Link>
         <h1 className="mt-6 text-xl font-semibold text-white">Sign in</h1>
         <p className="mt-2 text-sm text-muted">
-          GitHub sign-in also lets Night Shift open fix PRs on your repos, and only after you approve them.
+          GitHub sign-in also lets Nightly open fix PRs on your repos, and only after you approve them.
         </p>
         {error && (
           <p className="mt-4 rounded-md bg-alert/10 px-3 py-2 text-xs text-alert">

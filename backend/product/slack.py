@@ -92,11 +92,11 @@ def incident_blocks(title: str, body: str, agent_name: str, incident_id: str, ag
     if undo_id:
         buttons.append({"type": "button", "style": "danger", "text": {"type": "plain_text", "text": "Undo containment"},
                         "action_id": "undo", "value": json.dumps({"a": agent_id, "x": undo_id, "i": incident_id}),
-                        "confirm": {"title": {"type": "plain_text", "text": "Undo Night Shift's action?"},
+                        "confirm": {"title": {"type": "plain_text", "text": "Undo Nightly's action?"},
                                     "text": {"type": "mrkdwn", "text": "This puts the previous config back in production."},
                                     "confirm": {"type": "plain_text", "text": "Undo"},
                                     "deny": {"type": "plain_text", "text": "Cancel"}}})
-    buttons.append({"type": "button", "text": {"type": "plain_text", "text": "Open in Night Shift"},
+    buttons.append({"type": "button", "text": {"type": "plain_text", "text": "Open in Nightly"},
                     "url": web_url, "action_id": "open"})
     blocks.append({"type": "actions", "elements": buttons})
     return blocks

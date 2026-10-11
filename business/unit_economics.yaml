@@ -1,4 +1,4 @@
-# Harbor Goods unit economics used by Night Shift to price incidents.
+# Harbor Goods unit economics used by Nightly to price incidents.
 # Source of truth: the cfo.ai model (see business/README.md). This file mirrors its inputs;
 # `scripts/cfo_sync.py` refreshes it once the cfo.ai MCP login is approved.
 source: "cfo.ai model 'Harbor Goods — support economics' (mirror; pending sync)"

@@ -5,7 +5,7 @@ import { Moon } from "./ui";
 
 export type PhoneNote = { title: string; body: string; time: string; tone?: "ok" | "alert" | "low" };
 
-/** A lock-screen phone showing the pages Night Shift sends. */
+/** A lock-screen phone showing the pages Nightly sends. */
 export default function Phone({ notes, clock, footer }: { notes: PhoneNote[]; clock: string; footer?: ReactNode }) {
   return (
     <div className="force-dark relative mx-auto w-[260px] rounded-[38px] border border-white/15 bg-[#050506] p-3 shadow-[0_24px_60px_rgba(0,0,0,.22)]">
@@ -28,7 +28,7 @@ export default function Phone({ notes, clock, footer }: { notes: PhoneNote[]; cl
                 <span className="grid h-4 w-4 place-items-center rounded bg-black text-white">
                   <Moon size={10} />
                 </span>
-                Night Shift <span className="ml-auto normal-case">{n.time}</span>
+                Nightly <span className="ml-auto normal-case">{n.time}</span>
               </div>
               <div
                 className="text-[12.5px] font-semibold"

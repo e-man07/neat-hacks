@@ -1,4 +1,4 @@
-"""Night Shift's on-call loop and incident state machine.
+"""Nightly's on-call loop and incident state machine.
 
     OPEN → INVESTIGATING → MITIGATING → MONITORING → RESOLVED
                        ↘ AWAITING_HUMAN (not allowed to act alone)       ↘ ESCALATED (verify failed → undone)
@@ -166,7 +166,7 @@ class NightShift:
             note = actions.undo(self.adapter, applied["id"])
             self.event(iid, "undo", f"Verification failed ({rep.rate:.0%} < {gate:.0%}); {note}", {"replay": rep.as_dict()})
             self._set(iid, status="ESCALATED", verification_json=dumps({"replay": rep.as_dict()}))
-            self._page(iid, "🚨 Night Shift needs you", f"{diag.title}. My containment didn't verify, so I undid it. "
+            self._page(iid, "🚨 Nightly needs you", f"{diag.title}. My containment didn't verify, so I undid it. "
                        f"${imp.loss_per_minute:,.0f}/min at risk.", "urgent")
             reporter.write_postmortem(self.db, iid)
             return {"id": iid, "status": "ESCALATED"}
@@ -204,7 +204,7 @@ class NightShift:
             note = actions.undo(self.adapter, last["id"]) if last else "no action to undo"
             self._set(iid, status="ESCALATED", verification_json=dumps(verify))
             self.event(iid, "undo", "Live metrics did not recover: " + "; ".join(reasons) + f"; {note}", {"live": stats.as_dict()})
-            self._page(iid, "🚨 Night Shift needs you", "Containment did not hold in production; I rolled my change back.", "urgent")
+            self._page(iid, "🚨 Nightly needs you", "Containment did not hold in production; I rolled my change back.", "urgent")
         reporter.write_postmortem(self.db, iid)
         return {"id": iid, "status": "RESOLVED" if ok else "ESCALATED"}
 
@@ -230,7 +230,7 @@ class NightShift:
     def _await_human(self, iid: str, diag: Diagnosis, imp: impact_mod.Impact, why: str) -> dict[str, Any]:
         self._set(iid, status="AWAITING_HUMAN")
         self.event(iid, "page", f"Waiting for a human: {why}", {"why": why})
-        self._page(iid, "🚨 Night Shift needs a decision", f"{diag.title}. {why}. "
+        self._page(iid, "🚨 Nightly needs a decision", f"{diag.title}. {why}. "
                    f"${imp.loss_per_minute:,.2f}/min at risk.", "urgent")
         reporter.write_postmortem(self.db, iid)
         return {"id": iid, "status": "AWAITING_HUMAN"}

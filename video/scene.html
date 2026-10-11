@@ -1,0 +1,439 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="fonts/local.css" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; background: #8e8ad6; }
+  body { font-family: "Sora", system-ui, sans-serif; -webkit-font-smoothing: antialiased; color: #fff; }
+  #stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; }
+  canvas#bg { position: absolute; inset: 0; }
+  .abs { position: absolute; will-change: transform, opacity; }
+  #ghost { width: 640px; height: 579px; left: 0; top: 0; transform-origin: 50% 60%; }
+  #ghost img, #ghost canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  #shadow { width: 360px; height: 46px; border-radius: 50%; background: radial-gradient(closest-side, rgba(30,26,80,.38), rgba(30,26,80,0)); }
+  .chip { display: inline-flex; align-items: center; gap: 10px; padding: 8px 16px; border-radius: 999px; background: rgba(255,255,255,.92); color: #3a3570; font: 600 18px "Geist Mono", monospace; letter-spacing: .06em; box-shadow: 0 6px 20px rgba(40,30,110,.18); }
+  .chip i { width: 9px; height: 9px; border-radius: 50%; background: #ff8f6b; display: inline-block; }
+  .big { font-weight: 600; font-size: 104px; line-height: 1.02; letter-spacing: -0.035em; color: #fff; text-shadow: 0 4px 30px rgba(40,30,110,.18); }
+  .big .acc { color: #ffb08f; }
+  .big .line { display: block; }
+  #caption { left: 0; right: 0; bottom: 44px; text-align: center; font: 500 30px "Sora", sans-serif; color: rgba(255,255,255,.96); text-shadow: 0 2px 14px rgba(30,20,90,.45); }
+  #caption span { transition: none; }
+  .card { background: #fbfaf7; color: #1b1a2e; border-radius: 28px; box-shadow: 0 30px 80px rgba(36,28,110,.35), 0 2px 0 rgba(255,255,255,.6) inset; overflow: hidden; }
+  .card .hd { display: flex; align-items: center; gap: 16px; padding: 26px 32px; border-bottom: 1px solid #ecebe6; }
+  .avatar { width: 54px; height: 54px; border-radius: 14px; background: #ecebf8; display: grid; place-items: center; overflow: hidden; }
+  .avatar img { width: 46px; }
+  .ttl { font-weight: 600; font-size: 28px; }
+  .sub { font: 400 17px "Geist Mono", monospace; color: #8a8898; margin-top: 3px; }
+  .pill { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 999px; font: 500 17px "Geist Mono", monospace; }
+  .pill i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; background: currentColor; }
+  .ok { color: #1f8f55; background: #e4f5ea; }
+  .bad { color: #e04a2b; background: #fde9e3; }
+  .row { display: flex; align-items: center; gap: 18px; padding: 15px 32px; font-size: 23px; border-bottom: 1px solid #f1f0ec; }
+  .row .ic { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-size: 16px; font-weight: 700; flex: none; }
+  .row .ic.ok { background: #dff3e6; }
+  .row .ic.bad { background: #fde3dc; }
+  .row .q { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #33313f; }
+  .row .m { font: 400 17px "Geist Mono", monospace; color: #9a98a6; white-space: nowrap; }
+  .row .m.bad { background: none; color: #e04a2b; }
+  .banner { margin: 18px 32px 6px; padding: 14px 18px; border-radius: 14px; background: #f0eee8; font: 500 18px "Geist Mono", monospace; color: #4a4858; }
+  .field { margin: 0 32px; padding: 18px 0; border-bottom: 1px solid #efeee9; display: flex; align-items: center; gap: 18px; }
+  .field .lbl { width: 150px; font: 500 16px "Geist Mono", monospace; color: #9a98a6; text-transform: uppercase; letter-spacing: .08em; }
+  .field .val { flex: 1; font-size: 25px; color: #1b1a2e; min-height: 34px; }
+  .field .tag { width: 46px; height: 46px; border-radius: 12px; display: grid; place-items: center; font: 600 16px "Geist Mono", monospace; flex: none; }
+  .field.on { background: linear-gradient(90deg, rgba(255,176,143,.16), rgba(255,176,143,0)); }
+  .bar { height: 12px; border-radius: 99px; background: #ecebe6; overflow: hidden; }
+  .bar b { display: block; height: 100%; background: #1f8f55; border-radius: 99px; }
+  .btn { display: inline-flex; padding: 12px 20px; border-radius: 12px; font-weight: 600; font-size: 21px; }
+  .btn.dark { background: #1b1a2e; color: #fff; }
+  .btn.line { border: 2px solid #dcdbe4; color: #1b1a2e; }
+  .term { background: #17152b; color: #e7e5ff; border-radius: 22px; font: 400 26px/1.7 "Geist Mono", monospace; padding: 22px 34px 30px; box-shadow: 0 30px 80px rgba(20,14,70,.45); }
+  .term .dots { display: flex; gap: 10px; margin-bottom: 14px; }
+  .term .dots i { width: 14px; height: 14px; border-radius: 50%; background: #3b3860; display: inline-block; }
+  .term .p { color: #8f8cbf; }
+  .term .g { color: #7ee2a8; }
+  .term .a { color: #ffb08f; }
+  .badge { width: 104px; height: 104px; border-radius: 28px; background: rgba(255,255,255,.95); box-shadow: 0 10px 30px rgba(40,30,110,.25); display: grid; place-items: center; color: #3a3570; }
+  .badge .n { font: 600 15px "Geist Mono", monospace; margin-top: 2px; color: #6a6790; }
+  .badge .ck { width: 34px; height: 34px; border-radius: 50%; background: #1f8f55; color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 19px; }
+  #end .word { font-weight: 700; font-size: 150px; letter-spacing: -0.045em; }
+  #end .tag { font-size: 36px; color: rgba(255,255,255,.88); margin-top: 6px; }
+  #end .url { display: inline-flex; gap: 12px; margin-top: 34px; padding: 12px 24px; border-radius: 999px; background: rgba(255,255,255,.95); color: #3a3570; font: 500 24px "Geist Mono", monospace; }
+  #end .by { margin-top: 26px; font: 400 20px "Geist Mono", monospace; color: rgba(255,255,255,.8); letter-spacing: .04em; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="bg" width="1920" height="1080"></canvas>
+
+  <!-- ring of watched agents -->
+  <div id="ring"></div>
+
+  <!-- big text + chip -->
+  <div id="chip" class="abs" style="left:150px; top:250px"><span class="chip"><i></i>GHOST FACT #1</span></div>
+  <div id="big" class="abs big" style="left:150px; top:320px"></div>
+
+  <!-- agent card: runs / deploy / dig / fix -->
+  <div id="card" class="abs card" style="left:140px; top:190px; width:1000px; min-height:420px">
+    <div class="hd">
+      <div class="avatar" style="background:#e9f0ff; color:#3157c9; font:700 24px Sora">S</div>
+      <div><div class="ttl" id="cardTitle">Scout · docs assistant</div><div class="sub" id="cardSub">production · traced by neatlogs</div></div>
+      <span class="pill ok" id="cardPill"><i></i><span>healthy</span></span>
+    </div>
+    <div id="cardBody"></div>
+  </div>
+
+  <!-- slack card -->
+  <div id="slack" class="abs card" style="left:140px; top:250px; width:1000px">
+    <div class="hd" style="gap:12px">
+      <svg width="34" height="34" viewBox="0 0 24 24"><rect x="9.5" y="1.5" width="4" height="10" rx="2" fill="#36C5F0"/><rect x="12.5" y="9.5" width="10" height="4" rx="2" fill="#2EB67D"/><rect x="10.5" y="12.5" width="4" height="10" rx="2" fill="#ECB22E"/><rect x="1.5" y="10.5" width="10" height="4" rx="2" fill="#E01E5A"/></svg>
+      <div class="ttl"># incidents</div><div class="sub" style="margin:0 0 0 8px">Slack</div>
+    </div>
+    <div style="display:flex; gap:20px; padding:30px 34px">
+      <div class="avatar" style="background:#1b1a2e; width:62px; height:62px"><img src="ghost-64.png" style="width:50px" /></div>
+      <div style="flex:1">
+        <div style="font-size:24px"><b>Nightly</b> <span style="font:500 14px Geist Mono; background:#efeee9; color:#8a8898; padding:2px 6px; border-radius:5px">APP</span> <span style="font-size:18px; color:#9a98a6">3:08 AM</span></div>
+        <div id="slackLines" style="margin-top:16px; font-size:24px; line-height:1.45; color:#33313f"></div>
+        <div id="slackBtns" style="display:flex; gap:14px; margin-top:24px; align-items:center">
+          <span class="btn dark" id="approve">Approve fix PR</span><span class="btn line">Undo rollback</span>
+          <span style="font-size:19px; color:#9a98a6; margin-left:6px">the fix waits for you</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- terminal -->
+  <div id="term" class="abs term" style="left:150px; top:300px; width:1050px">
+    <div class="dots"><i></i><i></i><i></i></div>
+    <div id="termBody"></div>
+  </div>
+
+  <!-- ghost -->
+  <div id="shadow" class="abs"></div>
+  <div id="ghost" class="abs"><img src="ghost.png" /><canvas id="face" width="1314" height="1188"></canvas></div>
+
+  <!-- end card -->
+  <div id="end" class="abs" style="left:0; right:0; top:560px; text-align:center">
+    <div class="word">Nightly</div>
+    <div class="tag">The on-call engineer for your AI agents</div>
+    <div class="url">web-emrq.vercel.app</div>
+    <div class="by">built with neatlogs · Entire · cfo.ai</div>
+  </div>
+
+  <div id="caption" class="abs"></div>
+</div>
+
+<script>
+const TL = window.TIMELINE;            // injected
+const AMP = window.AMP || [];          // voice envelope at FPS
+const FPS = window.FPS || 30;
+const S = Object.fromEntries(TL.scenes.map(s => [s.id, s]));
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const eio = k => (k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2);
+const eout = k => 1 - Math.pow(1 - k, 3);
+const back = k => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(k - 1, 3) + c1 * Math.pow(k - 1, 2); };
+const prog = (t, a, d) => clamp((t - a) / d);
+const $ = id => document.getElementById(id);
+const sceneAt = t => { let cur = TL.scenes[0]; for (const s of TL.scenes) if (t >= s.vstart) cur = s; return cur; };
+const inScene = (t, ...ids) => ids.includes(sceneAt(t).id);
+const lineStart = i => TL.lines[i].start;
+
+/* ---------- background ---------- */
+const bg = $("bg").getContext("2d");
+const rnd = (i, k) => { const s = Math.sin(i * 127.1 + k * 311.7) * 43758.5453; return s - Math.floor(s); };
+const motes = Array.from({ length: 70 }, (_, i) => ({ x: rnd(i, 1) * 1920, y: rnd(i, 2) * 1080, r: 1.2 + rnd(i, 3) * 3.2, s: 6 + rnd(i, 4) * 18, p: rnd(i, 5) * 6.28 }));
+const stars = Array.from({ length: 90 }, (_, i) => ({ x: rnd(i, 7) * 1920, y: rnd(i, 8) * 560, r: .6 + rnd(i, 9) * 1.6, p: rnd(i, 10) * 6.28 }));
+function drawBg(t, alarm) {
+  const g = bg.createLinearGradient(0, 0, 0, 1080);
+  g.addColorStop(0, `rgb(${lerp(120, 132, alarm)},${lerp(116, 100, alarm)},${lerp(206, 196, alarm)})`);
+  g.addColorStop(1, `rgb(${lerp(160, 176, alarm)},${lerp(154, 138, alarm)},${lerp(228, 214, alarm)})`);
+  bg.fillStyle = g; bg.fillRect(0, 0, 1920, 1080);
+  // light shafts
+  for (let i = 0; i < 4; i++) {
+    const x = 300 + i * 420 + Math.sin(t * .2 + i) * 30;
+    const sg = bg.createLinearGradient(x, 0, x + 260, 1080);
+    sg.addColorStop(0, "rgba(255,255,255,0.10)"); sg.addColorStop(1, "rgba(255,255,255,0)");
+    bg.fillStyle = sg; bg.beginPath(); bg.moveTo(x, 0); bg.lineTo(x + 140, 0); bg.lineTo(x + 420, 1080); bg.lineTo(x + 160, 1080); bg.fill();
+  }
+  // moon glow
+  const mg = bg.createRadialGradient(1700, 120, 10, 1700, 120, 380);
+  mg.addColorStop(0, "rgba(255,246,226,0.55)"); mg.addColorStop(.12, "rgba(255,246,226,0.35)"); mg.addColorStop(1, "rgba(255,246,226,0)");
+  bg.fillStyle = mg; bg.fillRect(1300, -260, 800, 800);
+  bg.fillStyle = "rgba(255,250,236,0.95)"; bg.beginPath(); bg.arc(1700, 120, 44, 0, 6.283); bg.fill();
+  bg.fillStyle = `rgb(${lerp(120, 132, alarm)},${lerp(116, 100, alarm)},${lerp(206, 196, alarm)})`; bg.beginPath(); bg.arc(1722, 104, 40, 0, 6.283); bg.fill();
+  // stars
+  for (const s of stars) { bg.fillStyle = `rgba(255,255,255,${.35 + .45 * (0.5 + 0.5 * Math.sin(t * 1.6 + s.p))})`; bg.beginPath(); bg.arc(s.x, s.y, s.r, 0, 6.283); bg.fill(); }
+  // drifting motes
+  for (const m of motes) {
+    const y = (m.y - t * m.s) % 1080; const yy = y < 0 ? y + 1080 : y;
+    const x = m.x + Math.sin(t * .6 + m.p) * 18;
+    bg.fillStyle = "rgba(255,255,255,0.28)"; bg.beginPath(); bg.arc(x, yy, m.r, 0, 6.283); bg.fill();
+  }
+  // rooftops / hills silhouettes
+  const layer = (base, amp, col, seed, step) => {
+    bg.fillStyle = col; bg.beginPath(); bg.moveTo(0, 1080);
+    for (let x = 0; x <= 1920; x += step) {
+      const h = base - (Math.sin(x * .004 + seed) * amp + Math.sin(x * .011 + seed * 2) * amp * .4);
+      bg.lineTo(x, h);
+    }
+    bg.lineTo(1920, 1080); bg.fill();
+  };
+  layer(930, 30, "rgba(98,92,178,0.55)", 1.3, 20);
+  // town
+  bg.fillStyle = "rgba(76,70,150,0.9)";
+  for (let i = 0; i < 26; i++) {
+    const w = 50 + rnd(i, 21) * 70, h = 50 + rnd(i, 22) * 120, x = i * 78 - 20;
+    bg.fillRect(x, 1080 - 60 - h, w, h + 60);
+    if (rnd(i, 23) > .45) { bg.fillStyle = `rgba(255,214,150,${.55 + .3 * Math.sin(t * 2 + i)})`; bg.fillRect(x + w * .35, 1080 - 60 - h + 22, 10, 14); bg.fillStyle = "rgba(76,70,150,0.9)"; }
+  }
+  layer(1030, 14, "rgba(62,56,128,1)", 4.1, 24);
+  // alarm vignette
+  if (alarm > 0) { const v = bg.createRadialGradient(960, 540, 300, 960, 540, 1100); v.addColorStop(0, "rgba(255,90,60,0)"); v.addColorStop(1, `rgba(255,90,60,${.22 * alarm})`); bg.fillStyle = v; bg.fillRect(0, 0, 1920, 1080); }
+}
+
+/* ---------- ghost pose per scene ---------- */
+const POSE = {
+  hi: { x: 960, y: 500, s: 1.0, r: 0 },
+  fact: { x: 1300, y: 520, s: .95, r: 0 },
+  watch: { x: 1300, y: 540, s: .62, r: 0 },
+  runs: { x: 1560, y: 620, s: .6, r: -4 },
+  deploy: { x: 1560, y: 620, s: .6, r: -4 },
+  nobody: { x: 1320, y: 560, s: .85, r: 0 },
+  dig: { x: 1560, y: 620, s: .6, r: -8 },
+  fix: { x: 1560, y: 620, s: .6, r: -4 },
+  slack: { x: 1560, y: 640, s: .6, r: -6 },
+  tagline: { x: 1400, y: 560, s: .95, r: 0 },
+  sdk: { x: 1560, y: 620, s: .62, r: -4 },
+  end: { x: 960, y: 330, s: .55, r: 0 },
+};
+function ghostPose(t) {
+  const sc = TL.scenes; let i = 0;
+  for (let k = 0; k < sc.length; k++) if (t >= sc[k].vstart) i = k;
+  const cur = POSE[sc[i].id], prev = POSE[sc[Math.max(0, i - 1)].id];
+  const k = eio(prog(t, sc[i].vstart, .75));
+  return { x: lerp(prev.x, cur.x, k), y: lerp(prev.y, cur.y, k), s: lerp(prev.s, cur.s, k), r: lerp(prev.r, cur.r, k), moving: k > 0 && k < 1 };
+}
+
+/* ---------- face overlay: blink + talking mouth ---------- */
+const face = $("face").getContext("2d");
+const EYES = [{ x: 731, y: 471, w: 108, h: 148 }, { x: 975, y: 438, w: 92, h: 140 }];
+const MOUTH = { x: 878, y: 503 };
+const BODY = "#0c0c12";
+function drawFace(t, frame) {
+  face.clearRect(0, 0, 1314, 1188);
+  const amp = AMP[frame] || 0;
+  const blinkPhase = (t + .4) % 3.4;
+  const blink = blinkPhase < .14 || (inScene(t, "nobody") && false);
+  if (blink) {
+    for (const e of EYES) {
+      face.fillStyle = BODY; face.beginPath(); face.ellipse(e.x, e.y, e.w / 2 + 6, e.h / 2 + 6, 0, 0, 6.283); face.fill();
+      face.strokeStyle = "rgba(255,255,255,.95)"; face.lineWidth = 14; face.lineCap = "round";
+      face.beginPath(); face.arc(e.x, e.y + 8, e.w * .38, Math.PI * 1.15, Math.PI * 1.85); face.stroke();
+    }
+  }
+  if (amp > .06) {
+    face.fillStyle = BODY; face.beginPath(); face.ellipse(MOUTH.x, MOUTH.y + 4, 64, 44, 0, 0, 6.283); face.fill();
+    const open = clamp(amp * 1.6, .15, 1);
+    face.fillStyle = "rgba(255,255,255,.96)"; face.beginPath(); face.ellipse(MOUTH.x, MOUTH.y + 6, 34 + 10 * open, 8 + 30 * open, 0, 0, 6.283); face.fill();
+    face.fillStyle = "#3a1d2a"; face.beginPath(); face.ellipse(MOUTH.x, MOUTH.y + 12, 22 + 6 * open, 3 + 20 * open, 0, 0, 6.283); face.fill();
+  }
+}
+
+/* ---------- content builders ---------- */
+const QUESTIONS = ["How many steps can a funnel have?", "Can I get a refund on my annual plan?", "Which providers work with SSO?", "How long is data kept on Growth?", "How do I read data with an API key?", "What happens past the event cap?", "How do I export to BigQuery?"];
+function runsHTML(t) {
+  const sRuns = S.runs.vstart, sDep = S.deploy.vstart, sFix = S.fix.vstart;
+  const failing = t >= lineStart(7) - .9 && t < sFix + 1.2;
+  let html = "";
+  if (t >= lineStart(6)) {
+    const k = eout(prog(t, lineStart(6), .4));
+    html += `<div class="banner" style="opacity:${k}; transform:translateY(${(1 - k) * -12}px)">⤴ deploy <b>s3</b> · “get ready for the docs migration” · written by Claude Code</div>`;
+  }
+  const n = Math.floor(clamp((t - sRuns - .3) / .55, 0, 40));
+  const rows = [];
+  for (let i = 0; i < n; i++) {
+    const at = sRuns + .3 + i * .55;
+    const bad = at >= lineStart(7) - .9 && at < sFix + 1.2 && i % 4 !== 0;
+    const rel = at >= sDep + .4 && at < sFix + .6 ? "s3" : "s2";
+    const sec = 41 + i * 7;
+    rows.push({ q: QUESTIONS[i % QUESTIONS.length], bad, meta: bad ? "s3 · tool error: doc not found" : `${rel} · 03:0${6 + Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}`, at });
+  }
+  rows.reverse().slice(0, t >= lineStart(6) ? 6 : 7).forEach(r => {
+    const k = eout(prog(t, r.at, .35));
+    html += `<div class="row" style="opacity:${k}; transform:translateX(${(1 - k) * -20}px)"><span class="ic ${r.bad ? "bad" : "ok"}">${r.bad ? "✕" : "✓"}</span><span class="q">${r.q}</span><span class="m ${r.bad ? "bad" : ""}">${r.meta}</span></div>`;
+  });
+  return { html, failing };
+}
+const FIELDS = [
+  { lbl: "Traces", val: "12 failing runs read back from neatlogs", tag: "nl", bg: "#e6f0ff", fg: "#2f5bd3" },
+  { lbl: "Cause", val: "release s3 · commit c42532d", tag: "git", bg: "#efeee9", fg: "#33313f" },
+  { lbl: "Prompt", val: "“get ready for the docs migration…” · via Entire", tag: "En", bg: "#f1eaff", fg: "#6d4fe0" },
+  { lbl: "Cost", val: "$11.25 a minute · $3,376 by morning", tag: "$", bg: "#fff0e8", fg: "#e0502b" },
+];
+function digHTML(t) {
+  const starts = [lineStart(10) + .1, lineStart(10) + 1.0, lineStart(10) + 1.9, lineStart(11) + .5];
+  let html = `<div class="banner">🔎 investigating · INC-1011-02</div>`;
+  FIELDS.forEach((f, i) => {
+    const k = prog(t, starts[i], .9);
+    const chars = Math.floor(f.val.length * k);
+    html += `<div class="field ${k > 0 && k < 1 ? "on" : ""}"><span class="lbl">${f.lbl}</span><span class="val">${f.val.slice(0, chars)}${k > 0 && k < 1 ? '<span style="opacity:.5">▍</span>' : ""}</span><span class="tag" style="background:${f.bg}; color:${f.fg}; opacity:${k > 0 ? 1 : .35}">${f.tag}</span></div>`;
+  });
+  return html;
+}
+function fixHTML(t) {
+  const a = prog(t, lineStart(12), .5), b = prog(t, lineStart(13), 1.6);
+  const passed = Math.min(3, Math.floor(b * 3.2));
+  return `<div class="banner" style="background:#e4f5ea; color:#1f8f55">✓ contained · INC-1011-02</div>
+    <div class="field"><span class="lbl">Action</span><span class="val" style="opacity:${a}">↩ rolled back <b>s3 → s2</b> automatically</span><span class="tag" style="background:#e4f5ea; color:#1f8f55; opacity:${a}">✓</span></div>
+    <div class="field" style="display:block"><div style="display:flex; align-items:center; gap:18px"><span class="lbl">Replay</span><span class="val">${passed}/3 failed questions now pass</span><span class="tag" style="background:#e4f5ea; color:#1f8f55; opacity:${passed === 3 ? 1 : .35}">✓</span></div>
+      <div class="bar" style="margin:14px 0 4px 168px"><b style="width:${eout(b) * 100}%"></b></div></div>
+    <div class="field"><span class="lbl">Saved</span><span class="val" style="opacity:${prog(t, lineStart(13) + 1.2, .5)}">~$3,376 not lost overnight</span></div>`;
+}
+const SLACK = [
+  ["🔴", "Tool errors in 30% of Scout's runs since s3"],
+  ["🔎", "Cause: release s3, commit c42532d · prompt found via Entire"],
+  ["↩", "Rolled back s3 → s2 automatically · $11/min stopped"],
+  ["✅", "Verified: 3/3 failed questions now pass"],
+];
+function slackHTML(t) {
+  return SLACK.map(([ic, tx], i) => {
+    const k = eout(prog(t, S.slack.vstart + .35 + i * .4, .35));
+    return `<div style="display:flex; gap:14px; opacity:${k}; transform:translateY(${(1 - k) * 10}px)"><span style="width:30px; text-align:center">${ic}</span><span>${tx}</span></div>`;
+  }).join("");
+}
+const TERM = [
+  ['<span class="p">$</span> pip install nightly-sdk', 0],
+  ['<span class="p">$</span> python agent.py', .6],
+  ['<span class="g">✓</span> connected to <span class="a">Nightly</span> · on call', 1.3],
+  ['<span class="g">✓</span> traces  <span class="p">neatlogs · scout-answers</span>', 1.8],
+  ['<span class="g">✓</span> paging  <span class="p">slack · #incidents</span>', 2.3],
+  ['<span class="g">✓</span> policy  <span class="p">rollback · failover · kill switch</span>', 2.8],
+];
+function termHTML(t) {
+  const t0 = S.sdk.vstart + .3;
+  return TERM.map(([l, d], i) => {
+    const k = prog(t, t0 + d, i < 2 ? .5 : .2);
+    if (k <= 0) return "";
+    if (i < 2) { const plain = l.replace(/<[^>]+>/g, ""); const n = Math.floor(plain.length * k); return `<div>${l.startsWith('<span class="p">$</span>') ? '<span class="p">$</span>' + plain.slice(1, n) : plain.slice(0, n)}</div>`; }
+    return `<div style="opacity:${k}">${l}</div>`;
+  }).join("");
+}
+
+/* ---------- big text ---------- */
+function bigFor(t) {
+  const id = sceneAt(t).id;
+  if (id === "fact") return { html: `<span class="line">Never</span><span class="line acc">sleeps.</span>`, k: prog(t, lineStart(2) - .1, .5), chip: prog(t, lineStart(1) - .1, .4), chipText: "GHOST FACT #1" };
+  if (id === "watch") return { html: `<span class="line">All</span><span class="line acc">night.</span>`, k: prog(t, lineStart(4) - .1, .5), chip: 1, chipText: "GHOST FACT #1" };
+  if (id === "nobody") return { html: `<span class="line">Nobody's</span><span class="line acc">awake.</span>`, k: prog(t, S.nobody.vstart + .2, .5), chip: prog(t, S.nobody.vstart + .1, .4), chipText: "03:07 AM" };
+  if (id === "tagline") return { html: `<span class="line" style="font-size:88px">AI agents break</span><span class="line" style="font-size:88px">at night.</span><span class="line acc" style="font-size:88px; opacity:${prog(t, lineStart(17) - .1, .4)}">Nightly fixes them.</span>`, k: prog(t, S.tagline.vstart + .2, .5), chip: 0 };
+  return null;
+}
+
+/* ---------- caption ---------- */
+function captionAt(t) {
+  const l = TL.lines.find(l => t >= l.start - .05 && t <= l.end + .5);
+  if (!l) return "";
+  return l.words.map(w => `<span style="opacity:${t >= w.s - .03 ? 1 : .35}">${w.w}</span>`).join(" ");
+}
+
+/* ---------- ring of agents ---------- */
+const RING = ["support", "docs", "sales", "refunds", "billing", "onboard", "triage", "search"];
+function ringHTML(t, g) {
+  if (!inScene(t, "watch")) return "";
+  const t0 = S.watch.vstart + .4, out = S.watch.end - .3;
+  const fade = 1 - prog(t, out, .4);
+  return RING.map((n, i) => {
+    const a = -Math.PI / 2 + i * (Math.PI * 2 / RING.length) + t * .12;
+    const k = back(prog(t, t0 + i * .18, .45));
+    const ck = prog(t, lineStart(4) + i * .12, .25);
+    const x = g.x + Math.cos(a) * 330 - 52, y = g.y + Math.sin(a) * 300 - 52;
+    return `<div class="abs badge" style="left:${x}px; top:${y}px; opacity:${clamp(k) * fade}; transform:scale(${k})"><div style="display:grid; place-items:center"><div class="ck" style="opacity:${ck}; transform:scale(${.6 + .4 * ck})">✓</div><div class="n">${n}</div></div></div>`;
+  }).join("");
+}
+
+/* ---------- render ---------- */
+function show(el, k, dx = 0, dy = 0, s = 1) {
+  el.style.opacity = k; el.style.transform = `translate(${dx}px, ${dy}px) scale(${s})`;
+  el.style.display = k <= 0.001 ? "none" : "";
+}
+window.render = function (t, frame) {
+  const id = sceneAt(t).id;
+  const alarm = clamp(prog(t, lineStart(7), .6) - prog(t, S.dig.vstart + 2, 1.5)) * (["deploy", "nobody", "dig"].includes(id) ? 1 : 0);
+  drawBg(t, alarm);
+
+  // ghost
+  const p = ghostPose(t);
+  let s = p.s, r = p.r, x = p.x, y = p.y;
+  const intro = back(prog(t, S.hi.vstart + .1, .7));
+  if (id === "hi") { s *= intro; r += Math.sin(t * 7) * 6 * prog(t, S.hi.vstart + .5, .3); }
+  const bob = Math.sin(t * 2.1) * 14, sway = Math.sin(t * 1.3) * 3;
+  if (id === "nobody") { x += Math.sin(t * 40) * 3; }
+  const squash = 1 + Math.sin(t * 4.2) * .015;
+  const W = 640 * s, H = 579 * s;
+  const G = $("ghost");
+  G.style.width = W + "px"; G.style.height = H + "px";
+  G.style.transform = `translate(${x - W / 2}px, ${y - H / 2 + bob}px) rotate(${r + sway}deg) scale(${1 / squash}, ${squash})`;
+  G.style.opacity = id === "hi" ? clamp(intro * 1.5) : 1;
+  const SH = $("shadow");
+  SH.style.transform = `translate(${x - 180 * s}px, ${y + H * .48}px) scale(${s * (1 - bob / 160)}, ${s})`;
+  SH.style.opacity = (id === "end" ? 0 : .8) * (id === "hi" ? intro : 1);
+  drawFace(t, frame);
+
+  // chip + big text
+  const b = bigFor(t);
+  const chip = $("chip"), big = $("big");
+  if (b) {
+    big.innerHTML = b.html; show(big, b.k, 0, (1 - eout(b.k)) * 30);
+    chip.querySelector(".chip").lastChild.textContent = b.chipText || "";
+    show(chip, b.chip || 0, 0, (1 - eout(b.chip || 0)) * 14);
+  } else { show(big, 0); show(chip, 0); }
+
+  // ring
+  $("ring").innerHTML = ringHTML(t, p);
+
+  // agent card (runs → deploy → dig → fix)
+  const cardOn = ["runs", "deploy", "dig", "fix"].includes(id);
+  const cardIn = eout(prog(t, S.runs.vstart, .6));
+  const cardOutNobody = id === "nobody" ? 0 : 1;
+  const card = $("card");
+  if (cardOn) {
+    show(card, cardIn * cardOutNobody, (1 - cardIn) * -120, 0, .96 + .04 * cardIn);
+    let body = "", failing = false;
+    if (id === "runs" || id === "deploy") { const rr = runsHTML(t); body = rr.html; failing = rr.failing; }
+    else if (id === "dig") { body = digHTML(t); failing = true; }
+    else { body = fixHTML(t); failing = t < lineStart(12) + .3; }
+    $("cardBody").innerHTML = body;
+    const pill = $("cardPill");
+    pill.className = "pill " + (failing ? "bad" : "ok"); pill.lastChild.textContent = failing ? "degraded" : "healthy";
+    $("cardTitle").textContent = id === "dig" ? "Nightly · investigating" : id === "fix" ? "Nightly · fixed" : "Scout · docs assistant";
+    $("cardSub").textContent = id === "dig" || id === "fix" ? "Scout · INC-1011-02" : `production · release ${t >= lineStart(6) + .2 ? "s3" : "s2"} · traced by neatlogs`;
+  } else show(card, 0);
+
+  // slack
+  const sk = eout(prog(t, S.slack.vstart, .6));
+  if (id === "slack") {
+    show($("slack"), sk, (1 - sk) * -120, 0, .96 + .04 * sk);
+    $("slackLines").innerHTML = slackHTML(t);
+    const bk = prog(t, S.slack.vstart + 2.2, .4);
+    $("slackBtns").style.opacity = bk;
+    const pulse = t > lineStart(15) ? 1 + .05 * Math.sin((t - lineStart(15)) * 8) : 1;
+    $("approve").style.transform = `scale(${pulse})`;
+    $("approve").style.boxShadow = t > lineStart(15) ? "0 0 0 6px rgba(255,176,143,.55)" : "none";
+  } else show($("slack"), 0);
+
+  // terminal
+  const tk = eout(prog(t, S.sdk.vstart, .5));
+  if (id === "sdk") { show($("term"), tk, (1 - tk) * -100); $("termBody").innerHTML = termHTML(t); } else show($("term"), 0);
+
+  // end
+  const ek = eout(prog(t, S.end.vstart + .3, .7));
+  if (id === "end") show($("end"), ek, 0, (1 - ek) * 30); else show($("end"), 0);
+
+  // caption
+  $("caption").innerHTML = captionAt(t);
+};
+</script>
+</body>
+</html>

@@ -2,7 +2,7 @@
 human approves it.
 
 The PR reverts the culprit commit's changes file by file (contents restored from its parent), adds
-the regression eval Night Shift generated from the failing traces, and carries the postmortem.
+the regression eval Nightly generated from the failing traces, and carries the postmortem.
 Uses the approving user's GitHub token from sign-in.
 """
 
@@ -26,7 +26,7 @@ class GitHubError(RuntimeError):
 def _client(token: str) -> httpx.Client:
     return httpx.Client(base_url=API, timeout=30, headers={
         "Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json",
-        "X-GitHub-Api-Version": "2022-11-28", "User-Agent": "night-shift"})
+        "X-GitHub-Api-Version": "2022-11-28", "User-Agent": "nightly"})
 
 
 def _check(r: httpx.Response) -> Any:

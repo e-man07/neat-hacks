@@ -1,6 +1,6 @@
-# Night Shift
+# Nightly
 
-**The on-call engineer for your AI agents.** Built for neatHack 2026.
+**The on-call engineer for your AI agents.** Built for neatHack 2026. (Called *Night Shift* during the build; older evidence files use that name.)
 
 It stops the bleeding by itself, and only wakes you for decisions that can't be undone.
 
@@ -9,7 +9,7 @@ It stops the bleeding by itself, and only wakes you for decisions that can't be 
 
 At 3 AM, a "harmless" change to a production AI agent starts failing. Maybe it pays refunds it
 shouldn't, or reads docs from a folder that doesn't exist yet. Every request still returns HTTP 200.
-Night Shift notices from the agent's neatlogs traces and the outcomes the agent reports. It then
+Nightly notices from the agent's neatlogs traces and the outcomes the agent reports. It then
 investigates like a senior SRE: traces, deploy log, diff, and the **Entire checkpoint with the prompt
 the coding agent was given**. It prices the damage with the **cfo.ai** unit economics, applies the
 reversible fix your policy pre-approves, and proves the fix by having your agent replay the failed
@@ -26,10 +26,10 @@ approval in Slack.*
 |---|---|
 | **The agent completes a substantial task** | The whole incident lifecycle: detect → investigate → price → decide → contain → verify → report. Live on two agents: Harbor ([6/6 benchmark](evidence/benchmark/)) and Scout ([two live incidents](evidence/scout/)) |
 | **Agent improved (before/after with numbers)** | [`evidence/before-after.md`](evidence/before-after.md): run 1 → run 3, from 4/6 to 6/6 handled correctly, after fixes based on what run 1 showed |
-| **Recovers from failures** | Every incident is a failure it recovers from. If a fix fails verification, Night Shift undoes it ([`runner.py`](backend/nightshift/runner.py), test `test_failed_verification_undoes_action`). It survived neatlogs losing most of Scout's traces ([`evidence/scout/`](evidence/scout/README.md#what-we-learned-and-changed)) |
-| **Used neatlogs** | Every agent run and every investigation is traced. Night Shift reads traces back over the neatlogs MCP during investigations, and creates a neatlogs detection after an attack. [`evidence/neatlogs.md`](evidence/neatlogs.md) |
-| **Used Entire** | Every bad release was written by a separate Claude Code session with an Entire checkpoint. Night Shift resolves commit → checkpoint → prompt → the coding agent's own warning, plus entire-graph change lists. [`evidence/entire.md`](evidence/entire.md) |
-| **Used cfo.ai** | [Business plan in cfo.ai](https://app.cfo.ai/s/CsWafbQfu2U1y94W) (pricing, costs, revenue, runway: break-even M08, runway > 24 months) and [customer unit economics in cfo.ai](https://app.cfo.ai/s/fHcCAy2lG_aXs3Qt), which Night Shift uses to price every incident. [`business/PLAN.md`](business/PLAN.md) |
+| **Recovers from failures** | Every incident is a failure it recovers from. If a fix fails verification, Nightly undoes it ([`runner.py`](backend/nightshift/runner.py), test `test_failed_verification_undoes_action`). It survived neatlogs losing most of Scout's traces ([`evidence/scout/`](evidence/scout/README.md#what-we-learned-and-changed)) |
+| **Used neatlogs** | Every agent run and every investigation is traced. Nightly reads traces back over the neatlogs MCP during investigations, and creates a neatlogs detection after an attack. [`evidence/neatlogs.md`](evidence/neatlogs.md) |
+| **Used Entire** | Every bad release was written by a separate Claude Code session with an Entire checkpoint. Nightly resolves commit → checkpoint → prompt → the coding agent's own warning, plus entire-graph change lists. [`evidence/entire.md`](evidence/entire.md) |
+| **Used cfo.ai** | [Business plan in cfo.ai](https://app.cfo.ai/s/CsWafbQfu2U1y94W) (pricing, costs, revenue, runway: break-even M08, runway > 24 months) and [customer unit economics in cfo.ai](https://app.cfo.ai/s/fHcCAy2lG_aXs3Qt), which Nightly uses to price every incident. [`business/PLAN.md`](business/PLAN.md) |
 | **Built in public** | #neatHack posts, drafted in [`posts/`](posts) |
 | **Code written during the hackathon** | Commit history (first commit is the plan only), build log in [`hackathon.md`](hackathon.md) |
 
@@ -37,10 +37,10 @@ approval in Slack.*
 
 | | |
 |---|---|
-| **Connect an agent** | A 5-step wizard: name it → add the SDK → paste your neatlogs key (Night Shift finds your traces) → what a bad run costs → go live |
-| **SDK** (`pip install nightshift-sdk`) | Zero dependencies and fails open. Your agent reads its release, model, step cap and kill switches from Night Shift. It reports deploys and graded outcomes, and runs verification replays. [`sdk/python/`](sdk/python) |
-| **Agent page** | Live metrics, the control plane Night Shift steers, deploys (one-click redeploy), traces, a versioned policy editor, economics, credentials |
-| **Incident inbox** | Timeline of the investigation, root cause → commit → Entire checkpoint → prompt, $ at risk, replay results, Approve and Undo, and the postmortem Night Shift writes |
+| **Connect an agent** | A 5-step wizard: name it → add the SDK → paste your neatlogs key (Nightly finds your traces) → what a bad run costs → go live |
+| **SDK** (`pip install nightly-sdk`) | Zero dependencies and fails open. Your agent reads its release, model, step cap and kill switches from Nightly. It reports deploys and graded outcomes, and runs verification replays. [`sdk/python/`](sdk/python) |
+| **Agent page** | Live metrics, the control plane Nightly steers, deploys (one-click redeploy), traces, a versioned policy editor, economics, credentials |
+| **Incident inbox** | Timeline of the investigation, root cause → commit → Entire checkpoint → prompt, $ at risk, replay results, Approve and Undo, and the postmortem Nightly writes |
 | **Slack app** | One message per incident, updated as it works, with **Approve fix** and **Undo** buttons. Approving a code fix opens a revert PR on your repo with the postmortem and a regression eval |
 | **Policy** | YAML per agent: confidence and money gates, which reversible actions it may take alone, and what always needs a human. The API rejects any "auto" action that isn't reversible |
 
@@ -49,7 +49,7 @@ approval in Slack.*
 ```
  your agent ──(neatlogs SDK traces)──► neatlogs ◄──(MCP read-back)───┐
      │  ▲                                                             │
-     │  └── nightshift-sdk: release · model · flags · step cap        │
+     │  └── nightly-sdk: release · model · flags · step cap        │
      └────► outcomes, deploys, replay results ──► NIGHT SHIFT ────────┘
                                                    1 WATCH       failures, tool errors, escalations, loops, cost
                                                    2 INVESTIGATE Claude Sonnet + tools: traces, deploy log, diff,
@@ -98,7 +98,7 @@ branches). `scripts/restore_entire_refs.sh` moves them to `refs/entire/*`.
 | `backend/nightshift/` | Detector, investigator, provenance (git + Entire + entire-graph), impact, policy, actions, verifier, reporter, adapters, neatlogs sources |
 | `backend/product/` | Workspaces, agents, encrypted secrets, Slack app, paging, GitHub fix PRs, repo clones |
 | `backend/api/` | FastAPI: product API, SDK endpoints, Slack endpoints, sandbox, SSE |
-| `sdk/python/` | `nightshift-sdk` |
+| `sdk/python/` | `nightly-sdk` |
 | `backend/harbor/` | Harbor, the refunds support agent (releases r42–r46 written by coding-agent sessions) |
 | `agents/scout/` | Scout, the docs assistant, connected only through the SDK and neatlogs |
 | `web/` | Next.js: site, app, docs, sandbox |
@@ -112,5 +112,5 @@ branches). `scripts/restore_entire_refs.sh` moves them to `refs/entire/*`.
   answers questions from a fixed bank about a fictional product.
 - Harbor's provider outage is injected in our gateway client, and the prompt-injection traffic is generated.
 - The `sim` brain exists for offline demos and tests and is never used for evidence.
-- Permanent fixes are proposed as PRs, never merged by Night Shift: shipping code is a human decision by design.
-- Night Shift currently ships a Python SDK only; other agents can call the HTTP API directly.
+- Permanent fixes are proposed as PRs, never merged by Nightly: shipping code is a human decision by design.
+- Nightly currently ships a Python SDK only; other agents can call the HTTP API directly.

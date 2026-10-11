@@ -317,7 +317,7 @@ def default_economics() -> dict[str, Any]:
             "source": "defaults — edit in the agent's settings or sync from cfo.ai"}
 
 
-DEFAULT_POLICY_YAML = """# What Night Shift may do on its own for this agent.
+DEFAULT_POLICY_YAML = """# What Nightly may do on its own for this agent.
 gates:
   min_confidence: 0.6
   min_projected_loss_usd: 25

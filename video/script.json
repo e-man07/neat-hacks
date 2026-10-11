@@ -1,0 +1,22 @@
+[
+ {"scene":"hi","text":"Hi! I'm Nightly."},
+ {"scene":"fact","text":"Ghost fact."},
+ {"scene":"fact","text":"I never sleep."},
+ {"scene":"watch","text":"So while you sleep, I watch your AI agents."},
+ {"scene":"watch","text":"Every run, all night."},
+ {"scene":"runs","text":"Now. It's three a.m."},
+ {"scene":"deploy","text":"Someone ships a change..."},
+ {"scene":"deploy","text":"and your agent starts failing."},
+ {"scene":"nobody","text":"Nobody's awake."},
+ {"scene":"dig","text":"So I dig in."},
+ {"scene":"dig","text":"I read the traces, find the change behind it,"},
+ {"scene":"dig","text":"and put a price on every minute."},
+ {"scene":"fix","text":"Then I roll it back,"},
+ {"scene":"fix","text":"and prove the fix works."},
+ {"scene":"slack","text":"You get one message."},
+ {"scene":"slack","text":"The real fix waits for your yes."},
+ {"scene":"tagline","text":"AI agents break at night."},
+ {"scene":"tagline","text":"Nightly fixes them."},
+ {"scene":"sdk","text":"Put your agent on call in five minutes."},
+ {"scene":"end","text":"Nightly. Go to sleep."}
+]

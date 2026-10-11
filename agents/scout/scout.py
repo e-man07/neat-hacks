@@ -1,8 +1,8 @@
 """Scout: the docs Q&A assistant for Lumen, a (fictional) product analytics SaaS.
 
-Scout is an ordinary customer agent. It knows nothing about Night Shift's internals: it is traced by
-neatlogs, reads its release, model and limits through the Night Shift SDK, reports deploys and graded
-outcomes, and runs verification replays when Night Shift asks.
+Scout is an ordinary customer agent. It knows nothing about Nightly's internals: it is traced by
+neatlogs, reads its release, model and limits through the Nightly SDK, reports deploys and graded
+outcomes, and runs verification replays when Nightly asks.
 
     python scout.py ask "How many steps can a funnel have?"
     python scout.py serve --rate 6          # live traffic + replay worker
@@ -323,7 +323,7 @@ def init_tracing() -> None:
 
 
 def handle(question: str, ns: Any, replay: bool = False) -> dict[str, Any]:
-    """Answer one question on whatever Night Shift says is live, and report the graded outcome."""
+    """Answer one question on whatever Nightly says is live, and report the graded outcome."""
     init_tracing()
     try:
         release = load_release(ns.release(DEFAULT_RELEASE))
@@ -370,9 +370,9 @@ def replay_handler(ns: Any) -> Callable[[str], dict[str, Any]]:
 
 # -- CLI ------------------------------------------------------------------------------------------------------
 def _ns():
-    from nightshift_sdk import NightShift
+    from nightly_sdk import Nightly
 
-    return NightShift()
+    return Nightly()
 
 
 class _Pinned:

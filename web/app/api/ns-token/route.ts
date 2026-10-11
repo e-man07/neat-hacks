@@ -4,7 +4,7 @@ import { auth, githubEnabled } from "@/auth";
 
 export const dynamic = "force-dynamic";
 
-/** A short-lived bearer token for the Night Shift API, minted for the signed-in user. */
+/** A short-lived bearer token for the Nightly API, minted for the signed-in user. */
 export async function GET() {
   if (!githubEnabled) {
     return NextResponse.json({ dev: true, token: null, user: { login: "dev", name: "Local developer", avatar: null } });

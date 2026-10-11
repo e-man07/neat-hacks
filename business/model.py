@@ -1,4 +1,4 @@
-"""Night Shift business model (draft mirrored into cfo.ai).
+"""Nightly business model (draft mirrored into cfo.ai).
 
 Computes a 24-month plan — pricing, unit costs, revenue, costs, cash and runway — from the
 assumptions below and the investigation costs measured in the latest live benchmark.
@@ -99,7 +99,7 @@ def build() -> dict:
 def write(plan: dict) -> None:
     (ROOT / "web" / "public").mkdir(parents=True, exist_ok=True)
     (ROOT / "web" / "public" / "business.json").write_text(json.dumps(plan, indent=2))
-    lines = ["# Night Shift — business plan (draft)", "", f"_Status: {plan['status']}_", "",
+    lines = ["# Nightly — business plan (draft)", "", f"_Status: {plan['status']}_", "",
              "## Pricing", "", "| Tier | Price | Includes |", "|---|---|---|"]
     for p in plan["pricing"]:
         lines.append(f"| {p['tier']} | {p['price']} | {'; '.join(p['includes'])} |")
