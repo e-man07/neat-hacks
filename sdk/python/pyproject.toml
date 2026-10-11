@@ -1,14 +1,25 @@
 [project]
 name = "nightly-sdk"
-version = "0.2.0"
+version = "0.1.0"
 description = "Connect an LLM agent to Nightly: the on-call engineer for AI agents"
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = []
+keywords = ["llm", "agents", "on-call", "observability", "incident-response"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Operating System :: OS Independent",
+  "Topic :: Software Development :: Libraries",
+]
+
+[project.urls]
+Homepage = "https://web-emrq.vercel.app"
+Documentation = "https://web-emrq.vercel.app/docs"
+Source = "https://github.com/e-man07/neat-hacks/tree/main/sdk/python"
 
 [build-system]
 requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["nightly_sdk", "nightly_sdk"]
+packages = ["nightly_sdk", "nightshift_sdk"]
