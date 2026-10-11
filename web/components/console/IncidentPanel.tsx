@@ -139,6 +139,33 @@ export default function IncidentPanel({
           </div>
         )}
 
+        {/* How the price was computed */}
+        {inc.impact && (
+          <div className="mt-2 rounded-lg border border-line bg-white/[0.02] p-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <Label>how Nightly priced it</Label>
+              {inc.impact.economics_source && (
+                <span className="ml-auto max-w-[60%] truncate font-mono text-[10.5px] text-white/40" title={inc.impact.economics_source}>
+                  {inc.impact.economics_source}
+                </span>
+              )}
+            </div>
+            <div className="mt-2 font-mono text-[12px] leading-relaxed text-white/75">
+              {money(inc.impact.excess_loss_per_conversation + (inc.impact.extra_llm_cost_per_conversation ?? 0), 2)} lost per bad run ×{" "}
+              {inc.impact.conversations_per_minute} runs/min at {inc.impact.local_time} ={" "}
+              <span className="text-amber">{money(inc.impact.loss_per_minute, 2)}/min</span>
+              <br />× {inc.impact.human_response_minutes} min until a human would answer ={" "}
+              <span className="text-white">{money(inc.impact.projected_loss_if_waiting)}</span> at risk
+              {inc.impact.observed_loss > 0 && (
+                <>
+                  <br />
+                  already lost before Nightly acted: <span className="text-alert">{money(inc.impact.observed_loss, 2)}</span>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Why it acted (or didn't) */}
         {decision?.reasons?.length ? (
           <div className="mt-3 rounded-lg border border-line p-3">
