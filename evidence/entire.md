@@ -100,6 +100,27 @@ backend/harbor/releases/r43.yaml (YAML)
   + section system_prompt added
 ```
 
+## entire-graph as coding-agent context
+
+The hackathon asks for Entire to give the coding agent repository context. On Oct 12 we ran
+`entire graph init-agents`, which installs the entire-graph guide into [`CLAUDE.md`](../CLAUDE.md) and
+[`AGENTS.md`](../AGENTS.md) (`.entire/graph-agent.md`). Every Claude Code session in this repo now starts by locating code with
+the graph instead of grep. The session that added this evidence worked that way, and its raw outputs are in
+[`entire-graph/`](entire-graph/):
+
+- **Locate** ([`search-judge-page.txt`](entire-graph/search-judge-page.txt)):
+  `entire graph search --repo . --profile full --query "judge page that maps each criterion to neatlogs evidence"`.
+  The top hit was `JudgePage` in `web/app/judge/page.tsx`, followed by the neatlogs MCP client and the detection code.
+  That is where the neatlogs screenshots were then added.
+- **Impact** ([`impact-ensure_detection.txt`](entire-graph/impact-ensure_detection.txt)):
+  `entire graph impact --repo . --symbol ensure_detection` lists the five neatlogs MCP calls the detection
+  depends on. It reported 0 callers, but `runner.py:264` calls it as `reporter.ensure_detection(...)`.
+  We checked that by hand, as the guide says: treat graph output as evidence, not as an oracle.
+- **Checkpoint** ([`checkpoint-r46.txt`](entire-graph/checkpoint-r46.txt)):
+  `entire graph checkpoint 01M4KQB647BD1PF22Y91BZC2F8` gives the entity-level change list for the r46 release
+  behind that checkpoint. Nightly adds the same kind of change list to every incident's provenance at runtime
+  (`entire graph commit`, in `backend/nightshift/provenance.py`).
+
 ## Checkpoints on this branch
 
 ```

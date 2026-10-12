@@ -10,7 +10,7 @@ Problem: agent failures (prompt regressions, tool API drift, retry loops, provid
 injection) return HTTP 200 and go unnoticed until money is lost; nobody is awake at 3 AM.
 
 ## Team
-Aman (handle to be confirmed by Aman).
+Aman Jha ([@WhyParabola](https://x.com/WhyParabola)).
 
 ## Stack
 - Python 3.13, FastAPI, SQLite; Next.js + Tailwind (web)
@@ -81,6 +81,12 @@ Aman (handle to be confirmed by Aman).
 - Entire checkpoints moved from temporary `_entire/*` branches to `refs/entire/checkpoints/*` (31 refs) and the repo mirrored on entire.io; all 7 checkpoint links in the evidence now open.
 - Moved the site to https://nightly.whyparabola.online and renamed the repo to `e-man07/nightly`; the API allows the new origin and Slack links point to it.
 
+### 2026-10-12 ~15:00 IST: evidence pass before submission
+- neatlogs screenshots added (the trace links need a login): one incident shown as before / during / after traces from Harbor (policy checked → $249 refund with no check → policy checked again and the refund declined), the investigation trace, the detection Nightly created, and the traces list. They are in `evidence/neatlogs.md` and on `/judge`.
+- entire-graph now gives the coding agent repository context: `entire graph init-agents` installed its guide in `CLAUDE.md` and `AGENTS.md`. This session located code with `entire graph search`, `impact` and `checkpoint`, and the raw outputs are in `evidence/entire-graph/`. One finding: `impact` missed a caller reached through a module attribute (`reporter.ensure_detection`), and we checked it by hand.
+- GitHub repo description set. Demo script and post drafts tightened for tonight.
+- Tests: 26 passed (`uv run pytest`).
+
 ## Demo
 Live: https://nightly.whyparabola.online (GitHub sign-in) · sandbox without an account: `/sandbox` · SDK docs: `/docs`.
 Script: `docs/DEMO_SCRIPT.md` (a live Scout incident through the product, with the sandbox as fallback). Local: `scripts/dev.sh`.
@@ -94,4 +100,4 @@ Script: `docs/DEMO_SCRIPT.md` (a live Scout incident through the product, with t
 ## Submission
 - Confirmed (neatlogs.com/hackathon, re-checked Oct 11): one track; must use neatlogs, Entire and cfo.ai, and include the cfo.ai business plan; public repo with commits dated during the event; submit by quoting the official neatlogs post with team, project, repo and demo. Planned window Oct 12, 7:00–11:55 PM IST, with the final cutoff on Discord. Judging: agent 30%, tool use 25%, demo 20%, building in public 15%, usefulness 10%.
 - Done: public repo; live product; evidence for neatlogs, Entire, cfo.ai, before/after and recovery; cfo.ai plan links.
-- Outstanding (Aman): confirm the cutoff on Discord; post the remaining #neatHack drafts (`posts/drafts.md`); neatlogs screenshots; record the demo; submit the quote post in the window.
+- Outstanding (Aman): confirm the cutoff on Discord; post the remaining #neatHack drafts (`posts/drafts.md`); record the demo; submit the quote post in the window.

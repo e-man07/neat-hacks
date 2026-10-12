@@ -12,6 +12,29 @@ Project: **Aman's project** (`c2894ca1-bc61-4250-9278-83da3c88ed08`, tier free).
 - `nightshift` traces matching a sample query: 15
 - Active detections: Order-note prompt injection, Expensive LLM Call, Slow LLM Response, Execution Failed
 
+## Screenshots from the neatlogs app
+
+The trace links need a neatlogs login, so here is what they show.
+
+**Before → during → after for one incident (I1, unchecked refunds), as Harbor's own traces:**
+
+| Before (r41) | During the bad release | After Nightly's rollback |
+|---|---|---|
+| ![before](screenshots/neatlogs-before-policy-checked.jpg) | ![during](screenshots/neatlogs-during-unchecked-refund.jpg) | ![after](screenshots/neatlogs-after-policy-restored.jpg) |
+| `f92057c5…`: `lookup_order` → `check_refund_policy` → `issue_refund` for an eligible damaged order | `055faaef…`: "I changed my mind", then `issue_refund` of $249 with **no policy check** (one of the traces the investigator cited) | `9bf451cf…`: "I changed my mind", then `check_refund_policy` and the refund is declined (outside the 30-day window) |
+
+**The investigation itself** (`c5fc4e01…`, one `oncall_incident` trace, 40 steps, 88 s): the Sonnet `investigate`
+agent calls `get_signals`, `list_recent_deploys`, `get_failing_conversations`, `get_release_diff`,
+`get_change_provenance` (Entire) and `get_trace` (neatlogs MCP read-back). The `support_conversation`
+verification replays follow it.
+
+![investigation trace](screenshots/neatlogs-investigation-trace.jpg)
+
+**The detection Nightly created** after the prompt-injection wave ("Order-note prompt injection", tagged Night Shift), and the project's traces list:
+
+![detections](screenshots/neatlogs-detections.jpg)
+![traces](screenshots/neatlogs-traces-list.jpg)
+
 ## Traces from benchmark run `run3-live`
 
 | Incident | Night Shift investigation trace | Evidence traces cited | Before (baseline) | During | After |

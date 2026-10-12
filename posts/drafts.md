@@ -6,6 +6,19 @@ the demo, and the submission quote post in the window.
 
 Links: repo https://github.com/e-man07/nightly · live https://nightly.whyparabola.online
 
+## Tonight's plan (Oct 12)
+
+Building in public is 15% of the score and only the explainer post is up so far. Post these, spaced
+1–2 hours apart, before the submission window (7:00 PM IST) where possible:
+
+1. **9 (before / during / after)**: the strongest visual, and it shows neatlogs at work.
+2. **2 (the bad releases are real)**: shows Entire at work.
+3. **4 (it chose not to wake me)**: shows cfo.ai and judgement.
+4. **8 (demo)**: as soon as the video is uploaded.
+5. **Submission quote post**: in the window, early rather than at 11:50.
+
+Reply to your own first post with each new one, so judges can read them as one thread.
+
 ## 1 — the idea  (screenshot: landing page)
 Building Nightly for #neatHack: the on-call engineer for your AI agents.
 
@@ -66,8 +79,17 @@ message. [video link]
 
 Repo + evidence: https://github.com/e-man07/nightly #neatHack
 
+## 9 — same request, three traces  (attach the 3 screenshots in evidence/screenshots/neatlogs-*-*.jpg)
+Same kind of refund request, three @neatlogs traces:
+
+before: policy checked ✅
+bad release: $249 refunded, no check ❌
+after Nightly rolled it back on its own: policy checked, refund declined ✅
+
+Every request returned 200. #neatHack
+
 ## Submission quote post  (Oct 12, in the window; quote the official neatlogs submission post)
-Team: [team name]
+Team: [team name as registered on Luma], Aman Jha (@WhyParabola)
 Project: Nightly, the on-call engineer for your AI agents
 Repo: https://github.com/e-man07/nightly
 Demo: [video link] · Live: https://nightly.whyparabola.online

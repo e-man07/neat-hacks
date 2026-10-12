@@ -1,0 +1,21 @@
+Index: cache-miss (1720ms) | Query: 0ms | Total: 1721ms
+Completeness: no parse failures in Python (66 files parsed); 2 elsewhere (JSON 2) cannot affect this answer — see --format json.
+Impact: ensure_detection (backend/nightshift/reporter.py:52) def=52 span=52-78 [function]
+Blast radius: 0 callers (0 direct, 0 transitive), 5 callees, 2 type consumers, 0 data flows, 0 co-change files, 0 siblings.
+Callers (0 direct, 0 transitive; who breaks if behavior changes):
+- none
+Callees (5; what it depends on):
+- NeatlogsMCP.list_detections (backend/nightshift/neatlogs_mcp.py:126)
+- NeatlogsMCP.list_detection_groups (backend/nightshift/neatlogs_mcp.py:129)
+- NeatlogsMCP.create_detection_group (backend/nightshift/neatlogs_mcp.py:132)
+- NeatlogsMCP.preview_detection (backend/nightshift/neatlogs_mcp.py:135)
+- NeatlogsMCP.create_detection (backend/nightshift/neatlogs_mcp.py:139)
+Type consumers (0 in, 2 out; USES_TYPE/PARAM_TYPE/RETURNS_TYPE):
+- -> NeatlogsMCP (backend/nightshift/neatlogs_mcp.py:26) [PARAM_TYPE]
+- -> NeatlogsMCP (backend/nightshift/neatlogs_mcp.py:26) [USES_TYPE]
+Data flows (0 in, 0 out):
+- none
+Co-change coupling (0; files that historically change with backend/nightshift/reporter.py):
+- none
+Same-container siblings (0):
+- none

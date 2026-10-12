@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 const GH = "https://github.com/e-man07/nightly/blob/main";
 const TREE = "https://github.com/e-man07/nightly/tree/main";
 
-type Item = { claim: ReactNode; links: [string, string][] };
+type Item = { claim: ReactNode; links: [string, string][]; shots?: [string, string][] };
 type Criterion = { name: ReactNode; weight: string; items: Item[] };
 
 const CRITERIA: Criterion[] = [
@@ -48,6 +48,15 @@ const CRITERIA: Criterion[] = [
         claim: "Run 1 → run 3: 4/6 → 6/6 incidents handled correctly, after fixing confidence calibration and impact pricing based on what run 1 showed.",
         links: [["Before / after", `${GH}/evidence/before-after.md`]],
       },
+      {
+        claim: "The same change in Harbor’s neatlogs traces. Before: the policy is checked. During the bad release: a $249 refund with no policy check. After Nightly’s rollback: the policy is checked again and the refund is declined.",
+        links: [["Trace ids", `${GH}/evidence/neatlogs.md`]],
+        shots: [
+          ["/evidence/neatlogs-before-policy-checked.jpg", "Before (r41): lookup → check_refund_policy → refund"],
+          ["/evidence/neatlogs-during-unchecked-refund.jpg", "During (bad release): refund with no policy check"],
+          ["/evidence/neatlogs-after-policy-restored.jpg", "After rollback: policy checked, refund declined"],
+        ],
+      },
     ],
   },
   {
@@ -78,12 +87,24 @@ const CRITERIA: Criterion[] = [
       {
         claim: "neatlogs: every agent run and every investigation is traced; Nightly reads traces back over the neatlogs MCP and creates a detection after an attack.",
         links: [["neatlogs evidence", `${GH}/evidence/neatlogs.md`]],
+        shots: [
+          ["/evidence/neatlogs-investigation-trace.jpg", "One investigation in neatlogs: the Sonnet agent’s tool calls, then the verification replays"],
+          ["/evidence/neatlogs-detections.jpg", "The detection Nightly created after the prompt-injection wave"],
+          ["/evidence/neatlogs-traces-list.jpg", "1,075 traces in the project"],
+        ],
       },
       {
         claim: "Entire: every bad release was written by a separate Claude Code session with its own checkpoint. Nightly resolves commit → checkpoint → prompt → the coding agent’s own warning.",
         links: [
           ["Entire evidence", `${GH}/evidence/entire.md`],
           ["r46 checkpoint on entire.io", "https://entire.io/gh/e-man07/nightly/commit/e26a58f17ad4af5d119de989ebeaafc7055b8929"],
+        ],
+      },
+      {
+        claim: "entire-graph gives our own coding agent repository context: the guide is installed in CLAUDE.md and AGENTS.md, and sessions locate code with graph search and impact before editing. At runtime Nightly adds entire-graph’s change list to every incident’s provenance.",
+        links: [
+          ["entire-graph evidence", `${GH}/evidence/entire.md#entire-graph-as-coding-agent-context`],
+          ["CLAUDE.md", `${GH}/CLAUDE.md`],
         ],
       },
       {
@@ -158,6 +179,22 @@ export default function JudgePage() {
                       </a>
                     ))}
                   </div>
+                  {it.shots && (
+                    <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                      {it.shots.map(([src, caption]) => (
+                        <a key={src} href={src} target="_blank" rel="noreferrer" className="group block">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={src}
+                            alt={caption}
+                            loading="lazy"
+                            className="aspect-[16/10] w-full rounded-lg border border-line object-cover object-top transition group-hover:border-line-strong"
+                          />
+                          <span className="mt-1.5 block text-[12px] leading-snug text-muted">{caption}</span>
+                        </a>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
