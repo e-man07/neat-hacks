@@ -1,0 +1,15 @@
+{
+  "tool_use_id": "toolu_01TZYv3VTjT9kvsXxcePP43K",
+  "agent_id": "afa70d8b262e91750",
+  "subagent_type": "general-purpose",
+  "task_description": "Restyle the judge page",
+  "token_usage": {
+    "input_tokens": 34,
+    "cache_creation_tokens": 116506,
+    "cache_read_tokens": 1042858,
+    "output_tokens": 14726,
+    "api_call_count": 17
+  },
+  "started_at": "2026-10-12T17:24:42.18573+05:30",
+  "completed_at": "2026-10-12T17:27:52.271821+05:30"
+}
