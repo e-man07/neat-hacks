@@ -187,7 +187,12 @@ function OverviewTab({ id, s, onChange }: { id: string; s: State; onChange: () =
         <Kpi label="Runs watched" value={s.totals.n.toLocaleString()} icon={Activity} hint={`${fmtUsd(s.totals.loss)} lost to bad runs`} />
         <Kpi label="Bad-run rate" value={`${badRate}%`} icon={Percent} tone={badRate >= 20 ? "alert" : badRate >= 10 ? "amber" : undefined} hint="last 10 runs" />
         <Kpi label="Tool-error rate" value={`${toolRate}%`} icon={Wrench} tone={toolRate >= 20 ? "alert" : toolRate >= 10 ? "amber" : undefined} hint="last 10 runs" />
-        <Kpi label="LLM cost / run" value={fmtUsd(w.cost_per_conv, 4)} icon={Coins} hint={`${fmtUsd(s.totals.cost)} total`} />
+        <Kpi
+          label="LLM cost / run"
+          value={fmtUsd(w.cost_per_conv || (s.totals.n ? s.totals.cost / s.totals.n : 0), 4)}
+          icon={Coins}
+          hint={w.cost_per_conv ? `${fmtUsd(s.totals.cost)} total` : `average of ${s.totals.n} runs · ${fmtUsd(s.totals.cost)} total`}
+        />
       </div>
       {s.signals.length > 0 && (
         <Card className="gap-2 border-alert/30 bg-alert/[0.05] px-5 py-4">
