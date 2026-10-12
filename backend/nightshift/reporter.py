@@ -82,7 +82,9 @@ def postmortem(db: OpsDB, incident_id: str) -> str:
     for a in acts:
         lines.append(f"- [{a['mode']}] `{a['kind']}` {a['params_json']} — {a['status']} — {a['reason'] or ''}")
     lines += ["", "## Verification",
-              f"- Replay of failing conversations: {verify.get('replay', {}).get('passed')}/{verify.get('replay', {}).get('n')} pass",
+              ("- Replay of failing conversations: "
+               + (f"{verify['replay'].get('passed')}/{verify['replay'].get('n')} pass" if verify.get("replay")
+                  else "not run (no containment was applied)")),
               f"- Live metrics after action: {', '.join(verify.get('live_reasons', [])) or 'pending'}"]
     det = verify.get("neatlogs_detection") or {}
     if det:

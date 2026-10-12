@@ -106,7 +106,11 @@ export default function IncidentView({
               </>
             )}
           </div>
-          {inc.summary && <p className="mt-3 max-w-3xl text-sm leading-relaxed text-foreground/80">{inc.summary}</p>}
+          {inc.summary && (
+            <div className="mt-3 max-w-3xl text-sm leading-relaxed text-foreground/80 [&_strong]:font-semibold [&_strong]:text-foreground">
+              <ReactMarkdown remarkPlugins={[remarkGfm]} components={{ p: ({ children }) => <p>{children}</p> }}>{inc.summary}</ReactMarkdown>
+            </div>
+          )}
         </div>
       </div>
 
@@ -309,7 +313,9 @@ export default function IncidentView({
               <dl className="space-y-3 text-sm">
                 <div>
                   <dt className="text-xs text-muted-foreground">Root cause</dt>
-                  <dd className="mt-0.5 text-foreground/85">{d.root_cause}</dd>
+                  <dd className="mt-0.5 text-foreground/85 [&_strong]:font-semibold [&_strong]:text-foreground">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{String(d.root_cause ?? "")}</ReactMarkdown>
+                  </dd>
                 </div>
                 <div className="flex justify-between gap-3">
                   <dt className="text-muted-foreground">Action</dt>
