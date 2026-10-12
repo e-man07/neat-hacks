@@ -278,3 +278,97 @@ go
 ---
 
 I am thinking of creating it as a proper launch video lest's suppose our icon is sitting on right of the corner and it is presenting demo and speaking like a normal human will do and bonus point for is this one , I will give raw video once it is rendered and for video editing voiceover, motion graphic, 3d character take refrence from our /myprojects/video-content directory you will find elevn lab voice clips there as well, the demo should be conversational human, less jargony words more human
+
+---
+
+how much will you rate it?
+
+---
+
+how much will you rate it? and bonus point is for explaing the problem , solution and how we have used sponsors
+
+---
+
+yes go with the four-act version
+
+---
+
+'/Users/e-man/myprojects/nightly/Cap 2026-10-12 at 18.20.51.mp4' here is the raw recording
+
+---
+
+did you use html for creatong card components or js [Image #2] it is loking very bad cards and all not at all professional very bad visuals overall and even you didn't show the full landing it is cutting out for viewport and what is this purple background it does not look night did you take reference from video content poroejcts wehere we have created motion graphics, music evrything using js and code and what is this in the end? [Image #3] you're ending on screenrecording after demo has been finished does it make sense to show screen recording and showing cards and also captions typography everything is very bad
+
+---
+
+did you use html for creatong card components or js [Image #2] it is loking very bad cards and all not at all professional very bad visuals overall and even you didn't show the full landing it is cutting out for viewport and what is this purple background it does not look night did you take reference from video content poroejcts wehere we have created motion graphics, music evrything using js and code and what is this in the end? [Image #3] you're ending on screenrecording after demo has been finished does it make sense to show screen recording and showing cards and also captions typography everything is very bad[Image #4]
+
+---
+
+and also need zzom in zoom out feature for isnide screen recording when we're explaining things on that page
+
+---
+
+yes go ahead
+
+---
+
+did we include this in the script? Show the problem, why it matters, and how your solution works.
+
+---
+
+<task-notification>
+<task-id>bbsc2bfyq</task-id>
+<tool-use-id>toolu_01BhxxDNeke9bYLYTY4i4Zr1</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-e-man-myprojects-nightly/a30e9422-8f5c-4430-ab19-74789697ad14/tasks/bbsc2bfyq.output</output-file>
+<status>completed</status>
+<summary>Background command "Rebuild, lint and snapshot the redesigned film" completed (exit code 0)</summary>
+</task-notification>
+
+---
+
+yes do it
+
+---
+
+render it
+
+---
+
+till then give the launchpost caption [Image #5] in thsi format
+
+---
+
+<task-notification>
+<task-id>btzl8t2tp</task-id>
+<tool-use-id>toolu_01R6PJfGve2hyvoWzBVFbXfL</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-e-man-myprojects-nightly/a30e9422-8f5c-4430-ab19-74789697ad14/tasks/btzl8t2tp.output</output-file>
+<status>completed</status>
+<summary>Background command "Render the film at delivery quality" completed (exit code 0)</summary>
+</task-notification>
+
+---
+
+copy the video to my desktop
+
+---
+
+don't you think we should add the logo of each product we're talking about in the side above [Image #6] parllel to nightly character?[Image #7]
+
+---
+
+give me final caption in bullet points stating a lil story why we build nighlty then atht problem it solves and solution
+
+---
+
+<task-notification>
+<task-id>bwu3i9r72</task-id>
+<tool-use-id>toolu_0124BWvnuorAZAb2dWQ4XeLx</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-e-man-myprojects-nightly/a30e9422-8f5c-4430-ab19-74789697ad14/tasks/bwu3i9r72.output</output-file>
+<status>completed</status>
+<summary>Background command "Re-render, master, and copy the final video to the Desktop" completed (exit code 0)</summary>
+</task-notification>
+
+---
+
+here is the link https://x.com/WhyParabola/status/2109650318481088819
