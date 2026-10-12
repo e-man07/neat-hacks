@@ -1,0 +1,95 @@
+/* Landing-page-only styles. Hero content is never hidden in its initial state: everything here
+   animates things that are already visible (or that appear later in a loop). */
+
+.lp-hero-glow {
+  background:
+    radial-gradient(60% 50% at 50% 0%, rgba(47, 91, 211, 0.08), transparent 70%),
+    radial-gradient(40% 40% at 85% 30%, rgba(224, 80, 43, 0.06), transparent 70%);
+}
+
+.lp-grid {
+  background-image:
+    linear-gradient(rgba(17, 17, 17, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(17, 17, 17, 0.045) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000 30%, transparent 75%);
+}
+
+.lp-gradient-text {
+  background: linear-gradient(90deg, #18804a, #2f5bd3);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Hero incident card */
+.lp-bar {
+  transition: height 0.35s cubic-bezier(0.2, 0.7, 0.2, 1), background-color 0.4s ease;
+}
+
+.lp-step {
+  transition: color 0.35s ease, background-color 0.35s ease, border-color 0.35s ease, opacity 0.35s ease;
+}
+
+@keyframes lp-pop {
+  from { opacity: 0; transform: translateY(14px) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+
+.lp-pop {
+  animation: lp-pop 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@keyframes lp-ping {
+  0% { box-shadow: 0 0 0 0 currentColor; }
+  100% { box-shadow: 0 0 0 7px transparent; }
+}
+
+.lp-ping {
+  animation: lp-ping 1.4s ease-out infinite;
+}
+
+@keyframes lp-scan {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(400%); }
+}
+
+.lp-scan {
+  animation: lp-scan 1.6s linear infinite;
+}
+
+/* Logo marquee */
+@keyframes lp-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.lp-marquee {
+  animation: lp-marquee 32s linear infinite;
+}
+
+.lp-marquee-mask {
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+
+/* Scroll story: layers drift with --lp-p (0..1 progress through the section) */
+.lp-parallax-1 { transform: translate3d(0, calc(var(--lp-p, 0) * -160px), 0); }
+.lp-parallax-2 { transform: translate3d(0, calc(var(--lp-p, 0) * -320px), 0); }
+.lp-parallax-3 { transform: translate3d(0, calc(var(--lp-p, 0) * 120px), 0); }
+
+.lp-blob {
+  border-radius: 999px;
+  filter: blur(60px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-bar,
+  .lp-step { transition: none; }
+  .lp-pop,
+  .lp-ping,
+  .lp-scan,
+  .lp-marquee { animation: none; }
+  .lp-parallax-1,
+  .lp-parallax-2,
+  .lp-parallax-3 { transform: none; }
+}

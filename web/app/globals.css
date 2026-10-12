@@ -1,4 +1,7 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
 
 :root {
   /* Light only. Tailwind's white/black are used as foreground/background across the app, so they
@@ -25,6 +28,14 @@
   --info: #2f5bd3;
   --violet: #6d4fe0;
   color-scheme: light;
+  --sidebar: hsl(0 0% 98%);
+  --sidebar-foreground: hsl(240 5.3% 26.1%);
+  --sidebar-primary: hsl(240 5.9% 10%);
+  --sidebar-primary-foreground: hsl(0 0% 98%);
+  --sidebar-accent: hsl(240 4.8% 95.9%);
+  --sidebar-accent-foreground: hsl(240 5.9% 10%);
+  --sidebar-border: hsl(220 13% 91%);
+  --sidebar-ring: hsl(217.2 91.2% 59.8%);
 }
 
 .force-dark {
@@ -71,6 +82,85 @@
   --color-chip: var(--chip);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+}
+
+/* shadcn/ui tokens (dashboard components). `--muted` and `--card` above keep their app meaning (muted =
+   secondary text colour), so shadcn's muted surface is `secondary` here and its text is `muted-foreground`. */
+:root {
+  --radius: 0.625rem;
+  --background: #ffffff;
+  --foreground: #111111;
+  --card-foreground: #111111;
+  --popover: #ffffff;
+  --popover-foreground: #111111;
+  --primary: #111111;
+  --primary-foreground: #fafafa;
+  --secondary: #f5f5f4;
+  --secondary-foreground: #111111;
+  --accent: #f5f5f4;
+  --accent-foreground: #111111;
+  --destructive: #e0502b;
+  --muted-foreground: #6b6b6b;
+  --border: rgba(17, 17, 17, 0.09);
+  --input: rgba(17, 17, 17, 0.14);
+  --ring: rgba(17, 17, 17, 0.35);
+  --chart-1: #111111;
+  --chart-2: #e0502b;
+  --chart-3: #18804a;
+  --chart-4: #2f5bd3;
+  --chart-5: #b06a00;
+  --sidebar: #fafaf9;
+  --sidebar-foreground: #2a2a2a;
+  --sidebar-primary: #111111;
+  --sidebar-primary-foreground: #fafafa;
+  --sidebar-accent: #f0efeb;
+  --sidebar-accent-foreground: #111111;
+  --sidebar-border: rgba(17, 17, 17, 0.08);
+  --sidebar-ring: rgba(17, 17, 17, 0.35);
+}
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
 }
 
 html,
@@ -258,3 +348,23 @@ body {
 .prose-ns strong { color: var(--headline); }
 .prose-ns table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 0.8rem 0; }
 .prose-ns th, .prose-ns td { border-bottom: 1px solid var(--line); padding: 6px 8px; text-align: left; }
+
+.dark {
+  --sidebar: hsl(240 5.9% 10%);
+  --sidebar-foreground: hsl(240 4.8% 95.9%);
+  --sidebar-primary: hsl(224.3 76.3% 48%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(240 3.7% 15.9%);
+  --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
+  --sidebar-border: hsl(240 3.7% 15.9%);
+  --sidebar-ring: hsl(217.2 91.2% 59.8%);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
