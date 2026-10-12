@@ -28,7 +28,7 @@ const CRITERIA: Criterion[] = [
         ],
       },
       {
-        claim: "Benchmark of six staged incidents: 6/6 handled correctly; five contained 13–21 s after detection and verified by replay.",
+        claim: "Six incidents planted in Harbor, a live refunds agent: 6/6 handled correctly; five contained 13–21 s after detection and verified by replay.",
         links: [
           ["Benchmark results", "/benchmark"],
           ["Run logs", `${TREE}/evidence/benchmark`],
@@ -157,7 +157,9 @@ export default function JudgePage() {
       <p className="max-w-[720px] text-[15px] leading-relaxed text-muted">
         Nightly is the on-call engineer for AI agents. When a change makes an agent fail quietly, it finds the cause, prices
         the damage, applies a fix that can be undone, proves it by replaying the failed runs, and pages a human once.
-        Benchmark incidents are staged on purpose so they are reproducible; the Scout incidents ran live through the product.
+        Nightly and both agents it watches are live LLM agents: real model calls, real tool calls, every run traced in neatlogs,
+        and every bad release written by a separate Claude Code session. The agents’ users are scripted and the benchmark
+        incidents were planted, so the results can be reproduced.
       </p>
       <div className="mt-10 space-y-4">
         {CRITERIA.map((c, i) => (

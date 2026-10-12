@@ -6,7 +6,7 @@ When a change makes a production AI agent fail quietly, Nightly finds the cause,
 applies a fix that can be undone, proves it by replaying the failed runs, and pages you once in Slack.
 Built for neatHack 2026 (called *Night Shift* during the build; older evidence files use that name).
 
-| **6/6** staged incidents handled correctly | **13–21 s** from detection to containment | **4/6 → 6/6** from benchmark run 1 to run 3 |
+| **6/6** incidents planted in a live agent, handled correctly | **13–21 s** from detection to containment | **4/6 → 6/6** from benchmark run 1 to run 3 |
 |---|---|---|
 
 **Live:** [nightly.whyparabola.online](https://nightly.whyparabola.online) · [**for judges: every criterion and its evidence**](https://nightly.whyparabola.online/judge) ·
@@ -37,8 +37,12 @@ runs. Then it pages you once: *handled, here's what it cost, and a permanent fix
 approval in Slack.*
 
 > Autonomous within a policy you set. A human approves anything irreversible (code-fix PRs, refunds,
-> contacting customers, deleting data). Benchmark incidents are staged on purpose so they're
-> reproducible; the Scout incidents ran live through the product.
+> contacting customers, deleting data).
+>
+> **What's real:** Nightly and both agents it watches are live LLM agents. They make real model calls and
+> real tool calls, and every run is traced in neatlogs. Every bad release was written by a separate Claude
+> Code session. **What's staged:** the agents' users are scripted (a bank of customer messages and
+> questions), and the benchmark incidents were planted so the results can be reproduced.
 
 ## For judges: 60 seconds
 
@@ -86,7 +90,8 @@ demo script: [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md)
 
 ## Results
 
-- **Harbor benchmark** ([`evidence/benchmark/run3-live`](evidence/benchmark/)): six staged incidents
+- **Harbor benchmark** ([`evidence/benchmark/run3-live`](evidence/benchmark/)): Harbor is a live refunds
+  agent (Claude Haiku, real tool calls). We planted six incidents in it
   (unchecked refunds, tool schema drift, flaky-dependency loop, provider outage, prompt-injection
   wave, ticket flood). All six were handled correctly. Five were contained autonomously 13–21 s after
   detection and verified by replay; the low-impact one was deferred to the morning without paging
@@ -129,8 +134,9 @@ opens its checkpoint, session and the coding agent's prompt.
 
 ## Honest limitations
 
-- Harbor's customers are simulated from a scenario bank, and its tools act on a sandbox ledger. Scout
-  answers questions from a fixed bank about a fictional product.
+- The agents are real; their users aren't. Harbor's customers send scripted messages from a scenario
+  bank, and its refunds land in a test ledger. Scout answers a fixed question bank about a fictional product.
+- We wrote the benchmark incidents ourselves, so Nightly was tested on failures we knew in advance.
 - Harbor's provider outage is injected in our gateway client, and the prompt-injection traffic is generated.
 - The `sim` brain exists for offline demos and tests and is never used for evidence.
 - Permanent fixes are proposed as PRs, never merged by Nightly: shipping code is a human decision by design.
