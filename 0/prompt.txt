@@ -1,0 +1,382 @@
+I now have doubts on the way we're presenting info on landing page and our dashboard stil looks shit, it lloks, we're not using good dashboard components , cards, sidebar use that from maybe vercel brandkit and also landing page is very much text heavy, it does not look moder, ther eis no animations, infinite scroll, parallax effects and I think we're also not leading with our best proposition
+
+---
+
+tell me one more thing should I record myself demoing or ai generte demo will be nice?
+
+---
+
+by ai genrated I mean there will be screen recording of the product and ai will be dubbing voice?
+
+---
+
+<task-notification>
+<task-id>a1e9b461b117d509f</task-id>
+<tool-use-id>toolu_01L95Fd6CRXYvjkRMHKvGp7w</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-e-man-myprojects-nightly/a30e9422-8f5c-4430-ab19-74789697ad14/tasks/a1e9b461b117d509f.output</output-file>
+<status>completed</status>
+<summary>Agent "Redesign the landing page" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>The landing page is redesigned and committed as `d789dde` on branch `worktree-agent-a1e9b461b117d509f`. I did not push, merge or deploy. `tsc`, `eslint` on the page and new components, and `npm run build` all pass.
+
+**Blank hero is fixed.** `app/page.tsx` is now a server component and nothing in the hero starts hidden. The server HTML already contains the headline and the incident card, and the curl check found no `opacity:0` on hero content.
+
+**What's on the page now, top to bottom:**
+1. **Hero (two columns).** "Your AI agent broke at 3 AM. / Nightly fixed it before you woke up." with a one-sentence subline. Buttons: "Run the 3 AM incident" → /sandbox, "Connect your agent" → /app, and a small "For judges" link → /judge.
+2. **Live incident card (loops about every 16 s).** Bar chart of agent traffic ("Correct answers" drops 83% → 33% → 100% while "HTTP 200" stays at 100%), the r46 deploy marker, and red bars that turn green after rollback. Status goes healthy → "200 OK · wrong answers" → investigating → recovered. Six steps light up in turn: ships, detected (neatlogs), cause (commit e26a58f ← Entire checkpoint ← prompt), priced (cfo.ai, $22,846 at risk), contained (r46 → r41 in 20.6 s), verified (5/5 replays). It ends with a Slack-style toast: "✅ Handled — $22,846 prevented · Fix PR waiting for your approval", with Approve fix / Undo.
+3. **Proof strip with count-up:** 13–21 s to contain · 6/6 incidents · 4/6 → 6/6 · blind incident caught in 5 min, plus "$0.05–$0.15 per investigation".
+4. **Logo marquee:** neatlogs, Entire, cfo.ai (using the existing `Brand` marks), Slack, GitHub, PyPI.
+5. **Scroll-driven "3 AM" story (`id="how"`, so the nav link still works).** On desktop the timeline sits on the left and the visual on the right changes per step (7 steps, ending with the existing `SlackPreview`), with parallax layers behind. On mobile it becomes a simple stacked list.
+6. **With vs without Nightly** (3 lines each), the SDK snippet with `pip install nightly-sdk`, "Watch the 67-second explainer" (existing `HeroVideo`), a final CTA, and the footer.
+
+Copy is far shorter than before. The old integrations grid, architecture diagram, numbered rows, autonomy cards and comparison table are gone.
+
+**Choices and caveats you might want to revisit:**
+- **No `motion` package.** It isn't in this branch's `web/package.json` (it seems to exist only in the main checkout). Adding it would risk a package/lockfile conflict with the dashboard agent, so all animation is CSS plus small React hooks. Everything respects `prefers-reduced-motion`.
+- **No shadcn components.** `web/components/ui/` doesn't exist on this branch, so I used plain Tailwind and the old `components/ui.tsx` helpers.
+- **Data source.** The hero and story read the I1 incident from `public/benchmark.json` at build time, which is what puts the numbers in the first paint. The old page fetched the API live; the page no longer does.
+- **"$22,846 prevented".** This is that incident's at-risk figure, which the old page also called "saved".
+- **Unverified claims carried over.** "The coding agent warned about this" and "the neatlogs detection stopped firing" come from the old page and your brief. I didn't confirm either against that run's raw data.
+- **Disk is almost full** (about 230 MB free). One build failed with ENOSPC until I deleted this worktree's `.next` folder.
+- The servers I started are stopped and my browser tab is closed.
+
+**Mobile:** tested at 390 px in an iframe because resizing the window had no effect. No horizontal scroll; the SDK code block scrolls inside its own box. On a phone the hero card sits below the buttons.
+
+Screenshots are in `/tmp/nightly-landing-shots/`. I didn't save a single full-page desktop screenshot; the desktop shots cover the hero and the with/without + SDK sections.
+- `hero-first-load-desktop.jpg`: hero right after load, with headline and card visible. The proof numbers are caught mid count-up; the count now starts from 13 and 4/6, so it no longer shows "13–1 s".
+- `hero-loop-desktop.jpg`: the hero at the start of the loop. I watched the Slack toast appear but didn't save a screenshot of it.
+- `with-without-sdk-desktop.jpg`
+- `mobile-hero-top.png`, `mobile-hero-proof.png`, `mobile-sdk.png`
+
+**Files** (all paths start with `/Users/e-man/myprojects/nightly/.claude/worktrees/agent-a1e9b461b117d509f/web/`):
+- `app/page.tsx` (rewritten)
+- `components/landing/data.ts`
+- `components/landing/HeroIncident.tsx`
+- `components/landing/ProofStrip.tsx`
+- `components/landing/Story.tsx`
+- `components/landing/LogoMarquee.tsx`
+- `components/landing/landing.css`</result>
+<usage><subagent_tokens>173473</subagent_tokens><tool_uses>59</tool_uses><duration_ms>791455</duration_ms></usage>
+<worktree><worktreePath>/Users/e-man/myprojects/nightly/.claude/worktrees/agent-a1e9b461b117d509f</worktreePath><worktreeBranch>worktree-agent-a1e9b461b117d509f</worktreeBranch></worktree>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>ae96fdf7f7e336ca2</task-id>
+<tool-use-id>toolu_01DSjFefQvNuvg8NRddJXJmq</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-e-man-myprojects-nightly/a30e9422-8f5c-4430-ab19-74789697ad14/tasks/ae96fdf7f7e336ca2.output</output-file>
+<status>completed</status>
+<summary>Agent "Redesign the dashboard with shadcn" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>I've redesigned the signed-in dashboard on shadcn/ui and committed it as `5c63e3e` on branch `worktree-agent-ae96fdf7f7e336ca2`. Nothing is pushed, merged or deployed. `npx tsc --noEmit`, `npx eslint app/app components/app` and `npm run build` all pass, and the dev server and my seeding scripts are stopped.
+
+**Branch base.** My worktree started from `main`, which doesn't have the shadcn components. They were on `nightshift/p33-redesign` (commit `2b7935d`), so I fast-forwarded onto it. My commit sits on top of that branch.
+
+**What changed (only `web/app/app/**` and `web/components/app/**`):**
+- **Shell:** a collapsible sidebar (shrinks to icons) with the Nightly logo and workspace name. Nav groups have icons and keep every existing link, and Incidents shows a count of open incidents. The footer has your avatar and name, plus sign-out or the dev-mode note. A top bar has the sidebar toggle, a breadcrumb and a "Connect an agent" button. On a phone-width screen the sidebar opens as a slide-in panel.
+- **Overview:** four KPI cards with icons, one with a small trend line. There's a "runs in the last hour" chart (good vs bad runs, every agent combined), an agents list with status badges, and an incidents table showing status, severity and $ at risk.
+- **Agents list:** a proper table with status badges, plus a $ prevented column.
+- **Agent page:** five tabs: Overview, Deploys, Traces, Policy, Settings.
+  - Overview has the KPIs, the live warning signals, a runs/failures chart, the control plane and recent incidents.
+  - Deploys and Traces are tables.
+  - Settings has general fields, economics, credentials and a danger zone.
+  - All existing actions still work: control changes, redeploying an old release, saving policy, verifying keys, rotating the token, pause and delete.
+- **Incidents inbox:** filter tabs with counts, and status colours as you specified (RESOLVED green, MONITORING blue, AWAITING_HUMAN amber, ESCALATED red, DEFERRED grey).
+- **Incident page:** a new `IncidentView` component.
+  - A vertical timeline with an icon for each event kind, plus the investigator's reasoning folded away.
+  - Approve and Undo cards that call the same handlers as before.
+  - Cards for the money figures, provenance (release → commit → Entire checkpoint → prompt, including the coding agent's warning and the entire.io link), why Nightly acted, diagnosis, how it priced the incident, verification and the postmortem.
+- **Wizard and Paging:** the wizard has a vertical step list and a step card using the shadcn inputs and buttons. Paging is three integration cards. All the logic is unchanged.
+- **Empty and loading states:** an icon, one line and a button where useful when there's no data, and placeholder blocks while loading.
+
+**Behaviour changes to review:**
+- **Extra requests on Overview:** the chart and trend line call the existing per-agent metrics endpoint once per agent every 30 seconds.
+- **Chart window:** the agent chart now covers the last hour in 2-minute steps instead of 3 hours in 5-minute steps. Without that, a fresh demo shows a flat line.
+- **Warning signals fix:** the old agent page rendered blank warning signals because the API sends `description` and the page read `detail`. The page now shows whichever is present.
+- **Incident page no longer uses the old panel:** it uses the new `IncidentView` instead of the `IncidentPanel` in `components/console`. The old panel had a small link to the public `/incidents/{id}` page, and that link is gone.
+
+**Incident page not tested with real data.** The local API has no incidents, and I didn't trigger one in the sandbox because another session is using the same API. To check the layout I rendered `IncidentView` once from a temporary sample-data page, then deleted that page before committing. Please look at one real incident before the demo.
+
+**Demo data.** I seeded the shared API (dev workspace) with two agents, "Support agent" and "Order router", plus deploys and about 300 runs. Both show "waiting for first call" because they need a neatlogs key to go live.
+
+Screenshots are in `/tmp/nightly-seed/shots/`:
+- `overview.jpg`
+- `agent.jpg`
+- `incidents.jpg` (empty state)
+- `wizard.jpg`
+- `paging.jpg`
+- `incident-fixture.jpg` and `incident-fixture-timeline.jpg` (sample data, not real)
+- `mobile.jpg` and `mobile-sidebar.jpg` (390px)</result>
+<usage><subagent_tokens>205519</subagent_tokens><tool_uses>84</tool_uses><duration_ms>826061</duration_ms></usage>
+<worktree><worktreePath>/Users/e-man/myprojects/nightly/.claude/worktrees/agent-ae96fdf7f7e336ca2</worktreePath><worktreeBranch>worktree-agent-ae96fdf7f7e336ca2</worktreeBranch></worktree>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>b2xk06yrq</task-id>
+<tool-use-id>toolu_013AXMYDGC915cmFAqb1Lcni</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-e-man-myprojects-nightly/a30e9422-8f5c-4430-ab19-74789697ad14/tasks/b2xk06yrq.output</output-file>
+<status>completed</status>
+<summary>Background command "Start the local API and web app with the sim brain" completed (exit code 0)</summary>
+</task-notification>
+
+---
+
+yes merge it and check the incident page
+
+---
+
+it is already deloyed and live what are you still checking?
+
+---
+
+what does sandbox page does? [Image #1]
+
+---
+
+do you think people will understand or judges will underatand what's happening here the evrything looks so cluttery
+
+---
+
+yes go ahead
+
+---
+
+do you think there is still option to improve ui?
+
+---
+
+yes
+
+---
+
+<task-notification>
+<task-id>afa70d8b262e91750</task-id>
+<tool-use-id>toolu_01TZYv3VTjT9kvsXxcePP43K</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-e-man-myprojects-nightly/a30e9422-8f5c-4430-ab19-74789697ad14/tasks/afa70d8b262e91750.output</output-file>
+<status>completed</status>
+<summary>Agent "Restyle the judge page" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>The `/judge` page is restyled to match the landing page and dashboard. It's committed on branch `worktree-agent-afa70d8b262e91750` as `e0c1dd7`, on top of the "Merge pull request #38" commit. Nothing was pushed, merged or deployed. The type check, eslint on `app/judge` and `npm run build` all pass. I checked desktop and a 390px width in the browser: no horizontal scroll, and the sticky table of contents works. The dev server is stopped, `web/.next` is deleted and my Chrome tab is closed.
+
+Every criterion, claim sentence, weight label, link and screenshot is unchanged; only the layout and styling around them changed. The intro paragraph is kept in full. Only `web/app/judge/page.tsx` changed.
+
+**What the page has now:**
+- **Header:** title "For judges." with "Each criterion, and where to check it." in grey, the intro paragraph, and a four-cell proof row styled like the landing's proof strip:
+  - 6/6 incidents handled
+  - 13–21 s to contain
+  - 4/6 → 6/6 (run 1 → run 3)
+  - 18 → 0 detection hits
+  
+  All four numbers come from the page's own claims. I used 18 → 0 instead of "blind incident", because the page gives no number for the blind incident (the landing's "5 min" isn't on it).
+- **Left column (sticky on desktop):** each criterion group with its weight, a small bar, and links to its cards. On mobile it becomes a box at the top and the cards stack below.
+- **Cards:** each criterion is a shadcn `Card` with a lucide icon and its weight as a `Badge`. Claims are separate rows. External links are outline buttons with ↗; internal links are filled buttons with →. Screenshots sit in a 3-column grid (1 column on mobile) and open full size in a new tab, with a slight zoom on hover that is skipped when reduced motion is set. I also added a small footer.
+
+**Decision for you:** the table of contents shows 30%, 25%, 15% and 10%, but not 20%. The weights come from the official judging line in `hackathon.md`: agent 30, tool use 25, demo 20, building in public 15, usefulness 10. The page has no demo section and you asked me not to add one, so I left a TODO comment instead. The explainer video link is still under "Built in public". If you want 20% to appear, a Demo row needs to be added.
+
+Also, the 10% "A real product" card still shows its original "usefulness" badge rather than "10%", to keep the weight labels as they were.
+
+Screenshots are in `/tmp/nightly-judge-shots/`:
+- `desktop-top.jpg`
+- `desktop-scrolled-sticky-toc.jpg`
+- `mobile-390-top.jpg`
+- `mobile-390-cards.jpg`</result>
+<usage><subagent_tokens>87929</subagent_tokens><tool_uses>20</tool_uses><duration_ms>190532</duration_ms></usage>
+<worktree><worktreePath>/Users/e-man/myprojects/nightly/.claude/worktrees/agent-afa70d8b262e91750</worktreePath><worktreeBranch>worktree-agent-afa70d8b262e91750</worktreeBranch></worktree>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>a5cea07e826f8db51</task-id>
+<tool-use-id>toolu_01Vq2JwupcXF9ZvtrScFy4BB</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-e-man-myprojects-nightly/a30e9422-8f5c-4430-ab19-74789697ad14/tasks/a5cea07e826f8db51.output</output-file>
+<status>completed</status>
+<summary>Agent "Redesign sandbox as guided story" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>I rebuilt the sandbox page as a guided story and ran the full incident twice against the local API with the `sim` brain. Both runs went through all six steps to the summary card. It's committed on branch **`worktree-agent-a5cea07e826f8db51`** (commit `e0c30e2`, on top of "Merge pull request #38"). Nothing was pushed, merged or deployed. `tsc`, `eslint` (on `app/sandbox`, `components/console` and `components/sandbox`) and `npm run build` all pass. Afterwards I deleted `web/.next`, stopped the dev server, stopped traffic, reset the local sandbox and closed my browser tab.
+
+**What changed**
+- **Page** (`web/app/sandbox/page.tsx`): it uses the landing page's top nav, then a headline, one sentence and one big Start button with the time elapsed. Below that is the 6-step progress bar, then one large "Now" panel next to a narrow live-chats column. A summary card appears when the run finishes, and "Advanced controls" sits collapsed at the bottom.
+- **Advanced controls:** everything that was up front is still there, just hidden. That covers traffic start/stop and rate, the r42–r46 release picker, deploying r41 by hand, outage and attack buttons, the Nightly on/off switch, reset, release and model IDs, gateway budget, the clock, and stream status. Start and the other actions work and authenticate exactly as before.
+- **Progress bar:** each step is worked out from the real incident data and events, not a timer. A step stays on screen for at least 4.5 seconds, so the sim run, which finishes in about a second, still reads as a story. It can't get stuck: an incident that goes quiet after the rollback is treated as finished after 45–60 seconds. You can click any completed step to look at it again, with a "Back to now" link.
+- **Now panel, one view per step:**
+  1. The bad change is live, and "Every request still returns 200."
+  2. The wrong-refund chats, with money lost so far.
+  3. The prompt behind the change, plus the coding agent's ignored warning, which expands and renders its markdown.
+  4. The money in one line, for example "$68/min × 300 min = $20,348."
+  5. "Rolled back r46 → r41, automatically," with three plain reasons it was allowed.
+  6. Replays passed N/N, plus the phone showing the page.
+
+  The neatlogs, Entire, cfo.ai and Slack marks appear as small tags on their steps. Steps fade in, and the fade is off when reduced motion is set.
+- **Finished run:** the card reads like "Handled in 18s · $25,012 prevented · the permanent fix awaits your approval." It has a "See the full incident" button that opens the existing detailed incident panel inline, and a link to the postmortem.
+- **Idle:** "What you'll see" lists the six steps. If there's a previous incident, a compact "Last run" card shows with "Run it again" and a link to the full incident.
+- **Chat feed:** each row shows the customer's message, the reply as plain text (no more `**$49.99**`), and an outcome in words such as "refunded, shouldn't have." The running "lost" total is at the bottom.
+- **Other files:** the new pieces are in `web/components/sandbox/` (`Stepper.tsx`, `NowPanel.tsx`, `ChatFeed.tsx`, `text.tsx`). I deleted `components/console/Guide.tsx`, which nothing uses now. `TrafficFeed` also strips markdown now. I didn't touch the backend, API, landing, dashboard or `globals.css`.
+- **Mobile:** at 390px wide the layout stacks into one column with no horizontal scroll. I tested that in a 390px iframe, because the browser window wouldn't shrink that far.
+
+**Worth knowing**
+- **"Handled in" is short with the sim brain.** It's measured from the bad change shipping to the page, and came out at 18s and 9s in my runs. With real models it will be longer.
+- **The two loss numbers don't match.** The page's own "lost" total ($183–$338 in my runs) is added up from the chats it saw. The phone page text comes from the backend and said "~$8 lost" in one run. Both are real data, but a judge may notice the difference.
+- **The "Last run" card only shows after a reload.** It appears only when this tab hasn't started a run of its own.
+
+**Screenshots** in `/tmp/nightly-sandbox-shots/`:
+- `01-idle.jpg`
+- `02-step1-ships.jpg`
+- `03-step3-cause.jpg`
+- `03b-cause-warning-expanded.jpg`
+- `04-step4-priced.jpg`
+- `05-step5-contained.jpg`
+- `06-done.jpg`
+- `07-mobile-idle.png`</result>
+<usage><subagent_tokens>141674</subagent_tokens><tool_uses>49</tool_uses><duration_ms>564306</duration_ms></usage>
+<worktree><worktreePath>/Users/e-man/myprojects/nightly/.claude/worktrees/agent-a5cea07e826f8db51</worktreePath><worktreeBranch>worktree-agent-a5cea07e826f8db51</worktreeBranch></worktree>
+</task-notification>
+
+---
+
+what's happening?
+
+---
+
+merge both
+
+---
+
+I already signed in
+
+---
+
+delete the chutki agent
+
+---
+
+deleted it
+
+---
+
+I was thinking I will start the screen recording and you record everything which is needed and then we'll do the voiceover?
+
+---
+
+won't ypu show in neatlogs dashboard or entire or cfo.ai are they not necessary?
+
+---
+
+go
+
+---
+
+no fix it sandbox won't be a good I have reorded till I can continue after this fix and w ecan reshppt incidnet one
+
+---
+
+go
+
+---
+
+I am thinking of creating it as a proper launch video lest's suppose our icon is sitting on right of the corner and it is presenting demo and speaking like a normal human will do and bonus point for is this one , I will give raw video once it is rendered and for video editing voiceover, motion graphic, 3d character take refrence from our /myprojects/video-content directory you will find elevn lab voice clips there as well, the demo should be conversational human, less jargony words more human
+
+---
+
+how much will you rate it?
+
+---
+
+how much will you rate it? and bonus point is for explaing the problem , solution and how we have used sponsors
+
+---
+
+yes go with the four-act version
+
+---
+
+'/Users/e-man/myprojects/nightly/Cap 2026-10-12 at 18.20.51.mp4' here is the raw recording
+
+---
+
+did you use html for creatong card components or js [Image #2] it is loking very bad cards and all not at all professional very bad visuals overall and even you didn't show the full landing it is cutting out for viewport and what is this purple background it does not look night did you take reference from video content poroejcts wehere we have created motion graphics, music evrything using js and code and what is this in the end? [Image #3] you're ending on screenrecording after demo has been finished does it make sense to show screen recording and showing cards and also captions typography everything is very bad
+
+---
+
+did you use html for creatong card components or js [Image #2] it is loking very bad cards and all not at all professional very bad visuals overall and even you didn't show the full landing it is cutting out for viewport and what is this purple background it does not look night did you take reference from video content poroejcts wehere we have created motion graphics, music evrything using js and code and what is this in the end? [Image #3] you're ending on screenrecording after demo has been finished does it make sense to show screen recording and showing cards and also captions typography everything is very bad[Image #4]
+
+---
+
+and also need zzom in zoom out feature for isnide screen recording when we're explaining things on that page
+
+---
+
+yes go ahead
+
+---
+
+did we include this in the script? Show the problem, why it matters, and how your solution works.
+
+---
+
+<task-notification>
+<task-id>bbsc2bfyq</task-id>
+<tool-use-id>toolu_01BhxxDNeke9bYLYTY4i4Zr1</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-e-man-myprojects-nightly/a30e9422-8f5c-4430-ab19-74789697ad14/tasks/bbsc2bfyq.output</output-file>
+<status>completed</status>
+<summary>Background command "Rebuild, lint and snapshot the redesigned film" completed (exit code 0)</summary>
+</task-notification>
+
+---
+
+yes do it
+
+---
+
+render it
+
+---
+
+till then give the launchpost caption [Image #5] in thsi format
+
+---
+
+<task-notification>
+<task-id>btzl8t2tp</task-id>
+<tool-use-id>toolu_01R6PJfGve2hyvoWzBVFbXfL</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-e-man-myprojects-nightly/a30e9422-8f5c-4430-ab19-74789697ad14/tasks/btzl8t2tp.output</output-file>
+<status>completed</status>
+<summary>Background command "Render the film at delivery quality" completed (exit code 0)</summary>
+</task-notification>
+
+---
+
+copy the video to my desktop
+
+---
+
+don't you think we should add the logo of each product we're talking about in the side above [Image #6] parllel to nightly character?[Image #7]
+
+---
+
+give me final caption in bullet points stating a lil story why we build nighlty then atht problem it solves and solution
+
+---
+
+<task-notification>
+<task-id>bwu3i9r72</task-id>
+<tool-use-id>toolu_0124BWvnuorAZAb2dWQ4XeLx</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-e-man-myprojects-nightly/a30e9422-8f5c-4430-ab19-74789697ad14/tasks/bwu3i9r72.output</output-file>
+<status>completed</status>
+<summary>Background command "Re-render, master, and copy the final video to the Desktop" completed (exit code 0)</summary>
+</task-notification>
+
+---
+
+here is the link https://x.com/WhyParabola/status/2109650318481088819
+
+---
+
+let's do one thing add demo video in readme as well submission post as link real video which will render there
+
+---
+
+let's do one thing add demo video in readme as well submission post as link real video which will render there and also add a mit license in the project
