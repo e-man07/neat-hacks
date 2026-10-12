@@ -1,8 +1,13 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import type { ReactNode } from "react";
-import PageShell from "@/components/PageShell";
+import { ArrowRight, ArrowUpRight, Bot, Hammer, LifeBuoy, Package, Plug, TrendingUp, type LucideIcon } from "lucide-react";
+import Nav from "@/components/Nav";
 import { Brand } from "@/components/Marks";
-import { Card, Label } from "@/components/ui";
+import { Moon } from "@/components/ui";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 export const metadata: Metadata = {
   title: "For judges · Nightly",
@@ -13,10 +18,13 @@ const GH = "https://github.com/e-man07/nightly/blob/main";
 const TREE = "https://github.com/e-man07/nightly/tree/main";
 
 type Item = { claim: ReactNode; links: [string, string][]; shots?: [string, string][] };
-type Criterion = { name: ReactNode; weight: string; items: Item[] };
+type Criterion = { id: string; icon: LucideIcon; toc: string; name: ReactNode; weight: string; items: Item[] };
 
 const CRITERIA: Criterion[] = [
   {
+    id: "substantial-task",
+    icon: Bot,
+    toc: "Completes a substantial task",
     name: "The agent completes a substantial task",
     weight: "30%",
     items: [
@@ -45,6 +53,9 @@ const CRITERIA: Criterion[] = [
     ],
   },
   {
+    id: "improved",
+    icon: TrendingUp,
+    toc: "Improved, before/after",
     name: "It improved, with before/after numbers",
     weight: "in 30%",
     items: [
@@ -64,6 +75,9 @@ const CRITERIA: Criterion[] = [
     ],
   },
   {
+    id: "recovers",
+    icon: LifeBuoy,
+    toc: "Recovers from failures",
     name: "It recovers from failures",
     weight: "in 30%",
     items: [
@@ -81,6 +95,9 @@ const CRITERIA: Criterion[] = [
     ],
   },
   {
+    id: "tools",
+    icon: Plug,
+    toc: "Uses neatlogs, Entire, cfo.ai",
     name: (
       <span className="inline-flex flex-wrap items-center gap-2">
         Uses <Brand name="neatlogs" h={18} /> <Brand name="entire" h={18} /> <Brand name="cfo" h={20} />
@@ -126,6 +143,9 @@ const CRITERIA: Criterion[] = [
     ],
   },
   {
+    id: "product",
+    icon: Package,
+    toc: "A real product",
     name: "A real product, not a script",
     weight: "usefulness",
     items: [
@@ -140,6 +160,9 @@ const CRITERIA: Criterion[] = [
     ],
   },
   {
+    id: "in-public",
+    icon: Hammer,
+    toc: "Built in public",
     name: "Built during the hackathon, in public",
     weight: "15%",
     items: [
@@ -156,62 +179,191 @@ const CRITERIA: Criterion[] = [
   },
 ];
 
+/** Rubric overview for the sidebar (weights from the official judging criteria, see hackathon.md).
+ *  TODO: the 20% demo criterion has no section here yet; the demo video link is under "Built in public". */
+const RUBRIC: { label: string; weight: number; ids: string[] }[] = [
+  { label: "Agent", weight: 30, ids: ["substantial-task", "improved", "recovers"] },
+  { label: "Tool use", weight: 25, ids: ["tools"] },
+  { label: "Building in public", weight: 15, ids: ["in-public"] },
+  { label: "Usefulness", weight: 10, ids: ["product"] },
+];
+
+const PROOF = [
+  { n: "6/6", label: "incidents handled", sub: "planted in Harbor, a live refunds agent" },
+  { n: "13–21 s", label: "to contain", sub: "after detection, verified by replay" },
+  { n: "4/6 → 6/6", label: "it got better", sub: "benchmark run 1 → run 3" },
+  { n: "18 → 0", label: "detection hits", sub: "neatlogs, before vs after the rollback" },
+];
+
+const byId = Object.fromEntries(CRITERIA.map((c) => [c.id, c]));
+
 export default function JudgePage() {
   return (
-    <PageShell title="For judges" sub="Each criterion, and where to check it.">
-      <p className="max-w-[720px] text-[15px] leading-relaxed text-muted">
-        Nightly is the on-call engineer for AI agents. When a change makes an agent fail quietly, it finds the cause, prices
-        the damage, applies a fix that can be undone, proves it by replaying the failed runs, and pages a human once.
-        Nightly and both agents it watches are live LLM agents: real model calls, real tool calls, every run traced in neatlogs,
-        and every bad release written by a separate Claude Code session. The agents’ users are scripted and the benchmark
-        incidents were planted, so the results can be reproduced.
-      </p>
-      <div className="mt-10 space-y-4">
-        {CRITERIA.map((c, i) => (
-          <Card key={i} className="p-6">
-            <div className="flex flex-wrap items-baseline gap-3">
-              <h2 className="text-[19px] font-medium tracking-tight text-fg">{c.name}</h2>
-              <Label>{c.weight}</Label>
-            </div>
-            <div className="mt-4 space-y-4">
-              {c.items.map((it, j) => (
-                <div key={j} className="border-t border-line pt-4 first:border-0 first:pt-0">
-                  <p className="text-[14.5px] leading-relaxed text-fg-2">{it.claim}</p>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {it.links.map(([label, href]) => (
-                      <a
-                        key={href}
-                        href={href}
-                        target={href.startsWith("http") ? "_blank" : undefined}
-                        rel="noreferrer"
-                        className="rounded-full border border-line px-3 py-1 text-[12.5px] text-fg transition hover:border-line-strong hover:bg-chip"
-                      >
-                        {label} {href.startsWith("http") ? "↗" : "→"}
-                      </a>
-                    ))}
+    <main className="min-h-screen overflow-x-clip bg-bg pb-24">
+      <Nav />
+
+      {/* Header */}
+      <header className="relative">
+        <div className="mx-auto max-w-[1180px] px-4 pt-10 sm:px-5 sm:pt-16">
+          <span className="eyebrow inline-flex items-center gap-2 rounded-full border border-line bg-bg px-3 py-1 text-[12px]">
+            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-ok" /> neatHack 2026 · for judges
+          </span>
+          <h1 className="subhead mt-5 text-[36px] sm:text-[48px]">
+            For judges. <span className="dim">Each criterion, and where to check it.</span>
+          </h1>
+          <p className="mt-5 max-w-[760px] text-[15.5px] leading-relaxed text-muted">
+            Nightly is the on-call engineer for AI agents. When a change makes an agent fail quietly, it finds the cause, prices
+            the damage, applies a fix that can be undone, proves it by replaying the failed runs, and pages a human once.
+            Nightly and both agents it watches are live LLM agents: real model calls, real tool calls, every run traced in neatlogs,
+            and every bad release written by a separate Claude Code session. The agents’ users are scripted and the benchmark
+            incidents were planted, so the results can be reproduced.
+          </p>
+
+          <div className="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line lg:grid-cols-4">
+            {PROOF.map((s) => (
+              <div key={s.label} className="bg-bg p-4 sm:p-6">
+                <div className="whitespace-nowrap text-[22px] leading-none tracking-[-0.04em] text-fg tabular-nums sm:text-[34px]">{s.n}</div>
+                <div className="mt-2.5 text-[13.5px] font-medium text-fg">{s.label}</div>
+                <div className="mt-1 text-[12px] leading-snug text-muted">{s.sub}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </header>
+
+      <div className="mx-auto mt-12 grid max-w-[1180px] grid-cols-[minmax(0,1fr)] gap-10 px-4 sm:px-5 lg:mt-16 lg:grid-cols-[240px_minmax(0,1fr)]">
+        {/* Weight overview / table of contents */}
+        <aside className="lg:sticky lg:top-24 lg:self-start">
+          <nav aria-label="Judging criteria" className="rounded-xl border border-line bg-card-2 p-4 lg:border-0 lg:bg-transparent lg:p-0">
+            <div className="eyebrow text-[11.5px]">CRITERIA · WEIGHT</div>
+            <ol className="mt-4 space-y-4">
+              {RUBRIC.map((g) => (
+                <li key={g.label}>
+                  <div className="flex items-baseline justify-between gap-3 text-[13px]">
+                    <span className="font-medium text-fg">{g.label}</span>
+                    <span className="font-mono text-[12px] text-muted tabular-nums">{g.weight}%</span>
                   </div>
-                  {it.shots && (
-                    <div className="mt-4 grid gap-3 sm:grid-cols-3">
-                      {it.shots.map(([src, caption]) => (
-                        <a key={src} href={src} target="_blank" rel="noreferrer" className="group block">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={src}
-                            alt={caption}
-                            loading="lazy"
-                            className="aspect-[16/10] w-full rounded-lg border border-line object-cover object-top transition group-hover:border-line-strong"
-                          />
-                          <span className="mt-1.5 block text-[12px] leading-snug text-muted">{caption}</span>
-                        </a>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                  <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-secondary">
+                    <div className="h-full rounded-full bg-fg/80" style={{ width: `${(g.weight / 30) * 100}%` }} />
+                  </div>
+                  <ul className="mt-2 space-y-0.5">
+                    {g.ids.map((id) => {
+                      const c = byId[id];
+                      const Icon = c.icon;
+                      return (
+                        <li key={id}>
+                          <a
+                            href={`#${id}`}
+                            className="-mx-2 flex items-center gap-2 rounded-md px-2 py-1 text-[13px] text-muted transition-colors hover:bg-secondary hover:text-fg"
+                          >
+                            <Icon className="size-3.5 shrink-0" aria-hidden />
+                            {c.toc}
+                          </a>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </li>
               ))}
-            </div>
-          </Card>
-        ))}
+            </ol>
+          </nav>
+        </aside>
+
+        {/* Criteria */}
+        <div className="space-y-6">
+          {CRITERIA.map((c) => {
+            const Icon = c.icon;
+            return (
+              <Card key={c.id} id={c.id} className="scroll-mt-24 gap-0 border-line py-0 shadow-none">
+                <CardHeader className="flex items-center gap-3 border-b border-line px-5 py-4 sm:px-6">
+                  <span className="grid size-9 shrink-0 place-items-center rounded-lg border border-line bg-card-2 text-fg">
+                    <Icon className="size-[18px]" aria-hidden />
+                  </span>
+                  <h2 className="min-w-0 flex-1 text-[17px] font-medium tracking-tight text-fg sm:text-[19px]">{c.name}</h2>
+                  <Badge variant="outline" className="shrink-0 border-line font-mono text-[11.5px] text-fg">
+                    {c.weight}
+                  </Badge>
+                </CardHeader>
+                <CardContent className="divide-y divide-line px-0">
+                  {c.items.map((it, j) => (
+                    <div key={j} className="px-5 py-5 sm:px-6">
+                      <p className="text-[14.5px] leading-relaxed text-fg-2">{it.claim}</p>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {it.links.map(([label, href]) => (
+                          <EvidenceLink key={href} label={label} href={href} />
+                        ))}
+                      </div>
+                      {it.shots && (
+                        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                          {it.shots.map(([src, caption]) => (
+                            <a
+                              key={src}
+                              href={src}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="group block rounded-lg outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                              aria-label={`${caption} (open full size)`}
+                            >
+                              <span className="block overflow-hidden rounded-lg border border-line bg-card-2 transition-colors group-hover:border-line-strong">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                  src={src}
+                                  alt={caption}
+                                  loading="lazy"
+                                  className="aspect-[16/10] w-full object-cover object-top motion-safe:transition-transform motion-safe:duration-300 motion-safe:group-hover:scale-[1.02]"
+                                />
+                              </span>
+                              <span className="mt-1.5 flex items-start gap-1 text-[12px] leading-snug text-muted group-hover:text-fg">
+                                <span className="flex-1">{caption}</span>
+                                <ArrowUpRight className="mt-px size-3 shrink-0" aria-hidden />
+                              </span>
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            );
+          })}
+
+          <footer className="flex flex-wrap items-center justify-between gap-3 pt-6 text-[13px] text-muted">
+            <span className="flex items-center gap-2">
+              <Moon size={14} /> Nightly · neatHack 2026
+            </span>
+            <span className="flex flex-wrap gap-5">
+              <Link href="/" className="hover:text-fg">Home</Link>
+              <Link href="/benchmark" className="hover:text-fg">Benchmark</Link>
+              <a href="https://github.com/e-man07/nightly" className="hover:text-fg">GitHub</a>
+            </span>
+          </footer>
+        </div>
       </div>
-    </PageShell>
+    </main>
+  );
+}
+
+function EvidenceLink({ label, href }: { label: string; href: string }) {
+  const external = href.startsWith("http");
+  const inner = (
+    <>
+      {label}
+      {external ? <ArrowUpRight className="text-muted" aria-hidden /> : <ArrowRight aria-hidden />}
+    </>
+  );
+  if (external) {
+    return (
+      <Button asChild variant="outline" size="sm" className="h-8 border-line text-[12.5px] font-normal shadow-none">
+        <a href={href} target="_blank" rel="noreferrer">
+          {inner}
+        </a>
+      </Button>
+    );
+  }
+  return (
+    <Button asChild variant="secondary" size="sm" className="h-8 text-[12.5px] font-normal">
+      <Link href={href}>{inner}</Link>
+    </Button>
   );
 }
