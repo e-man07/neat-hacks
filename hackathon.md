@@ -1,7 +1,7 @@
-# neatHack build log — Night Shift
+# neatHack build log — Nightly
 
 ## Project
-**Night Shift** — the on-call engineer for AI agents. It detects incidents in a production LLM agent,
+**Nightly** — the on-call engineer for AI agents. It detects incidents in a production LLM agent,
 traces them to the change and the coding-agent prompt that caused them, prices the damage, takes
 reversible containment actions from a pre-approved policy, verifies the fix by replaying failed
 conversations, and pages a human only for irreversible decisions.
@@ -26,13 +26,13 @@ Aman Jha ([@WhyParabola](https://x.com/WhyParabola)).
 - Spikes recorded in `docs/SPIKES.md`: neatlogs ingest PASS, read-back via MCP PASS (REST needs a service-account token), Entire checkpoints PASS with redaction verified, cfo.ai MCP supports device login (pending human approval), LiteLLM budget $20 / 60 rpm.
 - Pending (human): GitHub write access for pushing branches/PRs; cfo.ai login approval.
 
-### 2026-10-11 ~01:45–03:00 IST — production agent + Night Shift core (completed)
+### 2026-10-11 ~01:45–03:00 IST — production agent + Nightly core (completed)
 - Harbor support agent (Claude Haiku through the LiteLLM gateway, OpenAI-style tool calling), sandbox orders API v1/v2, refund policy, ledger, grader priced with `business/unit_economics.yaml`.
 - Live smoke test: 10/10 conversations correct on the baseline release, ~$0.005/conversation, traces visible in neatlogs.
-- Night Shift: detector, neatlogs MCP client, provenance (git → Entire checkpoint → prompt), Sonnet investigator with tools, impact pricing, autonomy policy, reversible actions with undo, replay verification, ntfy paging, postmortems, regression evals. 16 unit tests pass (sim brain).
+- Nightly: detector, neatlogs MCP client, provenance (git → Entire checkpoint → prompt), Sonnet investigator with tools, impact pricing, autonomy policy, reversible actions with undo, replay verification, ntfy paging, postmortems, regression evals. 16 unit tests pass (sim brain).
 
 ### 2026-10-11 ~03:00–04:30 IST — incidents and live benchmark (completed)
-- Bad releases r42–r46 written by separate `claude -p` sessions with realistic developer requests; each commit carries its own Entire checkpoint. The coding agent warned about the risk in every session; Night Shift surfaces that note.
+- Bad releases r42–r46 written by separate `claude -p` sessions with realistic developer requests; each commit carries its own Entire checkpoint. The coding agent warned about the risk in every session; Nightly surfaces that note.
 - First attempt at r42 reused this session's id (env inheritance) — Entire recorded the wrong transcript. Fixed by clearing the session env for child sessions; deleted the bad checkpoint and re-ran.
 - Live finding: Haiku kept checking policy under r42 ("shorter replies"), so it caused a ticket flood instead of wrong refunds. Kept it as I6 (new escalation signal) and added r46 (developer removes the policy tool on a false assumption) as the money-loss incident.
 - Benchmark run 1 (live): I1, I4, I5, I6 resolved autonomously. I2: investigator found the exact bug but self-reported confidence 0.5 → policy refused to act. I3: live Haiku gave up on the flaky API instead of looping, so impact was $8 → it paged a human at 3 AM, which is wrong.
@@ -55,7 +55,7 @@ Aman Jha ([@WhyParabola](https://x.com/WhyParabola)).
 ### 2026-10-11 ~01:00–04:30 IST: from demo to product (P7–P11)
 - Multi-tenant platform: workspaces, agent tokens (stored hashed), Fernet-encrypted secrets, versioned per-agent policies (auto actions must be reversible), Slack app with Approve/Undo buttons, webhook and ntfy paging, and GitHub revert PRs opened only after approval.
 - `nightshift-sdk` (zero dependencies, fail-open): control plane (release, model, flags, step cap), deploy reports, outcome events, and a replay worker for verification.
-- **Scout**, a second agent wired only through the SDK and neatlogs. Two dev Claude Code sessions wrote s2 ("faster search", which Night Shift correctly left alone) and s3 (reads docs from a folder that doesn't exist yet; the dev session warned about it). Two live incidents: detected in about 1.5 min, rolled back automatically, verified by replays Scout ran itself (3/3), resolved in under 3 min. `evidence/scout/`.
+- **Scout**, a second agent wired only through the SDK and neatlogs. Two dev Claude Code sessions wrote s2 ("faster search", which Nightly correctly left alone) and s3 (reads docs from a folder that doesn't exist yet; the dev session warned about it). Two live incidents: detected in about 1.5 min, rolled back automatically, verified by replays Scout ran itself (3/3), resolved in under 3 min. `evidence/scout/`.
 - Finding: neatlogs lost most of Scout's traces. Search returned ~25 traces for ~120 runs, and the SDK diagnostics showed 0 drops. SDK events now carry run details, and traces enrich them when they arrive.
 - Finding: a noisy 3/10 escalation window opened a false incident. The money gate deferred it ($1, nobody paged), but the investigator blamed a release that was no longer live. Its output is now checked against the evidence.
 - Web product: GitHub sign-in (Auth.js), app shell, connect-an-agent wizard, agent pages (metrics, control plane, deploys, traces, policy editor, settings), incident inbox with approve/undo, paging setup, SDK docs. The old console became `/sandbox`.
@@ -68,7 +68,7 @@ Aman Jha ([@WhyParabola](https://x.com/WhyParabola)).
 - cfo.ai plan links wired into the README, `business/PLAN.md` and the business page. README and demo script rewritten for the live product. Post drafts refreshed.
 
 ### 2026-10-11 ~16:00–17:00 IST: Nightly, and an explainer video
-- Renamed the product from Night Shift to **Nightly** in display text: web, Slack messages, postmortems, fix-PR titles, docs. The SDK is now `nightly-sdk` / `nightly_sdk.Nightly`; the old module name and the `NIGHTSHIFT_*` env vars still work. Internal code names are unchanged. Evidence files from earlier runs keep the old name.
+- Renamed the product from Night Shift to **Nightly** in display text: web, Slack messages, postmortems, fix-PR titles, docs. The SDK is now `nightly-sdk` / `nightly_sdk.Nightly`; the old module name and the `NIGHTSHIFT_*` env vars still work. Internal code names are unchanged. Docs and evidence were updated to the new name on Oct 12.
 - New logo, favicon and character: the Nightly ghost.
 - A motion-design explainer for the hero, modelled on the Inkbox launch video: ElevenLabs voiceover with word-timed captions, the ghost blinking and lip-syncing, UI scenes (agent runs, investigation, fix, Slack message, SDK), and music plus sound effects generated in numpy. The source is in `video/`.
 
@@ -114,7 +114,7 @@ Script: `docs/DEMO_SCRIPT.md` (a live Scout incident through the product, with t
 ## Known limitations and next steps
 - Harbor's benchmark incidents are staged on purpose (bad releases and injected faults) to be reproducible. Its customers are simulated, and its tools act on a sandbox ledger.
 - Scout answers a fixed question bank about a fictional product.
-- neatlogs search and trace read-back missed most Scout traces during the live runs (reported in `evidence/scout/`). Night Shift falls back to SDK outcome events.
+- neatlogs search and trace read-back missed most Scout traces during the live runs (reported in `evidence/scout/`). Nightly falls back to SDK outcome events.
 - Python SDK only.
 
 ## Submission

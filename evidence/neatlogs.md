@@ -2,9 +2,9 @@
 
 Project: **Aman's project** (`c2894ca1-bc61-4250-9278-83da3c88ed08`, tier free). Trace ids below can be searched in the neatlogs app.
 
-## How Night Shift uses neatlogs
+## How Nightly uses neatlogs
 
-- **SDK tracing** (`ops/tracing.py`, `ops/llm.py`): every Harbor conversation is a WORKFLOW trace (`harbor-support`) with auto-instrumented LLM spans and a TOOL span per tool call; every Night Shift incident is a WORKFLOW trace (`nightshift`) containing the investigator's AGENT span, its TOOL spans and the verification replays.
+- **SDK tracing** (`ops/tracing.py`, `ops/llm.py`): every Harbor conversation is a WORKFLOW trace (`harbor-support`) with auto-instrumented LLM spans and a TOOL span per tool call; every Nightly incident is a WORKFLOW trace (`nightshift`) containing the investigator's AGENT span, its TOOL spans and the verification replays.
 - **Read-back over MCP** (`nightshift/neatlogs_mcp.py`): the investigator calls `search_traces` and `get_trace_context` during an investigation and cites trace ids in its diagnosis and postmortem.
 - **Detections in the verification loop** (`nightshift/neatlogs_check.py`, added Oct 12): after containment, Nightly reads the failing traces back and turns what they share into a neatlogs detection (errors from specific tools, an escalation spike, or the injection pattern). It previews the detection first and creates it only if the preview flags traces. While watching live traffic it then compares how often the detection fires before and after the fix. **A detection still firing fails verification and the fix is undone.** Too few traces in neatlogs is "inconclusive", never a failure. See [below](#neatlogs-in-the-verification-loop).
 
@@ -58,6 +58,13 @@ good one contain the same tool calls. neatlogs' MCP can create regex and conditi
 code or trace-rule detections that could express "a refund with no policy check before it". For those
 incidents Nightly says so in the timeline, and verification relies on replays and live metrics.
 
+## Exported traces
+
+neatlogs trace links need a login to the project (`c2894ca1-bc61-4250-9278-83da3c88ed08`). Anyone without access can read these two exports instead. Each one is the full span tree as returned by the neatlogs MCP `get_trace_context`, with spans in tree order:
+
+- [`104a64b2544a8f353cd2d130403a8e46`](neatlogs-traces/104a64b2544a8f353cd2d130403a8e46.md): Nightly's own investigation of the incident.
+- [`5e07f5faa3311a4898d82812a7cefef1`](neatlogs-traces/5e07f5faa3311a4898d82812a7cefef1.md): the failing Scout answer that Nightly detected.
+
 ## Screenshots from the neatlogs app
 
 The trace links need a neatlogs login, so here is what they show.
@@ -76,14 +83,14 @@ verification replays follow it.
 
 ![investigation trace](screenshots/neatlogs-investigation-trace.jpg)
 
-**The detection Nightly created** after the prompt-injection wave ("Order-note prompt injection", tagged Night Shift), and the project's traces list:
+**The detection Nightly created** after the prompt-injection wave ("Order-note prompt injection", tagged Nightly), and the project's traces list:
 
 ![detections](screenshots/neatlogs-detections.jpg)
 ![traces](screenshots/neatlogs-traces-list.jpg)
 
 ## Traces from benchmark run `run3-live`
 
-| Incident | Night Shift investigation trace | Evidence traces cited | Before (baseline) | During | After |
+| Incident | Nightly investigation trace | Evidence traces cited | Before (baseline) | During | After |
 |---|---|---|---|---|---|
 | I1 Unchecked refunds | `c5fc4e01e7938bf2991c45b483235d3a` | `055faaefae4d8f3c920d133f8c32b1eb`, `a6f9600c8d1ffd3e0a38eba5417a0147`, `a5f5e4ce37f7bbf5e58809adb1a8a43d` | `f92057c53cd75d0dbc5300459dd0dfbb` | `7c84f5e5c6b2283d55ece3de94389df7` | `9bf451cf98a7e09660990b5a58df529b` |
 | I2 Tool schema drift | `2d5d7eb03497f1e66dfdf449c9240a62` | `5d49641aa27c70d42b97de9c8c5de0cc`, `22e06f0c0f5dacafb56e168112e184a1`, `b1765d6ceaaeaba016598a23e43be74c` | `c984d3cc7b7be4e9e56946188c5f202c` | `b1765d6ceaaeaba016598a23e43be74c` | `2f8407bdec7996aaf8b5aff27dfde665` |

@@ -16,7 +16,7 @@
 
 When a change makes a production AI agent fail quietly, Nightly finds the cause, prices the damage,
 applies a fix that can be undone, proves it by replaying the failed runs, and pages you once in Slack.
-Built for neatHack 2026 (called *Night Shift* during the build; older evidence files use that name).
+Built for neatHack 2026 (it was called *Nightly* early in the build; code identifiers such as the `nightshift` module and the `nightshift` neatlogs workflow keep that name).
 
 https://github.com/user-attachments/assets/6dbd29f1-a1ea-4ece-925c-e00bab30382f
 
@@ -87,7 +87,7 @@ approval in Slack.*
  your agent ──(neatlogs SDK traces)──► neatlogs ◄──(MCP read-back)───┐
      │  ▲                                                             │
      │  └── nightly-sdk: release · model · flags · step cap        │
-     └────► outcomes, deploys, replay results ──► NIGHT SHIFT ────────┘
+     └────► outcomes, deploys, replay results ──► NIGHTLY ───────────┘
                                                    1 WATCH       failures, tool errors, escalations, loops, cost
                                                    2 INVESTIGATE Claude Sonnet + tools: traces, deploy log, diff,
                                                                  Entire checkpoint → prompt, entire-graph

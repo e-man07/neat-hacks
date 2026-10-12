@@ -1,6 +1,6 @@
-# Night Shift improved: `run1-live` → `run3-live`
+# Nightly improved: `run1-live` → `run3-live`
 
-Same six staged incidents, same live models. Between the runs we changed Night Shift itself, based on what run 1 showed (see the build log):
+Same six staged incidents, same live models. Between the runs we changed Nightly itself, based on what run 1 showed (see the build log):
 
 - investigator: explicit confidence calibration; a diagnosis without a confidence is rejected and re-submitted
 - low-impact incidents are deferred to the morning instead of paging someone
@@ -26,4 +26,4 @@ Same six staged incidents, same live models. Between the runs we changed Night S
 
 Both runs are scored against the same incident specs. Dollar figures are not comparable across the two runs: between them we lowered Harbor's production volume in the unit economics (night 420 → 90 conversations/hour) to match a mid-size store.
 
-Harbor's own before/during/after numbers for each incident (the production agent improving once Night Shift acts) are in [`run3-live/SUMMARY.md`](run3-live/SUMMARY.md).
+Harbor's own before/during/after numbers for each incident (the production agent improving once Nightly acts) are in [`run3-live/SUMMARY.md`](run3-live/SUMMARY.md).

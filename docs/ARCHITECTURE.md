@@ -29,7 +29,7 @@ failed conversations, and pages a human only for decisions that can't be undone.
  business signals (ledger invariants,   │
  outcomes, cost)  ──────────────────────┤
                                         ▼
-            ┌──────────────────────── NIGHT SHIFT ────────────────────────────┐
+            ┌──────────────────────── NIGHTLY ─────────────────────────────────┐
             │ 1 WATCH      window metrics vs baseline → open incident          │
             │ 2 INVESTIGATE LLM agent + tools: neatlogs traces, deploy log,    │
             │              git diff, Entire checkpoint (the prompt behind it)  │
