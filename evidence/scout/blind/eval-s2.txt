@@ -1,0 +1,19 @@
+ok        How much do you charge when we go past our event allowance o all required facts present
+ok        We're on the free plan and hit our event cap. Do we lose dat all required facts present
+ok        Can I get a refund on our annual plan? We renewed two weeks  all required facts present
+ok        Which identity providers work with SSO?                      all required facts present
+ok        If we enforce SSO, can anyone still log in with a password?  all required facts present
+ok        How fast does SCIM remove someone who left the company?      all required facts present
+ok        How many rows can I get in a CSV download of a chart?        all required facts present
+ok        How often does the BigQuery sync run on Enterprise?          all required facts present
+ok        A user asked us to erase their data under GDPR. How long doe all required facts present
+ok        I deleted a project by mistake yesterday. Can I get it back? all required facts present
+ok        How many events can I batch in one ingestion call?           all required facts present
+ok        What happens if we send too many requests to ingestion?      all required facts present
+ok        What's the longest conversion window a funnel can have?      all required facts present
+ok        How many steps can a funnel have?                            all required facts present
+ok        How long do cohort webhooks keep retrying if our endpoint is all required facts present
+ok        How long is data kept on the Growth plan?                    all required facts present
+ok        How do I read data with an API key? My write key gets denied all required facts present
+ok        How many days of data can I pull per Export API call?        all required facts present
+s2: 18/18 correct

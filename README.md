@@ -101,6 +101,14 @@ demo script: [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md)
   replays Scout ran itself (3/3), resolved in under 3 min. The postmortem quotes the coding agent's
   ignored warning, found through Entire.
 
+- **Blind incident** ([`evidence/scout/blind/`](evidence/scout/blind/README.md)): a fresh Claude Code session
+  that knew nothing about Nightly was asked to make Scout cheaper, and chose the change itself. We deployed it
+  unread. Nightly detected it 5 min after the deploy and named the release and the two changes that broke the
+  annual-plan refund question. The offline eval (17/18, that exact question) and the coding agent's own
+  warning agree. With $0 at risk, Nightly deferred it to the morning with the fix attached. It overstated
+  the magnitude (30% from a short window, 9% over the run). It also missed the coding agent's warning
+  because of a stale, blob-less repo clone, which is fixed now.
+
 ## Run it locally
 
 ```bash

@@ -99,6 +99,12 @@ Aman Jha ([@WhyParabola](https://x.com/WhyParabola)).
 - Checked live: run-3 I2 gives 18 hits in 282 traces before the rollback and 0 in 57 after. A full incident through the on-call loop against the real neatlogs project resolved with "27 hits in 58 traces before, 0 in 13 after".
 - Tests: 31 passed (5 new: signatures, verdicts, cleared → resolved, still firing → undo).
 
+### 2026-10-12 ~16:45–18:00 IST: wording, and a blind incident
+- README, `/judge` and the landing page now lead with what's real (live LLM agents, real tool calls, neatlogs traces, releases from real Claude Code sessions), then what's staged (scripted users, planted incidents).
+- Blind incident on Scout, live on the VM: a fresh `claude -p` session wrote s4 ("make it cheaper") and we deployed it unread. Nightly detected it 5 min 15 s after the deploy, blamed s4's `top_k` 2 → 1 and its shorter replies for breaking the annual-plan refund question, priced it at $0, and deferred it. Ground truth agrees on the cause: eval 17/18 on that exact question, each change breaks it alone (0/5 vs 3/5 on s2), and the coding agent warned about `top_k: 1`. Nightly overstated the magnitude (30% window vs 9% over the run). `evidence/scout/blind/`.
+- Bugs found by it and fixed: Nightly's clone of an agent repo was synced only at connect time, and it was blob-less, so `entire checkpoint explain` failed and the postmortem had no prompt or warning. The adapter now re-syncs before provenance, and sync fetches the checkpoint objects. Verified on a fresh blob-less clone.
+- Tests: 31 passed.
+
 ## Demo
 Live: https://nightly.whyparabola.online (GitHub sign-in) · sandbox without an account: `/sandbox` · SDK docs: `/docs`.
 Script: `docs/DEMO_SCRIPT.md` (a live Scout incident through the product, with the sandbox as fallback). Local: `scripts/dev.sh`.

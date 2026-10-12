@@ -38,6 +38,10 @@ const CRITERIA: Criterion[] = [
         claim: "Live on a second agent (Scout) connected only through the SDK and neatlogs: detected ~1.5 min after deploy, rolled back, 3/3 replays passed, resolved in under 3 min.",
         links: [["Scout incidents", `${TREE}/evidence/scout`]],
       },
+      {
+        claim: "A blind incident nobody planned: a fresh Claude Code session chose a “make it cheaper” change and we deployed it unread. Nightly found the release and the two changes that broke one question type (the eval agrees: 17/18, that exact question) and deferred it, since $0 was at risk. We published what it got wrong too.",
+        links: [["Blind incident", `${GH}/evidence/scout/blind/README.md`]],
+      },
     ],
   },
   {
