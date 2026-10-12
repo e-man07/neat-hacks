@@ -6,10 +6,14 @@ When a change makes a production AI agent fail quietly, Nightly finds the cause,
 applies a fix that can be undone, proves it by replaying the failed runs, and pages you once in Slack.
 Built for neatHack 2026 (called *Night Shift* during the build; older evidence files use that name).
 
+https://github.com/user-attachments/assets/6dbd29f1-a1ea-4ece-925c-e00bab30382f
+
+**Demo video (2:55)** plays above · [full quality 1080p](https://pub-322f2127ed23420ebefb3a5062774ae4.r2.dev/films/nightly-launch-demo-1080p.mp4) · [the #neatHack submission post](https://x.com/WhyParabola/status/2109650318481088819)
+
 | **6/6** incidents planted in a live agent, handled correctly | **13–21 s** from detection to containment | **4/6 → 6/6** from benchmark run 1 to run 3 |
 |---|---|---|
 
-**Demo video:** [the submission post](https://x.com/WhyParabola/status/2109650318481088819) · **Live:** [nightly.whyparabola.online](https://nightly.whyparabola.online) · [**for judges: every criterion and its evidence**](https://nightly.whyparabola.online/judge) ·
+**Live:** [nightly.whyparabola.online](https://nightly.whyparabola.online) · [**for judges: every criterion and its evidence**](https://nightly.whyparabola.online/judge) ·
 [sandbox: run the 3 AM incident](https://nightly.whyparabola.online/sandbox) · [SDK docs](https://nightly.whyparabola.online/docs) ·
 `pip install nightly-sdk` ([PyPI](https://pypi.org/project/nightly-sdk/)) ·
 [explainer video](https://pub-322f2127ed23420ebefb3a5062774ae4.r2.dev/films/nightly-master-1080p60.mp4)
@@ -149,3 +153,7 @@ opens its checkpoint, session and the coding agent's prompt.
 - The `sim` brain exists for offline demos and tests and is never used for evidence.
 - Permanent fixes are proposed as PRs, never merged by Nightly: shipping code is a human decision by design.
 - Nightly currently ships a Python SDK only; other agents can call the HTTP API directly.
+
+## License
+
+MIT. See [LICENSE](LICENSE).
