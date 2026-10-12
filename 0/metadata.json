@@ -1,0 +1,78 @@
+{
+  "cli_version": "0.11.4",
+  "checkpoint_id": "01M4R1VHMTW47777SKJEY579PH",
+  "session_id": "231e2373-0e1f-43df-becc-2513a0d3bfaa",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-12T12:37:02.457328Z",
+  "branch": "nightshift/s5-haiku",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "agents/scout/releases/s5.yaml"
+  ],
+  "agent": "Claude Code",
+  "model": "claude-sonnet-5-5",
+  "turn_id": "7272b0e2e7ff",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 12,
+    "cache_creation_tokens": 22600,
+    "cache_read_tokens": 176681,
+    "output_tokens": 1766,
+    "api_call_count": 6
+  },
+  "skill_events_version": 1,
+  "skill_events": [
+    {
+      "id": "claude-skill-toolu_01WeBnNKeiPGW6KJa7Mjd6Lk",
+      "event_type": "tool_invocation",
+      "skill": {
+        "name": "claude-api"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "skill_tool_use",
+        "confidence": "explicit"
+      },
+      "turn_id": "7272b0e2e7ff",
+      "transcript_anchor": {
+        "unit": "line",
+        "start": 21,
+        "end": 22,
+        "entry_ids": [
+          "58cf8cda-a281-4773-86f3-227ef1e0418f"
+        ],
+        "tool_use_id": "toolu_01WeBnNKeiPGW6KJa7Mjd6Lk"
+      },
+      "native": {
+        "tool_name": "Skill",
+        "tool_use_id": "toolu_01WeBnNKeiPGW6KJa7Mjd6Lk"
+      },
+      "collapse": {
+        "target": "tool_pair",
+        "label": "Skill: claude-api",
+        "default_collapsed": true
+      }
+    }
+  ],
+  "initial_attribution": {
+    "calculated_at": "2026-10-12T12:37:02.449519Z",
+    "agent_lines": 11,
+    "agent_removed": 0,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 11,
+    "total_lines_changed": 11,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    }
+  ]
+}
