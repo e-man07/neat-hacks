@@ -44,3 +44,10 @@ def sync(path: Path, repo: str | None = None, token: str | None = None) -> None:
           "+refs/entire/*:refs/entire/*"], cwd=path, timeout=120)
     _run(["git", "fetch", "--quiet", remote, "+refs/heads/_entire/*:refs/entire/*"], cwd=path, timeout=120)
     _run(["git", "merge", "--ff-only", "--quiet", "origin/HEAD"], cwd=path, timeout=60)
+    # The clone is blob-less, so the checkpoint refs arrive without their files, and `entire checkpoint
+    # explain` then fails with "checkpoint not found". Fetch the missing objects under refs/entire.
+    missing = _run(["git", "rev-list", "--objects", "--missing=print", "--glob=refs/entire/*"], cwd=path, timeout=60)
+    oids = [line[1:] for line in missing.stdout.splitlines() if line.startswith("?")]
+    if oids:
+        subprocess.run(["git", "-c", "fetch.negotiationAlgorithm=noop", "fetch", "--quiet", "--no-tags", "--stdin", remote],
+                       input="\n".join(oids), cwd=path, capture_output=True, text=True, timeout=180)

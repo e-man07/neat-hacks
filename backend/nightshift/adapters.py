@@ -195,6 +195,10 @@ class HarborAdapter(AgentAdapter):
         return verifier.replay(self.db, conversation_ids, brain=self.brain)
 
 
+_REPO_SYNCED: dict[str, float] = {}
+REPO_SYNC_EVERY_S = 60
+
+
 class SdkAdapter(AgentAdapter):
     """A customer agent connected through the SDK and its neatlogs project."""
 
@@ -224,6 +228,27 @@ class SdkAdapter(AgentAdapter):
 
     def fallback_model(self) -> str:
         return self.db.get_control("fallback_model") or settings.harbor_fallback_model
+
+    def _sync_repo(self) -> None:
+        """Pull the agent's repo before reading provenance: the release under investigation may have been
+        committed after the agent was connected (the clone is otherwise only synced at connect time)."""
+        if not self.repo_dir or time.time() - _REPO_SYNCED.get(self.repo_dir, 0) < REPO_SYNC_EVERY_S:
+            return
+        _REPO_SYNCED[self.repo_dir] = time.time()
+        try:
+            from product import repos
+
+            repos.sync(Path(self.repo_dir))
+        except Exception:  # a stale clone degrades provenance; it must not stop the investigation
+            pass
+
+    def release_diff(self, old: str, new: str) -> str:
+        self._sync_repo()
+        return super().release_diff(old, new)
+
+    def provenance(self, release: str) -> provenance.Provenance:
+        self._sync_repo()
+        return super().provenance(release)
 
     def replay(self, conversation_ids: list[str], incident_id: str | None = None, timeout_s: float = 90) -> Any:
         """Ask the agent (through the SDK) to re-run the failing inputs on its current config."""
