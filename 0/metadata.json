@@ -1,0 +1,68 @@
+{
+  "cli_version": "0.11.4",
+  "checkpoint_id": "01M4R0EEW649G0SD2TRJ36TTE8",
+  "session_id": "a30e9422-8f5c-4430-ab19-74789697ad14",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-12T12:12:24.293817Z",
+  "branch": "nightshift/p36-cost-card",
+  "checkpoints_count": 2,
+  "save_step_count": 1,
+  "files_touched": [],
+  "agent": "Claude Code",
+  "model": "claude-opus-5-5",
+  "turn_id": "1d4f4c18e6b4",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 546,
+    "cache_creation_tokens": 519504,
+    "cache_read_tokens": 75936686,
+    "output_tokens": 195749,
+    "api_call_count": 269
+  },
+  "skill_events_version": 1,
+  "skill_events": [
+    {
+      "id": "claude-skill-toolu_01JrwJ8W1ifaULCj92uJkGze",
+      "event_type": "tool_invocation",
+      "skill": {
+        "name": "claude-in-chrome"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "skill_tool_use",
+        "confidence": "explicit"
+      },
+      "turn_id": "d97a7e933e53",
+      "transcript_anchor": {
+        "unit": "line",
+        "start": 127,
+        "end": 128,
+        "entry_ids": [
+          "52c6afb7-efe7-4613-9a0b-8567bb7214d7"
+        ],
+        "tool_use_id": "toolu_01JrwJ8W1ifaULCj92uJkGze"
+      },
+      "native": {
+        "tool_name": "Skill",
+        "tool_use_id": "toolu_01JrwJ8W1ifaULCj92uJkGze"
+      },
+      "collapse": {
+        "target": "tool_pair",
+        "label": "Skill: claude-in-chrome",
+        "default_collapsed": true
+      }
+    }
+  ],
+  "session_metrics": {
+    "turn_count": 13
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    }
+  ]
+}
