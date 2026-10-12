@@ -199,20 +199,22 @@ def _trace(name: str, kind: str):
 
 
 def run_tool(name: str, args: dict[str, Any], release: Release, res: Result) -> Any:
-    """Each tool call is its own neatlogs span; a raised ToolError marks the span as errored."""
-    try:
-        with _trace(f"tool.{name}", "TOOL") as span:
-            _set(span, **{"input.value": json.dumps(args)})
+    """Each tool call is its own neatlogs span; a ToolError is recorded as the span's output, so the
+    failure is visible in the trace (and to detections on it), not only in the outcome report."""
+    with _trace(f"tool.{name}", "TOOL") as span:
+        _set(span, **{"input.value": json.dumps(args)})
+        try:
             if name == "search_docs":
                 out: Any = INDEX.search(str(args.get("query", "")), release.top_k, release.retriever)
             elif name == "read_doc":
                 out = INDEX.read_doc(str(args.get("slug", "")), release.doc_root)[:4000]
             else:
                 raise ToolError(f"unknown tool {name}")
-            _set(span, **{"output.value": json.dumps(out)[:2000]})
-    except ToolError as exc:
-        res.tool_errors += 1
-        out = {"error": str(exc)}
+        except ToolError as exc:
+            res.tool_errors += 1
+            out = {"error": str(exc)}
+            _set(span, **{"error": True})
+        _set(span, **{"output.value": json.dumps(out)[:2000]})
     res.tool_log.append({"tool": name, "args": args, "hits": len(out) if isinstance(out, list) else None,
                          "error": out.get("error") if isinstance(out, dict) else None})
     return out

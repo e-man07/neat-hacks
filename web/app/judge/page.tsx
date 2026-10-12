@@ -85,8 +85,12 @@ const CRITERIA: Criterion[] = [
     weight: "25%",
     items: [
       {
-        claim: "neatlogs: every agent run and every investigation is traced; Nightly reads traces back over the neatlogs MCP and creates a detection after an attack.",
-        links: [["neatlogs evidence", `${GH}/evidence/neatlogs.md`]],
+        claim: "neatlogs: every agent run and every investigation is traced, and Nightly reads traces back over the neatlogs MCP. It turns each incident’s failing traces into a neatlogs detection, then verifies the fix by that detection’s hit rate: 18 hits before the rollback, 0 after. If it is still firing, the fix is undone.",
+        links: [
+          ["neatlogs evidence", `${GH}/evidence/neatlogs.md`],
+          ["The verification loop", `${GH}/evidence/neatlogs.md#neatlogs-in-the-verification-loop`],
+          ["neatlogs_check.py", `${GH}/backend/nightshift/neatlogs_check.py`],
+        ],
         shots: [
           ["/evidence/neatlogs-investigation-trace.jpg", "One investigation in neatlogs: the Sonnet agent’s tool calls, then the verification replays"],
           ["/evidence/neatlogs-detections.jpg", "The detection Nightly created after the prompt-injection wave"],

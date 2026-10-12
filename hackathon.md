@@ -87,6 +87,18 @@ Aman Jha ([@WhyParabola](https://x.com/WhyParabola)).
 - GitHub repo description set. Demo script and post drafts tightened for tonight.
 - Tests: 26 passed (`uv run pytest`).
 
+### 2026-10-12 ~15:15–16:45 IST: neatlogs in the verification loop
+- Before: Nightly traced runs, read traces back, and created one detection, only after prompt injection. We were using 5 of the 28 tools the neatlogs MCP offers.
+- Now (`nightshift/neatlogs_check.py`): after containment, Nightly builds a signature from the failing traces (errored tool spans, escalation spike, or injection), previews it, and creates a neatlogs detection. During the live watch it compares the detection's hits before and after the fix. A detection still firing fails verification and the fix is undone. Too few traces is inconclusive.
+- Findings on the way:
+  - `search_traces` with the summary `fields` projection is not enabled yet (NL-1923 rollout).
+  - neatlogs normalises tool output (`{"error": …}` → `Error: …`) before regex matching.
+  - Backfilled detection hits show up only in the detection's trend, not in analytics or search, so before/after uses a trend snapshot.
+  - Live scoring updated the trend within 11 s.
+- Scout's tool errors were invisible in its traces: the span said SUCCESS with an empty output. Fixed in Scout's instrumentation.
+- Checked live: run-3 I2 gives 18 hits in 282 traces before the rollback and 0 in 57 after. A full incident through the on-call loop against the real neatlogs project resolved with "27 hits in 58 traces before, 0 in 13 after".
+- Tests: 31 passed (5 new: signatures, verdicts, cleared → resolved, still firing → undo).
+
 ## Demo
 Live: https://nightly.whyparabola.online (GitHub sign-in) · sandbox without an account: `/sandbox` · SDK docs: `/docs`.
 Script: `docs/DEMO_SCRIPT.md` (a live Scout incident through the product, with the sandbox as fallback). Local: `scripts/dev.sh`.

@@ -15,7 +15,7 @@ import uuid
 from typing import Any, Callable
 
 from harbor import deploy as deploys
-from nightshift import actions, detector, impact as impact_mod, notifier, policy, reporter, verifier
+from nightshift import actions, detector, impact as impact_mod, neatlogs_check, notifier, policy, reporter, verifier
 from nightshift.investigator import Diagnosis, Investigation
 from nightshift.neatlogs_mcp import NeatlogsMCP
 from ops import clock
@@ -28,6 +28,8 @@ log = logging.getLogger(__name__)
 ACTIVE = ("OPEN", "INVESTIGATING", "MITIGATING", "MONITORING")
 LIVE_WATCH_MIN = 5          # conversations after the action before judging recovery
 LIVE_WATCH_TIMEOUT_S = 240
+NEATLOGS_WAIT_S = 180       # after the fix, how long to wait for neatlogs to have enough traces to judge
+NEATLOGS_RECHECK_S = 20     # the loop ticks every few seconds; ask neatlogs at most this often per incident
 
 
 class NightShift:
@@ -44,6 +46,7 @@ class NightShift:
         self.on_event = on_event or (lambda e: None)
         self.page = page
         self._lock = threading.Lock()
+        self._neatlogs_last: dict[str, tuple[float, dict[str, Any]]] = {}
         self.enabled = True
 
     # -- bookkeeping --------------------------------------------------------------------------
@@ -193,6 +196,16 @@ class NightShift:
         base = loads(inc["signals_json"], {}).get("baseline", detector.DEFAULT_BASELINE)
         ok, reasons = verifier.recovered(stats, base)
         verify = loads(inc["verification_json"], {}) or {}
+        nl = self._neatlogs_verdict(inc, verify)
+        if nl and nl["status"] == "inconclusive" and ok and time.time() - inc["mitigated_at"] < NEATLOGS_WAIT_S:
+            return inc  # give neatlogs time to ingest post-fix traces before judging
+        if nl:
+            verify["neatlogs"] = nl
+            self.event(iid, "verify", f"neatlogs: “{nl['detection']}” {nl['status'].replace('_', ' ')}: {nl['reason']}", nl)
+            if nl["status"] == "still_firing":
+                ok = False
+                reasons = [r for r in reasons if r != "metrics back within baseline"]
+            reasons.append(f"neatlogs detection {nl['status'].replace('_', ' ')} ({nl['reason']})")
         verify.update({"live": stats.as_dict(), "live_ok": ok, "live_reasons": reasons})
         if ok:
             self._set(iid, status="RESOLVED", resolved_at=time.time(), verification_json=dumps(verify))
@@ -261,9 +274,46 @@ class NightShift:
         if path:
             self.event(iid, "regression", f"Added regression eval {path.name} from the failing conversations",
                        {"path": str(path)})
-        det = reporter.ensure_detection(self.mcp, diag.incident_type)
-        if det:
-            self.event(iid, "detection", f"neatlogs detection: {det.get('status')}", det)
+        self._neatlogs_detection(iid, diag, stats)
+
+    def _neatlogs_detection(self, iid: str, diag: Diagnosis, stats: detector.WindowStats) -> None:
+        """Turn what the failing traces share into a neatlogs detection, to verify the fix against later."""
+        if not self.mcp.available:
+            return
+        marks = ",".join("?" for _ in stats.conversation_ids) or "''"
+        rows = self.db.query(f"SELECT trace_id FROM conversations WHERE id IN ({marks}) AND trace_id IS NOT NULL "
+                             f"AND (outcome != 'correct' OR tool_errors > 0) ORDER BY ts DESC LIMIT 5",
+                             stats.conversation_ids)
+        trace_ids = list(dict.fromkeys([*diag.evidence_trace_ids, *(r["trace_id"] for r in rows)]))
+        inc = self.db.one("SELECT signals_json, verification_json FROM incidents WHERE id = ?", [iid]) or {}
+        signals = [s.get("name") for s in (loads(inc.get("signals_json"), {}) or {}).get("signals", [])]
+        traces = neatlogs_check.failing_traces(self.mcp, trace_ids)
+        sig = neatlogs_check.signature(diag.incident_type, self.adapter.name, traces, signals)
+        if sig is None:
+            self.event(iid, "detection", f"neatlogs: read {len(traces)} failing traces; no span-level signature to "
+                       "watch, so verification relies on replays and live metrics", {"traces_read": len(traces)})
+            return
+        det = neatlogs_check.ensure(self.mcp, sig)
+        verify = loads(inc.get("verification_json"), {}) or {}
+        verify["neatlogs_detection"] = det
+        self._set(iid, verification_json=dumps(verify))
+        extra = f", preview flagged {det['preview_flagged']}" if det.get("preview_flagged") else ""
+        self.event(iid, "detection", f"neatlogs detection {det['status']}: “{sig.name}” ({sig.basis}{extra})", det)
+
+    def _neatlogs_verdict(self, inc: dict[str, Any], verify: dict[str, Any]) -> dict[str, Any] | None:
+        det = verify.get("neatlogs_detection") or {}
+        if det.get("status") not in ("created", "exists") or not self.mcp.available:
+            return None
+        last = self._neatlogs_last.get(inc["id"])
+        if last and time.time() - last[0] < NEATLOGS_RECHECK_S:
+            return last[1]
+        had_snapshot = "snapshot" in det
+        res = neatlogs_check.compare(self.mcp, det, self.adapter.workflow_name, inc["opened_at"],
+                                     inc["mitigated_at"], time.time())
+        if "snapshot" in det and not had_snapshot:  # keep the incident's baseline across ticks and restarts
+            self._set(inc["id"], verification_json=dumps(verify))
+        self._neatlogs_last[inc["id"]] = (time.time(), res)
+        return res
 
     def _page(self, iid: str, title: str, body: str, priority: str) -> None:
         if not self.page:
