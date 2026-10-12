@@ -1,51 +1,71 @@
 "use client";
 
 import Link from "next/link";
-import { AgentStatus, Empty, PageHead } from "@/components/app/bits";
-import { Card, PrimaryLink } from "@/components/ui";
+import { useRouter } from "next/navigation";
+import { Bot } from "lucide-react";
+import { AgentStatus, Empty, PageHead, TableSkeleton } from "@/components/app/bits";
+import { Card } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { type OverviewAgent, ago, fmtUsd, useApi } from "@/lib/app";
 
 export default function AgentsPage() {
+  const router = useRouter();
   const { data } = useApi<{ agents: OverviewAgent[] }>("/overview", 15000);
   const agents = data?.agents ?? [];
   return (
     <>
-      <PageHead title="Agents" sub="Production agents Nightly is on call for." actions={<PrimaryLink href="/app/agents/new">Connect an agent</PrimaryLink>} />
+      <PageHead title="Agents" sub="Production agents Nightly is on call for." />
       {data && agents.length === 0 ? (
-        <Empty>No agents connected yet.</Empty>
+        <Empty icon={Bot} title="No agents connected yet" action={{ href: "/app/agents/new", label: "Connect an agent" }}>
+          Add the SDK to your agent and Nightly starts watching its runs.
+        </Empty>
       ) : (
-        <Card className="overflow-x-auto">
-          <table className="w-full min-w-[640px] text-sm">
-            <thead className="border-b border-line text-left font-mono text-[11px] uppercase tracking-wider text-faint">
-              <tr>
-                <th className="px-4 py-2.5 font-normal">agent</th>
-                <th className="px-4 py-2.5 font-normal">status</th>
-                <th className="px-4 py-2.5 font-normal">release</th>
-                <th className="px-4 py-2.5 font-normal">runs 24h</th>
-                <th className="px-4 py-2.5 font-normal">loss 24h</th>
-                <th className="px-4 py-2.5 font-normal">last seen</th>
-              </tr>
-            </thead>
-            <tbody>
-              {agents.map((a) => (
-                <tr key={a.id} className="border-b border-line last:border-0 hover:bg-white/[0.03]">
-                  <td className="px-4 py-3">
-                    <Link href={`/app/agents/${a.id}`} className="font-medium text-white hover:underline">
-                      {a.name}
-                    </Link>
-                    <div className="font-mono text-[11px] text-faint">{a.id}</div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <AgentStatus status={a.status} lastSeen={a.last_seen_at} />
-                  </td>
-                  <td className="px-4 py-3 font-mono text-fg-2">{a.release ?? "—"}</td>
-                  <td className="px-4 py-3 tabular-nums text-fg-2">{a.runs_24h}</td>
-                  <td className="px-4 py-3 tabular-nums text-fg-2">{fmtUsd(a.loss_24h)}</td>
-                  <td className="px-4 py-3 text-muted">{ago(a.last_seen_at)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <Card className="gap-0 overflow-hidden py-0">
+          {!data ? (
+            <TableSkeleton />
+          ) : (
+            <Table className="min-w-[720px]">
+              <TableHeader>
+                <TableRow className="bg-secondary/50 hover:bg-secondary/50">
+                  <TableHead className="pl-5">Agent</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Release</TableHead>
+                  <TableHead className="text-right">Runs 24h</TableHead>
+                  <TableHead className="text-right">Loss 24h</TableHead>
+                  <TableHead className="text-right">Prevented</TableHead>
+                  <TableHead className="pr-5 text-right">Last seen</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {agents.map((a) => (
+                  <TableRow key={a.id} className="cursor-pointer" onClick={() => router.push(`/app/agents/${a.id}`)}>
+                    <TableCell className="py-3 pl-5">
+                      <div className="flex items-center gap-3">
+                        <span className="grid size-8 shrink-0 place-items-center rounded-md border bg-background text-muted-foreground">
+                          <Bot className="size-4" />
+                        </span>
+                        <div className="min-w-0">
+                          <Link href={`/app/agents/${a.id}`} className="font-medium text-foreground hover:underline" onClick={(e) => e.stopPropagation()}>
+                            {a.name}
+                          </Link>
+                          <div className="font-mono text-[11px] text-muted-foreground">{a.id}</div>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <AgentStatus status={a.status} lastSeen={a.last_seen_at} />
+                      {a.open_incident && <div className="mt-1 max-w-[200px] truncate text-xs text-alert">● {a.open_incident.title ?? "incident open"}</div>}
+                    </TableCell>
+                    <TableCell className="font-mono text-xs">{a.release ?? "—"}</TableCell>
+                    <TableCell className="text-right tabular-nums">{a.runs_24h.toLocaleString()}</TableCell>
+                    <TableCell className="text-right tabular-nums">{fmtUsd(a.loss_24h)}</TableCell>
+                    <TableCell className="text-right tabular-nums text-ok">{fmtUsd(a.loss_prevented, 0)}</TableCell>
+                    <TableCell className="pr-5 text-right text-muted-foreground">{ago(a.last_seen_at)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </Card>
       )}
     </>

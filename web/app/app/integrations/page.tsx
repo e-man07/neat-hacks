@@ -1,14 +1,35 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Field, PageHead, inputCls } from "@/components/app/bits";
-import { Button, Card, Label, Pill } from "@/components/ui";
+import { Hash, Send, Smartphone, Webhook, type LucideIcon } from "lucide-react";
+import { Field, Notice, PageHead, Tone } from "@/components/app/bits";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { api, useApi } from "@/lib/app";
 
 type Integrations = {
   connected: Record<string, { connected?: boolean; channel?: string; team_name?: string; url_host?: string; topic?: string } | undefined>;
   slack_available: boolean;
 };
+
+function Head({ icon: Icon, title, on, children }: { icon: LucideIcon; title: string; on: boolean; children: React.ReactNode }) {
+  return (
+    <CardHeader className="gap-3">
+      <div className="flex items-center justify-between">
+        <span className="grid size-10 place-items-center rounded-lg border bg-background text-foreground">
+          <Icon className="size-5" />
+        </span>
+        {on ? <Tone color="ok">connected</Tone> : <Tone color="grey">off</Tone>}
+      </div>
+      <div>
+        <CardTitle className="text-base">{title}</CardTitle>
+        <CardDescription className="mt-1 leading-relaxed">{children}</CardDescription>
+      </div>
+    </CardHeader>
+  );
+}
 
 export default function IntegrationsPage() {
   const { data, reload } = useApi<Integrations>("/integrations");
@@ -36,6 +57,7 @@ export default function IntegrationsPage() {
         sub="Where Nightly reaches you. It pages only when something needs a human; everything else lands in the morning report."
         actions={
           <Button
+            variant="outline"
             onClick={() =>
               act(async () => {
                 const r = await api<{ delivered: string[]; errors: string[] }>("/integrations/test", { method: "POST" });
@@ -44,77 +66,99 @@ export default function IntegrationsPage() {
               }, "Test page sent")
             }
           >
-            Send a test page
+            <Send /> Send a test page
           </Button>
         }
       />
-      {justConnected && <p className="mb-4 rounded-md bg-ok/10 px-3 py-2 text-sm text-ok">Slack connected.</p>}
-      {msg && <p className={`mb-4 rounded-md px-3 py-2 text-sm ${msg.ok ? "bg-ok/10 text-ok" : "bg-alert/10 text-alert"}`}>{msg.text}</p>}
-      <div className="grid gap-4 lg:grid-cols-3">
-        <Card className="space-y-3 p-5">
-          <div className="flex items-center justify-between">
-            <Label>slack</Label>
-            {c.slack ? <Pill color="var(--ok)">connected</Pill> : <Pill>off</Pill>}
-          </div>
-          <p className="text-sm text-muted">
-            One message per incident, updated as Nightly works, with <b>Approve fix</b> and <b>Undo</b> buttons right in the channel.
-          </p>
-          {c.slack ? (
-            <>
-              <p className="text-sm text-fg-2">
-                Posting to <b>{c.slack.channel ?? "your channel"}</b>
-                {c.slack.team_name ? ` in ${c.slack.team_name}` : ""}.
-              </p>
-              <Button tone="danger" onClick={() => act(() => api("/integrations/slack", { method: "DELETE" }), "Slack disconnected")}>
-                Disconnect
-              </Button>
-            </>
-          ) : data?.slack_available ? (
-            <button
-              onClick={() => act(async () => (window.location.href = (await api<{ url: string }>("/integrations/slack/install")).url), "")}
-              className="inline-flex items-center gap-2 rounded-md bg-white px-3.5 py-2 text-sm font-medium text-black"
-            >
-              Add to Slack
-            </button>
-          ) : (
-            <p className="text-xs text-faint">The Slack app isn&apos;t configured on this server (SLACK_CLIENT_ID/SECRET).</p>
-          )}
-        </Card>
-        <Card className="space-y-3 p-5">
-          <div className="flex items-center justify-between">
-            <Label>phone push (ntfy)</Label>
-            {c.ntfy ? <Pill color="var(--ok)">connected</Pill> : <Pill>off</Pill>}
-          </div>
-          <p className="text-sm text-muted">Push notifications through the free ntfy app. Pick a long, unguessable topic and subscribe to it on your phone.</p>
-          {c.ntfy && <p className="font-mono text-xs text-fg-2">topic: {c.ntfy.topic}</p>}
-          <Field label="Topic">
-            <input className={inputCls} value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="nightshift-7f3a9c21" />
-          </Field>
-          <div className="flex gap-2">
-            <Button tone="primary" disabled={!topic} onClick={() => act(() => api("/integrations/ntfy", { method: "PUT", json: { config: { topic } } }), "ntfy saved")}>
-              Save
-            </Button>
-            {c.ntfy && <Button onClick={() => act(() => api("/integrations/ntfy", { method: "DELETE" }), "ntfy removed")}>Remove</Button>}
-          </div>
-        </Card>
-        <Card className="space-y-3 p-5">
-          <div className="flex items-center justify-between">
-            <Label>webhook</Label>
-            {c.webhook ? <Pill color="var(--ok)">connected</Pill> : <Pill>off</Pill>}
-          </div>
-          <p className="text-sm text-muted">A JSON POST for PagerDuty, Opsgenie or your own tooling: title, body, priority, incident and agent ids, link.</p>
-          {c.webhook && <p className="font-mono text-xs text-fg-2">→ {c.webhook.url_host}</p>}
-          <Field label="HTTPS URL">
-            <input className={inputCls} value={hook} onChange={(e) => setHook(e.target.value)} placeholder="https://events.pagerduty.com/…" />
-          </Field>
-          <div className="flex gap-2">
-            <Button tone="primary" disabled={!hook} onClick={() => act(() => api("/integrations/webhook", { method: "PUT", json: { config: { url: hook } } }), "Webhook saved")}>
-              Save
-            </Button>
-            {c.webhook && <Button onClick={() => act(() => api("/integrations/webhook", { method: "DELETE" }), "Webhook removed")}>Remove</Button>}
-          </div>
-        </Card>
+      <div className="mb-4 space-y-2">
+        {justConnected && <Notice ok>Slack connected.</Notice>}
+        {msg && <Notice ok={msg.ok}>{msg.text}</Notice>}
       </div>
+      {!data ? (
+        <div className="grid gap-4 lg:grid-cols-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} className="h-72 bg-secondary" />
+          ))}
+        </div>
+      ) : (
+        <div className="grid gap-4 lg:grid-cols-3">
+          <Card className="gap-4">
+            <Head icon={Hash} title="Slack" on={!!c.slack}>
+              One message per incident, updated as Nightly works, with <b className="text-foreground">Approve fix</b> and{" "}
+              <b className="text-foreground">Undo</b> buttons right in the channel.
+            </Head>
+            <CardContent className="flex-1 text-sm">
+              {c.slack ? (
+                <p className="text-foreground/80">
+                  Posting to <b className="text-foreground">{c.slack.channel ?? "your channel"}</b>
+                  {c.slack.team_name ? ` in ${c.slack.team_name}` : ""}.
+                </p>
+              ) : !data.slack_available ? (
+                <p className="text-xs text-muted-foreground">The Slack app isn&apos;t configured on this server (SLACK_CLIENT_ID/SECRET).</p>
+              ) : null}
+            </CardContent>
+            <CardFooter>
+              {c.slack ? (
+                <Button
+                  variant="outline"
+                  className="border-alert/30 text-alert hover:bg-alert/10 hover:text-alert"
+                  onClick={() => act(() => api("/integrations/slack", { method: "DELETE" }), "Slack disconnected")}
+                >
+                  Disconnect
+                </Button>
+              ) : data.slack_available ? (
+                <Button onClick={() => act(async () => (window.location.href = (await api<{ url: string }>("/integrations/slack/install")).url), "")}>
+                  <Hash /> Add to Slack
+                </Button>
+              ) : null}
+            </CardFooter>
+          </Card>
+
+          <Card className="gap-4">
+            <Head icon={Smartphone} title="Phone push (ntfy)" on={!!c.ntfy}>
+              Push notifications through the free ntfy app. Pick a long, unguessable topic and subscribe to it on your phone.
+            </Head>
+            <CardContent className="flex-1 space-y-3">
+              {c.ntfy && <p className="font-mono text-xs text-foreground/80">topic: {c.ntfy.topic}</p>}
+              <Field label="Topic">
+                <Input value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="nightshift-7f3a9c21" className="font-mono" />
+              </Field>
+            </CardContent>
+            <CardFooter className="gap-2">
+              <Button disabled={!topic} onClick={() => act(() => api("/integrations/ntfy", { method: "PUT", json: { config: { topic } } }), "ntfy saved")}>
+                Save
+              </Button>
+              {c.ntfy && (
+                <Button variant="outline" onClick={() => act(() => api("/integrations/ntfy", { method: "DELETE" }), "ntfy removed")}>
+                  Remove
+                </Button>
+              )}
+            </CardFooter>
+          </Card>
+
+          <Card className="gap-4">
+            <Head icon={Webhook} title="Webhook" on={!!c.webhook}>
+              A JSON POST for PagerDuty, Opsgenie or your own tooling: title, body, priority, incident and agent ids, link.
+            </Head>
+            <CardContent className="flex-1 space-y-3">
+              {c.webhook && <p className="font-mono text-xs text-foreground/80">→ {c.webhook.url_host}</p>}
+              <Field label="HTTPS URL">
+                <Input value={hook} onChange={(e) => setHook(e.target.value)} placeholder="https://events.pagerduty.com/…" />
+              </Field>
+            </CardContent>
+            <CardFooter className="gap-2">
+              <Button disabled={!hook} onClick={() => act(() => api("/integrations/webhook", { method: "PUT", json: { config: { url: hook } } }), "Webhook saved")}>
+                Save
+              </Button>
+              {c.webhook && (
+                <Button variant="outline" onClick={() => act(() => api("/integrations/webhook", { method: "DELETE" }), "Webhook removed")}>
+                  Remove
+                </Button>
+              )}
+            </CardFooter>
+          </Card>
+        </div>
+      )}
     </>
   );
 }
