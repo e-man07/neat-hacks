@@ -9,7 +9,7 @@ Built for neatHack 2026 (called *Night Shift* during the build; older evidence f
 | **6/6** incidents planted in a live agent, handled correctly | **13–21 s** from detection to containment | **4/6 → 6/6** from benchmark run 1 to run 3 |
 |---|---|---|
 
-**Live:** [nightly.whyparabola.online](https://nightly.whyparabola.online) · [**for judges: every criterion and its evidence**](https://nightly.whyparabola.online/judge) ·
+**Demo video:** [the submission post](https://x.com/WhyParabola/status/2109650318481088819) · **Live:** [nightly.whyparabola.online](https://nightly.whyparabola.online) · [**for judges: every criterion and its evidence**](https://nightly.whyparabola.online/judge) ·
 [sandbox: run the 3 AM incident](https://nightly.whyparabola.online/sandbox) · [SDK docs](https://nightly.whyparabola.online/docs) ·
 `pip install nightly-sdk` ([PyPI](https://pypi.org/project/nightly-sdk/)) ·
 [explainer video](https://pub-322f2127ed23420ebefb3a5062774ae4.r2.dev/films/nightly-master-1080p60.mp4)
@@ -54,7 +54,7 @@ approval in Slack.*
 | **Used neatlogs** | Every agent run and every investigation is traced. Nightly reads traces back over the neatlogs MCP during investigations, turns each incident's failing traces into a neatlogs detection, then uses that detection's before/after hit rate to verify the fix: if it is still firing, the fix is undone. [`evidence/neatlogs.md`](evidence/neatlogs.md) has the loop end to end and screenshots of a before / during / after set of traces and of an investigation trace |
 | **Used Entire** | Every bad release was written by a separate Claude Code session with an Entire checkpoint. Nightly resolves commit → checkpoint → prompt → the coding agent's own warning, plus entire-graph change lists. entire-graph also gives our own coding agent repository context ([`CLAUDE.md`](CLAUDE.md)). [`evidence/entire.md`](evidence/entire.md) |
 | **Used cfo.ai** | [Business plan in cfo.ai](https://app.cfo.ai/s/CsWafbQfu2U1y94W) (pricing, costs, revenue, runway: break-even M08, runway > 24 months) and [customer unit economics in cfo.ai](https://app.cfo.ai/s/fHcCAy2lG_aXs3Qt), which Nightly uses to price every incident. [`business/PLAN.md`](business/PLAN.md) |
-| **Built in public** | #neatHack posts on X: [the explainer video](https://x.com/WhyParabola/status/2109333155702571151), [post 2](https://x.com/WhyParabola/status/2109581037995233462); more drafted in [`posts/`](posts) |
+| **Built in public** | #neatHack posts on X: [the explainer video](https://x.com/WhyParabola/status/2109333155702571151), [post 2](https://x.com/WhyParabola/status/2109581037995233462), [the submission with the demo video](https://x.com/WhyParabola/status/2109650318481088819) |
 | **Code written during the hackathon** | Commit history (first commit is the plan only), build log in [`hackathon.md`](hackathon.md) |
 
 ## The product

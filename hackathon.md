@@ -78,6 +78,7 @@ Aman Jha ([@WhyParabola](https://x.com/WhyParabola)).
 - Reviewed 21 other public neatHack repos and the market (agent observability vs AI SRE tools). About 9 build agents that debug or fix other agents; none combines a live production agent, $ pricing, reversible containment and a hosted product. Acted on it: `/judge` page mapping each criterion to evidence; a one-click guided "3 AM incident" in the sandbox with a live $-lost counter; incidents now show confidence, traces cited and each policy check; a Slack message preview and a comparison table on the landing page; README opening with proof numbers.
 - Built in public: first #neatHack post with the explainer video: https://x.com/WhyParabola/status/2109333155702571151
 - Second #neatHack post (Oct 12): https://x.com/WhyParabola/status/2109581037995233462
+- Submitted (Oct 12, in the window): quote post of the official neatlogs submission post, with the 2:55 demo video: https://x.com/WhyParabola/status/2109650318481088819
 - Slack connected to the live product.
 - Entire checkpoints moved from temporary `_entire/*` branches to `refs/entire/checkpoints/*` (31 refs) and the repo mirrored on entire.io; all 7 checkpoint links in the evidence now open.
 - Moved the site to https://nightly.whyparabola.online and renamed the repo to `e-man07/nightly`; the API allows the new origin and Slack links point to it.
@@ -119,4 +120,4 @@ Script: `docs/DEMO_SCRIPT.md` (a live Scout incident through the product, with t
 ## Submission
 - Confirmed (neatlogs.com/hackathon, re-checked Oct 11): one track; must use neatlogs, Entire and cfo.ai, and include the cfo.ai business plan; public repo with commits dated during the event; submit by quoting the official neatlogs post with team, project, repo and demo. Planned window Oct 12, 7:00–11:55 PM IST, with the final cutoff on Discord. Judging: agent 30%, tool use 25%, demo 20%, building in public 15%, usefulness 10%.
 - Done: public repo; live product; evidence for neatlogs, Entire, cfo.ai, before/after and recovery; cfo.ai plan links.
-- Outstanding (Aman): confirm the cutoff on Discord; post the remaining #neatHack drafts (`posts/drafts.md`); record the demo; submit the quote post in the window.
+- Done (Oct 12): demo video recorded and edited (HyperFrames: live footage with camera moves, the Nightly ghost presenting, synthesized score); submitted as a quote post of the official neatlogs post: https://x.com/WhyParabola/status/2109650318481088819
