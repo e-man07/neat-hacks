@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { ArrowRight, ArrowUpRight, Bot, Hammer, LifeBuoy, Package, Plug, TrendingUp, type LucideIcon } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Bot, Clapperboard, Hammer, LifeBuoy, Package, Plug, TrendingUp, type LucideIcon } from "lucide-react";
 import Nav from "@/components/Nav";
 import { Brand } from "@/components/Marks";
 import { Moon } from "@/components/ui";
@@ -160,6 +160,19 @@ const CRITERIA: Criterion[] = [
     ],
   },
   {
+    id: "demo",
+    icon: Clapperboard,
+    toc: "Demo video",
+    name: "The demo video",
+    weight: "20%",
+    items: [
+      {
+        claim: "2:55, a live incident on Scout: a coding agent ships a model upgrade, Nightly notices in 22 s, finds the prompt and the coding agent's ignored warning through Entire, prices it with unit economics modelled in cfo.ai, rolls back, replays 3/3 and sends one Slack message. Then how neatlogs, Entire and cfo.ai are used.",
+        links: [["Watch the demo (submission post)", "https://x.com/WhyParabola/status/2109650318481088819"]],
+      },
+    ],
+  },
+  {
     id: "in-public",
     icon: Hammer,
     toc: "Built in public",
@@ -171,6 +184,7 @@ const CRITERIA: Criterion[] = [
         links: [
           ["#neatHack post: explainer video", "https://x.com/WhyParabola/status/2109333155702571151"],
           ["#neatHack post 2", "https://x.com/WhyParabola/status/2109581037995233462"],
+          ["Submission post, with the demo", "https://x.com/WhyParabola/status/2109650318481088819"],
           ["Build log", `${GH}/hackathon.md`],
           ["Commits", "https://github.com/e-man07/nightly/commits/main"],
         ],
@@ -179,11 +193,11 @@ const CRITERIA: Criterion[] = [
   },
 ];
 
-/** Rubric overview for the sidebar (weights from the official judging criteria, see hackathon.md).
- *  TODO: the 20% demo criterion has no section here yet; the demo video link is under "Built in public". */
+/** Rubric overview for the sidebar (weights from the official judging criteria, see hackathon.md). */
 const RUBRIC: { label: string; weight: number; ids: string[] }[] = [
   { label: "Agent", weight: 30, ids: ["substantial-task", "improved", "recovers"] },
   { label: "Tool use", weight: 25, ids: ["tools"] },
+  { label: "Demo video", weight: 20, ids: ["demo"] },
   { label: "Building in public", weight: 15, ids: ["in-public"] },
   { label: "Usefulness", weight: 10, ids: ["product"] },
 ];
