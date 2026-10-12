@@ -17,6 +17,7 @@ from typing import Any, Callable, Protocol
 
 from harbor import deploy as harbor_deploy
 from harbor import releases as harbor_releases
+from harbor.agent import WORKFLOW as HARBOR_WORKFLOW
 from nightshift import provenance
 from nightshift.neatlogs_mcp import NeatlogsMCP
 from ops import llm
@@ -112,6 +113,7 @@ class AgentAdapter:
         return provenance.for_commit(sha, release=release, repo_dir=Path(self.repo_dir))
 
     repo_dir: str | None = None
+    workflow_name: str | None = None  # the agent's neatlogs workflow, to scope analytics
 
     # health & verification --------------------------------------------------------------------------
     def check_model_health(self, model: str) -> dict[str, Any]:
@@ -148,6 +150,7 @@ class HarborAdapter(AgentAdapter):
         self.policy = policy or load_policy()
         self.economics = load_economics()
         self.repo_dir = str(REPO_DIR)
+        self.workflow_name = HARBOR_WORKFLOW
 
     def active_config(self) -> dict[str, Any]:
         from harbor.agent import effective_config
@@ -209,6 +212,7 @@ class SdkAdapter(AgentAdapter):
         self.policy = policy
         self.economics = AgentEconomics(agent.get("economics") or {})
         self.repo_dir = agent.get("repo_dir")
+        self.workflow_name = agent.get("workflow_name") or None
         self._create_job = create_replay_job
         self._get_job = get_replay_job
 

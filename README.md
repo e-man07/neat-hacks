@@ -47,7 +47,7 @@ approval in Slack.*
 | **The agent completes a substantial task** | The whole incident lifecycle: detect → investigate → price → decide → contain → verify → report. Live on two agents: Harbor ([6/6 benchmark](evidence/benchmark/)) and Scout ([two live incidents](evidence/scout/)) |
 | **Agent improved (before/after with numbers)** | [`evidence/before-after.md`](evidence/before-after.md): run 1 → run 3, from 4/6 to 6/6 handled correctly, after fixes based on what run 1 showed |
 | **Recovers from failures** | Every incident is a failure it recovers from. If a fix fails verification, Nightly undoes it ([`runner.py`](backend/nightshift/runner.py), test `test_failed_verification_undoes_action`). It survived neatlogs losing most of Scout's traces ([`evidence/scout/`](evidence/scout/README.md#what-we-learned-and-changed)) |
-| **Used neatlogs** | Every agent run and every investigation is traced. Nightly reads traces back over the neatlogs MCP during investigations, and creates a neatlogs detection after an attack. [`evidence/neatlogs.md`](evidence/neatlogs.md) has screenshots of a before / during / after set of traces and of an investigation trace |
+| **Used neatlogs** | Every agent run and every investigation is traced. Nightly reads traces back over the neatlogs MCP during investigations, turns each incident's failing traces into a neatlogs detection, then uses that detection's before/after hit rate to verify the fix: if it is still firing, the fix is undone. [`evidence/neatlogs.md`](evidence/neatlogs.md) has the loop end to end and screenshots of a before / during / after set of traces and of an investigation trace |
 | **Used Entire** | Every bad release was written by a separate Claude Code session with an Entire checkpoint. Nightly resolves commit → checkpoint → prompt → the coding agent's own warning, plus entire-graph change lists. entire-graph also gives our own coding agent repository context ([`CLAUDE.md`](CLAUDE.md)). [`evidence/entire.md`](evidence/entire.md) |
 | **Used cfo.ai** | [Business plan in cfo.ai](https://app.cfo.ai/s/CsWafbQfu2U1y94W) (pricing, costs, revenue, runway: break-even M08, runway > 24 months) and [customer unit economics in cfo.ai](https://app.cfo.ai/s/fHcCAy2lG_aXs3Qt), which Nightly uses to price every incident. [`business/PLAN.md`](business/PLAN.md) |
 | **Built in public** | [#neatHack post with the explainer video](https://x.com/WhyParabola/status/2109333155702571151); more drafted in [`posts/`](posts) |
@@ -77,7 +77,7 @@ approval in Slack.*
                                                    3 PRICE       $/min × minutes until a human answers (cfo.ai)
                                                    4 DECIDE      your policy: reversible? confident? worth waking you?
                                                    5 CONTAIN     roll back · fail over model · kill switch · cap steps
-                                                   6 VERIFY      your agent replays the failed runs; live metrics; auto-undo
+                                                   6 VERIFY      replays · live metrics · the incident's neatlogs detection must stop firing · auto-undo
                                                    7 REPORT      Slack/ntfy/webhook · postmortem · regression eval · fix PR on approval
 ```
 

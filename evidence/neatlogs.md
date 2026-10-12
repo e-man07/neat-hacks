@@ -6,11 +6,57 @@ Project: **Aman's project** (`c2894ca1-bc61-4250-9278-83da3c88ed08`, tier free).
 
 - **SDK tracing** (`ops/tracing.py`, `ops/llm.py`): every Harbor conversation is a WORKFLOW trace (`harbor-support`) with auto-instrumented LLM spans and a TOOL span per tool call; every Night Shift incident is a WORKFLOW trace (`nightshift`) containing the investigator's AGENT span, its TOOL spans and the verification replays.
 - **Read-back over MCP** (`nightshift/neatlogs_mcp.py`): the investigator calls `search_traces` and `get_trace_context` during an investigation and cites trace ids in its diagnosis and postmortem.
-- **Detections** (`nightshift/reporter.py`): after a prompt-injection incident Night Shift creates a regex detection for the attack signature so future traces are flagged.
+- **Detections in the verification loop** (`nightshift/neatlogs_check.py`, added Oct 12): after containment, Nightly reads the failing traces back and turns what they share into a neatlogs detection (errors from specific tools, an escalation spike, or the injection pattern). It previews the detection first and creates it only if the preview flags traces. While watching live traffic it then compares how often the detection fires before and after the fix. **A detection still firing fails verification and the fix is undone.** Too few traces in neatlogs is "inconclusive", never a failure. See [below](#neatlogs-in-the-verification-loop).
 
 - `harbor-support` traces matching a sample query: 382
 - `nightshift` traces matching a sample query: 15
 - Active detections: Order-note prompt injection, Expensive LLM Call, Slow LLM Response, Execution Failed
+
+## neatlogs in the verification loop
+
+Before Oct 12, Nightly verified a fix with its own replays and live metrics. Now neatlogs is a second,
+independent check.
+
+1. **Signature from the failing traces.** `get_trace_context` on up to 3 failing traces, then the tool spans
+   whose output is an error. For I2 that gives `lookup_order, check_refund_policy` ("6 errored tool calls in 3
+   failing traces").
+2. **Preview, then create.** `preview_detection` (regex `(?i)\berror\b` on those span names) flagged 5 spans,
+   so `create_detection` created *Nightly · Harbor: errors from lookup_order, check_refund_policy* in the
+   "Nightly" group. Its 14-day backfill scanned 480 traces.
+3. **Before / after.** neatlogs counts backfilled hits only in a detection's trend, not in analytics or
+   search (we checked all three). So Nightly snapshots the trend once the backfill is done: the hits in the
+   incident's hours, and the running total. Post-fix hits are the growth of that total. Trace counts for both
+   windows come from `get_project_analytics` (kpis, scoped to the agent's workflow). On the run-3 I2
+   incident: **18 hits in 282 traces before the rollback, 0 in 57 after**.
+4. **How fast neatlogs scores new traces.** We sent 4 live conversations on the broken r43 release. The
+   detection's trend went from 18 to 24 **within 11 s**, fast enough to judge a fix during the live watch.
+
+**End to end through the real on-call loop** (offline `sim` brain, real neatlogs project, r41 → r43):
+
+```
+[act]       Auto action: rolled back r43 → r41
+[verify]    Replayed 8 failing conversations on the new config: 8/8 pass
+[detection] neatlogs detection created: "Nightly · Harbor: errors from lookup_order"
+            (3 errored tool calls in 3 failing traces, preview flagged 5)
+[verify]    neatlogs: "Nightly · Harbor: errors from lookup_order" cleared:
+            flagged 27 hits in 58 traces before the fix, 0 in 13 after
+[resolved]  Live metrics recovered over 10 new conversations: metrics back within baseline;
+            neatlogs detection cleared (flagged 27 hits in 58 traces before the fix, 0 in 13 after)
+```
+
+The postmortem's Verification section now carries the detection and the neatlogs verdict. Tests cover
+both outcomes: cleared → RESOLVED, and still firing → the rollback is undone and the incident ESCALATED
+(`backend/tests/test_nightshift.py`).
+
+**What this changed in Scout.** Scout raised tool errors inside the span, so neatlogs recorded a failing
+`tool.read_doc` as SUCCESS with an empty output, and no detection could see it. Scout now writes the error
+into the span output (`{"error": "doc not found: 'data-export'"}`), and Nightly's signature for it matches in a
+neatlogs preview.
+
+**Limits.** A wrong refund that skips the policy check leaves no span-level signature: the bad trace and a
+good one contain the same tool calls. neatlogs' MCP can create regex and conditional detections, but not the
+code or trace-rule detections that could express "a refund with no policy check before it". For those
+incidents Nightly says so in the timeline, and verification relies on replays and live metrics.
 
 ## Screenshots from the neatlogs app
 

@@ -132,11 +132,24 @@ class NeatlogsMCP:
     def create_detection_group(self, name: str) -> Any:
         return self.call("create_detection_group", {"name": name})
 
-    def preview_detection(self, config: dict[str, Any], timeframe_days: int = 1) -> Any:
-        return self.call("preview_detection", {"type": "regex", "config": config, "timeframe_days": timeframe_days,
-                                               "limit": 5})
+    def preview_detection(self, config: dict[str, Any], timeframe_days: int = 1, kind: str = "regex",
+                          run_on: dict[str, Any] | None = None) -> Any:
+        args: dict[str, Any] = {"type": kind, "config": config, "timeframe_days": timeframe_days, "limit": 5}
+        if run_on:
+            args["run_on"] = run_on
+        return self.call("preview_detection", args)
 
     def create_detection(self, display_name: str, group_id: str, config: dict[str, Any],
-                         description: str) -> Any:
-        return self.call("create_detection", {"display_name": display_name, "group_id": group_id,
-                                              "type": "regex", "config": config, "description": description})
+                         description: str, kind: str = "regex", run_on: dict[str, Any] | None = None) -> Any:
+        args: dict[str, Any] = {"display_name": display_name, "group_id": group_id, "type": kind,
+                                "config": config, "description": description}
+        if run_on:
+            args["run_on"] = run_on
+        return self.call("create_detection", args)
+
+    def analytics(self, start: str, end: str, view: str = "kpis", workflow_name: str | None = None) -> Any:
+        """Dashboard aggregates over an exact [start, end) window (ISO timestamps, max 30 days)."""
+        args: dict[str, Any] = {"from": start, "to": end, "view": view}
+        if workflow_name:
+            args["workflow_name"] = workflow_name
+        return self.call("get_project_analytics", args)

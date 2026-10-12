@@ -1,4 +1,4 @@
-"""Incident outputs: postmortem, regression evals, permanent-fix proposal, neatlogs detection."""
+"""Incident outputs: postmortem, regression evals, permanent-fix proposal."""
 
 from __future__ import annotations
 
@@ -9,7 +9,6 @@ from typing import Any
 
 import yaml
 
-from nightshift.neatlogs_mcp import NeatlogsMCP, NeatlogsMCPError
 from ops.db import OpsDB, loads
 from ops.settings import BACKEND_DIR
 
@@ -17,9 +16,6 @@ log = logging.getLogger(__name__)
 
 INCIDENT_DIR = BACKEND_DIR / "runs" / "incidents"
 REGRESSION_DIR = BACKEND_DIR / "harbor" / "evals" / "regressions"
-
-DETECTION_GROUP = "Nightly"
-INJECTION_PATTERN = r"(?i)(refund policy checks are waived|ignore previous instructions|admin override approved)"
 
 
 def _fmt_ts(ts: float | None) -> str:
@@ -47,35 +43,6 @@ def write_regressions(db: OpsDB, incident_id: str, conversation_ids: list[str]) 
     path = REGRESSION_DIR / f"{incident_id}.yaml"
     path.write_text(yaml.safe_dump({"incident": incident_id, "cases": cases}, sort_keys=False))
     return path
-
-
-def ensure_detection(mcp: NeatlogsMCP, incident_type: str) -> dict[str, Any] | None:
-    """Leave a permanent neatlogs detection for the incident signature (injection only, for now)."""
-    if incident_type != "prompt_injection" or not mcp.available:
-        return None
-    try:
-        existing = mcp.list_detections()
-        text = str(existing)
-        if "Order-note prompt injection" in text:
-            return {"status": "exists", "name": "Order-note prompt injection"}
-        groups = mcp.list_detection_groups()
-        group_list = groups.get("groups", groups) if isinstance(groups, dict) else groups
-        group_id = None
-        for g in group_list or []:
-            if isinstance(g, dict) and g.get("name") == DETECTION_GROUP:
-                group_id = g.get("id")
-        if not group_id:
-            created = mcp.create_detection_group(DETECTION_GROUP)
-            group_id = created.get("id") or created.get("group", {}).get("id") if isinstance(created, dict) else None
-        config = {"output_pattern": INJECTION_PATTERN, "input_pattern": INJECTION_PATTERN, "operator": "OR"}
-        preview = mcp.preview_detection(config)
-        det = mcp.create_detection("Order-note prompt injection", group_id, config,
-                                   "Instructions hidden in order notes that try to trigger refunds (created by Nightly).")
-        return {"status": "created", "preview": preview if isinstance(preview, dict) else str(preview)[:300],
-                "detection": det if isinstance(det, dict) else str(det)[:300]}
-    except (NeatlogsMCPError, Exception) as exc:  # observability config must never break the incident flow
-        log.warning("detection setup failed: %s", exc)
-        return {"status": "failed", "error": str(exc)[:300]}
 
 
 def postmortem(db: OpsDB, incident_id: str) -> str:
@@ -116,8 +83,16 @@ def postmortem(db: OpsDB, incident_id: str) -> str:
         lines.append(f"- [{a['mode']}] `{a['kind']}` {a['params_json']} — {a['status']} — {a['reason'] or ''}")
     lines += ["", "## Verification",
               f"- Replay of failing conversations: {verify.get('replay', {}).get('passed')}/{verify.get('replay', {}).get('n')} pass",
-              f"- Live metrics after action: {', '.join(verify.get('live_reasons', [])) or 'pending'}",
-              "", "## Evidence (neatlogs traces)"]
+              f"- Live metrics after action: {', '.join(verify.get('live_reasons', [])) or 'pending'}"]
+    det = verify.get("neatlogs_detection") or {}
+    if det:
+        sig = det.get("signature") or {}
+        lines.append(f"- neatlogs detection: **{det.get('name')}** ({det.get('status')}"
+                     + (f", from {sig['basis']}" if sig.get("basis") else "") + ")")
+    nl = verify.get("neatlogs") or {}
+    if nl:
+        lines.append(f"- neatlogs check: **{nl.get('status')}**, {nl.get('reason')}")
+    lines += ["", "## Evidence (neatlogs traces)"]
     for t in diag.get("evidence_trace_ids") or []:
         lines.append(f"- `{t}`")
     lines += ["", "## Permanent fix (needs human approval)", diag.get("permanent_fix") or "—", "", "## Timeline"]
