@@ -1,0 +1,8 @@
+incident: INC-1012-02-4376
+cases:
+- scenario: null
+  must_be:
+  - correct
+  - escalated
+  observed_during_incident: failed
+  source_trace: 4fc5e8e9ad31f867301a13177eca904b
