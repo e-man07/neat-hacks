@@ -1,0 +1,87 @@
+go through this project and have a context around it then we will talk
+
+---
+
+where does our project lacks? and is it following whatever the requirements of the hackathon? and also look for competitors, what are they building where are they and what are the chnaces of us winning this hackathon
+
+---
+
+<task-notification>
+<task-id>aabbb968b8fdac2e0</task-id>
+<tool-use-id>toolu_01VRi5bXyd1THZC6h3AeVZeD</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-e-man-myprojects-nightly/f63e354e-fccb-4440-929b-8460b1f46d49/tasks/aabbb968b8fdac2e0.output</output-file>
+<status>completed</status>
+<summary>Agent "Research neatHack competitor projects" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>I found about 100 public neatHack 2026 repos and 75–80 of them look like real entries. Activity numbers come from the GitHub API and are commits on the default branch only. "Live" means the URL returned HTTP 200 just now. I took each project's claims from its README and did not run any of their code.
+
+**What I couldn't verify:** X/Twitter isn't searchable through web search (`#neatHack` returned nothing), so building in public is judged only by X links inside READMEs and `hackathon.md`. Discord isn't public. Most demo videos are still marked "pending" because submissions open tonight, so video counts will change in the next few hours. Some entries may be in private repos or repos not tagged "neathack", so this is a lower bound.
+
+## Event facts (neatlogs.com/hackathon, Luma)
+- **Registrants:** Luma shows 1,356 "Going", with registration closed. Neither page states how many teams or submissions there are. GitHub search finds 80 repos matching "neathack" created after Sept 20.
+- **Submission:** today, 7:00–11:55 PM IST, made by quote-posting the official neatlogs X post. Winners are announced Oct 16.
+- **Judging weights:**
+  - The agent completes a substantial task end to end: 30%
+  - Use of neatlogs, Entire and cfo.ai: 25%
+  - Demo video: 20%
+  - Building in public (#neatHack posts): 15%
+  - Usefulness and originality: 10%
+- **Evidence judges check:** before/after runs with numbers, neatlogs traces, Entire checkpoints or graph output, a cfo.ai plan, a run where an action failed and the agent recovered, #neatHack posts, a public repo with commits dated during the event, and a demo video.
+- **Judges:** Haimantika Mitra and Abhi Singh (Entire), Prateek Karnal (Orchestrator.inc), Ajay Yadav and Akshay Hangloo (neatlogs).
+- **Prizes:** $2,000 / $1,000 / $500 cash plus Dodo Payments credits, a $500 community prize, and neatlogs Pro for every winner.
+
+**Nightly for reference:** 83 commits from Oct 10 19:48 to Oct 11 20:15 (author dates), 51 Entire-Checkpoint trailers in the last 100 commits, one X post linked in `hackathon.md`, and no video link in the repo yet. Nightly has fewer commits than most of the top tier, and the strongest entries already link a video.
+
+## Projects that overlap with Nightly (agents that debug, monitor or fix other agents)
+| Repo | What it does | Activity | Tool use / notes |
+|---|---|---|---|
+| [kinnuworks/whodunit](https://github.com/kinnuworks/whodunit) | Finds which commit broke an agent and why it was written, using probabilistic bisect by replay. Fixes it, proves it by replay and counts the cost. Has a sealed eval of 5 planted regressions. | 115 commits, Oct 10 → today; 721-line build log | 100/100 checkpoint trailers; starts cases from neatlogs or neatroots traces. **Closest to Nightly's "commit + checkpoint prompt" pitch.** |
+| [jaxsonsprinkles/agentbisect](https://github.com/jaxsonsprinkles/agentbisect) | `git bisect` for agent behaviour. Ranks suspect commits by span divergence, `entire graph impact` and each commit's Entire checkpoint intent, then proves the culprit by reverting it. | 52 commits, Oct 10–11 | cfo.ai plan link; 48 trailers. Strong Entire use. |
+| [bruce249/rootline](https://github.com/bruce249/rootline) | Traces a failing support agent to the bad commit, reads its Entire checkpoint, fixes it, replays tickets. | 10 commits, Oct 10 only | Same concept as Nightly, but thin. |
+| [abhilash2429/BladeRunner](https://github.com/abhilash2429/BladeRunner) | Watchdog for agent fleets: polls neatlogs detections, pauses or quarantines the run, cites spans, a cross-model verifier checks findings, patches the guardrail, confirms against hidden ground truth. Tested on 102 held-out traces plus 858 AgentDojo runs. | 106 commits, solo; video "pending" | Uses Entire Brain; writes tags and feedback back into neatlogs. Very rigorous. |
+| [ROHITCRAFTSYT/pitstop](https://github.com/ROHITCRAFTSYT/pitstop) | Reads a failing agent's neatlogs traces, patches via Entire Graph, re-runs evals, keeps the fix only if it helps. Opened a real PR. Both demo agents went 0/6 → 6/6. | 28 commits | 2 X posts linked |
+| [thegoodengineers/mend](https://github.com/thegoodengineers/mend) | An agent that reads its own neatlogs traces, fixes its own code, and keeps a fix only if a gated re-run improves. 11 rounds (5 kept), cost per task $0.040 → $0.015. | 218 commits; site live; 2:58 video hosted | 3 X posts; 652-line build log |
+| [arnxv0/neathacks-project](https://github.com/arnxv0/neathacks-project) (Preflight) | Crash-tests an agent with attacks, groups failures by root cause, dispatches Claude Code fixers. 22–23/50 attacks get through before, 1/50 after. | 165 commits; Terraform AWS host (login-gated, 401); 2 videos | Full judge table: neatlogs before/after links, Entire checkpoint, cfo.ai through MCP |
+| [faroukobayanju/kedge](https://github.com/faroukobayanju/kedge) | Supervisor for unattended coding agents: catches deleted tests, false "fixed" claims and drift, then rolls back. Before 2/5 tests, after 5/5. | 77 commits | Video pending |
+| [rajkaria/roster](https://github.com/rajkaria/roster) | Performance reviews for AI coding agents, backed by a pre-registered experiment (McNemar p=0.006). | **396 commits**; tryroster.dev live | Entire checkpoint branch exists |
+| [RaYYeR220/dailies](https://github.com/RaYYeR220/dailies) | Fact-checks coding-agent sessions from Entire checkpoints and turns them into a narrated 60-second reel. | 237 commits; live app; [video](https://youtu.be/MdR_a0zio8M) | 2 X posts. Built mainly on Entire. |
+| [padmanabhan-r/whittle](https://github.com/padmanabhan-r/whittle) | Finds wasted model spend in an agent, fixes it in code, proves the saving from traces. | 109 commits; whittleai.site; [video](https://youtu.be/J1PHhwzYoHk) | All three tools used substantively |
+| [sanchit940/nightwatch-agent](https://github.com/sanchit940/nightwatch-agent) | DevOps on-call agent: investigates incidents and changes infrastructure only after an approval bound to the exact change. Same "on-call" framing as Nightly, but for infrastructure, not AI agents. | 60 commits; has a SUBMISSION.md | — |
+| [Saber1Y/Once](https://github.com/Saber1Y/Once) | Verification layer placed in front of a support agent. | 37 commits | — |
+
+Lower-effort projects in the same space: [Zaygal/ouroboros](https://github.com/Zaygal/ouroboros), [zzeeyyaahh/ouroboros-neathack](https://github.com/zzeeyyaahh/ouroboros-neathack), [subhamm-dmg/neatlogs](https://github.com/subhamm-dmg/neatlogs) (AgentDoctor, 6 commits), [MD-Sharik/guardian](https://github.com/MD-Sharik/guardian), [Abdullah-m7/neat-rescue](https://github.com/Abdullah-m7/neat-rescue), [mohammadfahimhaque/sentinelops-ai](https://github.com/mohammadfahimhaque/sentinelops-ai), [Pierce05/pocket-startup](https://github.com/Pierce05/pocket-startup).
+
+## Strong projects that don't overlap with Nightly
+- [HighnessAtharva/firstrun](https://github.com/HighnessAtharva/firstrun): runs a project's quickstart in a clean container and fixes the first step that breaks. 239 commits, **5 YouTube videos**, live site. Quickstarts finished went from 2/4 to 3/4. **The most polished submission I saw.**
+- [Timidan/resurgo](https://github.com/Timidan/resurgo): repairs repos that have stopped building, verified in a second clean container; has a GitHub App. 133 commits, live site.
+- [edycutjong/cair](https://github.com/edycutjong/cair): prize-payout planner with sourced rules. 100 commits, live, [video](https://youtu.be/UC7pSo3hUlk), 5 X posts, but no Entire checkpoint trailers.
+- [akarsh-dhingra/SpeedRadar-NeetHack](https://github.com/akarsh-dhingra/SpeedRadar-NeetHack) (Spend Radar): competitor spend analysis using Crustdata. 117 commits, evidence site that maps every judging requirement.
+- [imprint-hash/detour](https://github.com/imprint-hash/detour): fleet dispatcher. Only 16 commits, but **the deepest neatlogs use I saw**: custom detections, a 👎 button that creates a new detection, neatlogs-raised fixes marked resolved. It also has a public cfo.ai share link.
+- [shivanshjain456/neatHack](https://github.com/shivanshjain456/neatHack) (VeriFix): verified-patch agent. 74 commits, 175 tests, verify page.
+- [Vaibhaav-Tiwari/neatlogs-hack](https://github.com/Vaibhaav-Tiwari/neatlogs-hack) (Tally): budget router for a fleet of coding agents, published on npm. 331 commits.
+- [DurgaPritam/neatHack-QBITS-](https://github.com/DurgaPritam/neatHack-QBITS-) (PreJudge): scores submissions against the neatHack rubric, live. Judges may find it fun.
+- Others with live demos: [PhiBao/verbatim](https://github.com/PhiBao/verbatim) (fly.dev plus video), [warsang/vendorlens](https://github.com/warsang/vendorlens), [isHeSatoshi/paperci](https://github.com/isHeSatoshi/paperci), [JMadhan1/tenantguard](https://github.com/JMadhan1/tenantguard) (Loom video; Render site down), [Shivam-sopho/release-gate-agent](https://github.com/Shivam-sopho/release-gate-agent) (video), [emreozyoruk/crashtest](https://github.com/emreozyoruk/crashtest), [PugarHuda/jangkau](https://github.com/PugarHuda/jangkau), [shubhasai/droid-monkey](https://github.com/shubhasai/droid-monkey), [itssaharsh/crossfoot](https://github.com/itssaharsh/crossfoot), [Eartherai/zerodrop](https://github.com/Eartherai/zerodrop), [romilp619/upshift](https://github.com/romilp619/upshift), [Proofofaudit/poa-neathack](https://github.com/Proofofaudit/poa-neathack), [Chinteyley/releasecrew](https://github.com/Chinteyley/releasecrew).
+
+## Top 8 threats
+1. **FirstRun.** The best demo-video and polish package (5 videos, live app), real before/after numbers, and a 183-line build log. The video is worth 20% of the score.
+2. **Mend.** Very rigorous evidence, X posts, a hosted video and a pre-registered keep/revert gate. It overlaps with Nightly's "fix the agent and prove it by replay" story.
+3. **Whodunit.** The most direct overlap: commit plus Entire checkpoint intent plus replay verification plus a cost count. Every commit has a checkpoint and the build log is long. Its weakness is that I found no video or X posts.
+4. **Preflight.** A full judge evidence table, an AWS deployment, two videos and cfo.ai built through MCP. It also overlaps on "fix agents".
+5. **Bladerunner.** A production agent watchdog with stronger evaluation than most entries (held-out traces plus AgentDojo). It writes back into neatlogs. Its video is pending.
+6. **Roster.** By far the most commits (396), statistically tested claims and a live product.
+7. **Dailies.** A video, a live app and X posts, and it shows off Entire very well, which matters with two Entire judges.
+8. **Detour / Whittle (tie).** Detour has the most native neatlogs use, which fits the 25% tool weighting and the neatlogs judges. Whittle has a video, a live site and all three tools used for real.
+
+Also worth watching: AgentBisect (same idea as Nightly, strong Entire use), Pitstop (a real PR and 0/6 → 6/6 on two agents), Resurgo and Kedge.
+
+## What sets Nightly apart, and where it is behind
+- **Different from everyone above:** most overlapping projects fix agents in a dev or eval loop. Nightly is the only one I found that does **production on-call**: silent-failure detection, damage priced through cfo.ai unit economics, reversible rollback or failover, and Slack paging. It also ships as a hosted product plus a PyPI SDK.
+- **Behind the leaders:** they have more commits, published videos, and more #neatHack posts linked. Building in public is 15% of the score and the video 20%.
+
+Sources: [neatlogs.com/hackathon](https://neatlogs.com/hackathon), [luma.com/s5blr882](https://luma.com/s5blr882), the GitHub repos linked above.</result>
+<usage><subagent_tokens>104239</subagent_tokens><tool_uses>18</tool_uses><duration_ms>343494</duration_ms></usage>
+</task-notification>
+
+---
+
+yes

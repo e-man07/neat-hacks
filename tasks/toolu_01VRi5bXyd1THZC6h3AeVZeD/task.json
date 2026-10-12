@@ -1,0 +1,15 @@
+{
+  "tool_use_id": "toolu_01VRi5bXyd1THZC6h3AeVZeD",
+  "agent_id": "aabbb968b8fdac2e0",
+  "subagent_type": "general-purpose",
+  "task_description": "Research neatHack competitor projects",
+  "token_usage": {
+    "input_tokens": 30,
+    "cache_creation_tokens": 99244,
+    "cache_read_tokens": 859073,
+    "output_tokens": 13119,
+    "api_call_count": 15
+  },
+  "started_at": "2026-10-12T14:45:04.200061+05:30",
+  "completed_at": "2026-10-12T14:50:47.59347+05:30"
+}
