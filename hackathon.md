@@ -77,6 +77,7 @@ Aman Jha ([@WhyParabola](https://x.com/WhyParabola)).
 - `nightly-sdk` published on PyPI (0.1.0, then 0.1.1 with a full description). Fixed packaging found on the way: the `nightshift_sdk` shim wasn't shipped and the `NIGHTSHIFT_*` env fallback was lost in the rename.
 - Reviewed 21 other public neatHack repos and the market (agent observability vs AI SRE tools). About 9 build agents that debug or fix other agents; none combines a live production agent, $ pricing, reversible containment and a hosted product. Acted on it: `/judge` page mapping each criterion to evidence; a one-click guided "3 AM incident" in the sandbox with a live $-lost counter; incidents now show confidence, traces cited and each policy check; a Slack message preview and a comparison table on the landing page; README opening with proof numbers.
 - Built in public: first #neatHack post with the explainer video: https://x.com/WhyParabola/status/2109333155702571151
+- Second #neatHack post (Oct 12): https://x.com/WhyParabola/status/2109581037995233462
 - Slack connected to the live product.
 - Entire checkpoints moved from temporary `_entire/*` branches to `refs/entire/checkpoints/*` (31 refs) and the repo mirrored on entire.io; all 7 checkpoint links in the evidence now open.
 - Moved the site to https://nightly.whyparabola.online and renamed the repo to `e-man07/nightly`; the API allows the new origin and Slack links point to it.
