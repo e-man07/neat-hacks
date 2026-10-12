@@ -157,7 +157,7 @@ export default function HeroIncident({ inc }: { inc: Incident }) {
           <div className="flex items-center gap-2 text-[12px] text-[#616061]">
             <SlackMark size={14} /> <b className="text-[#1d1c1d]">Nightly</b> · #incidents · 3:08 AM
           </div>
-          <div className="mt-1.5 text-[14px] font-semibold leading-snug">✅ Handled — {inc.atRisk} prevented</div>
+          <div className="mt-1.5 text-[14px] font-semibold leading-snug">✅ Handled — {inc.prevented} prevented</div>
           <div className="mt-0.5 text-[12.5px] text-[#616061]">Fix PR waiting for your approval.</div>
           <div className="mt-2.5 flex gap-2">
             <span className="rounded-md bg-[#007a5a] px-2.5 py-1 text-[12px] font-bold" style={{ color: "#fff" }}>

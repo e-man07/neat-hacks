@@ -15,6 +15,8 @@ export type HeroIncident = {
   diagnosis: string;
   lossPerMin: string;
   atRisk: string;
+  /** at risk minus what was lost before containment (loss rate × detect + contain time) */
+  prevented: string;
   secondsToContain: string;
   replay: string;
   correctBefore: number;
@@ -44,6 +46,8 @@ export function heroIncident(): HeroIncident {
     diagnosis: title("diagnosis").replace(/\s*\(.*\)$/, ""),
     lossPerMin: usd(r.loss_per_minute ?? 0, 2),
     atRisk: usd(r.projected_loss_if_waiting ?? 0),
+    prevented: usd(Math.max((r.projected_loss_if_waiting ?? 0)
+      - ((r.loss_per_minute ?? 0) * ((r.seconds_to_detect ?? 0) + (r.seconds_detect_to_mitigate ?? 0))) / 60, 0)),
     secondsToContain: String(r.seconds_detect_to_mitigate ?? ""),
     replay: `${r.replay}/${r.replay_n}`,
     correctBefore: Math.round(r.before.correct_rate * 100),

@@ -134,10 +134,9 @@ export default function Story({ inc }: { inc: HeroIncident }) {
         <Card label="verification">
           <div className="space-y-3 text-[15px]">
             <Check>Replayed the failed runs: {inc.replay} pass</Check>
-            <Check>The incident’s neatlogs detection stopped firing</Check>
             <Check>Correct answers back to {inc.correctAfter}%</Check>
           </div>
-          <div className="mt-5 text-[13px] text-muted">If either check fails, Nightly undoes its own fix and pages you.</div>
+          <div className="mt-5 text-[13px] text-muted">If a check fails, Nightly undoes its own fix and pages you.</div>
         </Card>
       ),
     },
@@ -157,7 +156,7 @@ export default function Story({ inc }: { inc: HeroIncident }) {
             release={inc.release}
             seconds={String(Math.round(Number(inc.secondsToContain)))}
             replay={inc.replay}
-            saved={inc.atRisk}
+            saved={inc.prevented}
           />
         </div>
       ),
