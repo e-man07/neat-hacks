@@ -274,7 +274,7 @@ export default function SandboxPage() {
           <ChatFeed
             items={feed.slice(0, 25)}
             lost={active ? lost : 0}
-            lostLabel={!active ? "Lost to bad answers" : contained && shown >= 4 ? "Lost before the rollback" : "Lost so far"}
+            lostLabel={!active ? "Refunded that shouldn’t have been" : contained && shown >= 4 ? "Wrongly refunded before the rollback" : "Wrongly refunded so far"}
             running={!!state?.traffic.running}
           />
         </section>
