@@ -2,6 +2,7 @@
 
 import { OUTCOME_COLOR, clockTime, money, type Conversation } from "@/lib/api";
 import { Label } from "../ui";
+import { plain } from "../sandbox/text";
 
 const LABEL: Record<string, string> = {
   correct: "resolved",
@@ -37,7 +38,7 @@ export default function TrafficFeed({ items, offset = 0 }: { items: Conversation
                 </span>
               </div>
               <div className="mt-1 truncate text-[12.5px] text-white/80">“{c.message}”</div>
-              <div className="truncate text-[12px] text-white/40">{c.error ? `⚠ ${c.error}` : c.reply}</div>
+              <div className="truncate text-[12px] text-white/40">{c.error ? `⚠ ${c.error}` : plain(c.reply)}</div>
             </div>
           );
         })}
