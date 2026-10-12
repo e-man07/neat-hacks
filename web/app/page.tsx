@@ -242,7 +242,7 @@ export default function Home() {
               </div>
             ))}
           </div>
-          <p className="mt-3 font-mono text-[11.5px] text-faint">{bench?.run ? `benchmark ${bench.run} · live models · staged incidents` : "loading…"}</p>
+          <p className="mt-3 font-mono text-[11.5px] text-faint">{bench?.run ? `benchmark ${bench.run} · live agents · planted incidents` : "loading…"}</p>
         </Reveal>
       </section>
 
