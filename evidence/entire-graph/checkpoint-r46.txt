@@ -1,0 +1,12 @@
+Semantic changes b50ccc2b7eac101780723ae0aecc52f9cce2672d..e26a58f17ad4af5d119de989ebeaafc7055b8929
+
+backend/harbor/releases/r46.yaml (YAML)
+  + section id added
+  + section title added
+  + section description added
+  + section max_steps added
+  + section orders_api added
+  + section tools added
+  + section flags added
+  + section system_prompt added
+
