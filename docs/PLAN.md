@@ -1,4 +1,4 @@
-# Night Shift — Build Plan
+# Nightly — Build Plan
 
 Event window: Oct 10 12:30 IST → Oct 12 submission (7:00–11:55 PM IST, final cutoff on Discord).
 Each phase is one branch and one PR, stacked on the previous phase.

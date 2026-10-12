@@ -3,7 +3,7 @@
 Entire is enabled for Claude Code in this repo (`.entire/settings.json`, git-refs checkpoints, custom redaction rules). Two uses:
 
 1. **Development**: this repo's commits carry `Entire-Checkpoint:` trailers linking each change to the coding-agent session that produced it.
-2. **Runtime provenance**: every Harbor release after r41 was written by a *separate* Claude Code session (`claude -p` with a realistic developer request). When a release causes an incident, Night Shift follows release → commit → checkpoint → the developer's prompt and the coding agent's final note, plus the entire-graph semantic change list (`nightshift/provenance.py`).
+2. **Runtime provenance**: every Harbor release after r41 was written by a *separate* Claude Code session (`claude -p` with a realistic developer request). When a release causes an incident, Nightly follows release → commit → checkpoint → the developer's prompt and the coding agent's final note, plus the entire-graph semantic change list (`nightshift/provenance.py`).
 
 ## Releases and the sessions behind them
 
@@ -151,8 +151,8 @@ branch       nightshift/p3-incidents
 ● 01M4KPVDWXBEHTK5NXGKF99PKB  "Customers say Harbor's support replies are too long and r..."
   10-10 20:07 (48838b2) Release r42: shorter, friendlier replies
 
-● 01M4KPQMJX82NDJ3VSWJRE96E5  Add Night Shift on-call agent: detection, investigation, ...
-  10-10 20:05 (00501eb) Add Night Shift on-call agent: detection, investigation, policy, containment,...
+● 01M4KPQMJX82NDJ3VSWJRE96E5  Add Nightly on-call agent: detection, investigation, ...
+  10-10 20:05 (00501eb) Add Nightly on-call agent: detection, investigation, policy, containment,...
 
 ● 01M4KPCQM4EWJC1BE79SQJSP8P  Add Harbor support agent, orders sandbox, releases, grade...
   10-10 19:59 (d305a4d) Add Harbor support agent, orders sandbox, releases, grader and traffic
